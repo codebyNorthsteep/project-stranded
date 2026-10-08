@@ -1,9 +1,12 @@
 
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/quizController');
+const quizController = require('../controllers/quizController');
 
-router.get('/api/levels/:levelId/questions', userController.getQuestionsByLevel);
+// Define the route for getting questions by level
+router.get('/api/levels/:levelId/questions', quizController.getQuestionsByLevel);
+// Define the route for validating an answer
+router.get('/api/answers/:answerId/validate', quizController.getAnswerValidation);
 
 
 module.exports = router;
