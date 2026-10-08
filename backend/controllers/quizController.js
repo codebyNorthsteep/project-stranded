@@ -12,9 +12,9 @@ exports.getQuestionsByLevel = async (req, res) => {
   }
 };
 
-exports.postAnswerForValidation = async (req, res) => {
+exports.getAnswerValidation = async (req, res) => {
   try {
-    const result = await userService.postAnswerForValidation(req.params.answerId);
+    const result = await userService.getAnswerValidation(req.params.answerId);
     res.json(result);
   } catch (err) {
     console.error(err);

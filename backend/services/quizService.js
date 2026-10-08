@@ -40,7 +40,7 @@ function getQuestionsByLevel(levelId) {
   });
 }
 
-function postAnswerForValidation(anwerId) {
+function getAnswerValidation(anwerId) {
     return new Promise((resolve, reject) => {
         const sql = `
             SELECT is_correct
@@ -49,12 +49,12 @@ function postAnswerForValidation(anwerId) {
         `;
         connectionMySQL.query(sql, [anwerId], (err, rows) => {
             if (err) reject(err);
-            resolve(rows); 
+            resolve(rows[0]); 
         });
     });
 }
 
 module.exports = {
   getQuestionsByLevel,
-  postAnswerForValidation,
+  getAnswerValidation,
 };
