@@ -5,7 +5,6 @@
 <template>
 
     <header>
-        <h1 class="title"> Stranded </h1>
         <h3 class="slogan"> your knowledge is your survival tool </h3>
     </header>
 
