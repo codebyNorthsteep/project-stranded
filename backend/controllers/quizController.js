@@ -11,3 +11,15 @@ exports.getQuestionsByLevel = async (req, res) => {
     });
   }
 };
+
+exports.postAnswerForValidation = async (req, res) => {
+  try {
+    const result = await userService.postAnswerForValidation(req.params.answerId);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "An error occurred while validating the answer" + err.message,
+    });
+  }
+};
