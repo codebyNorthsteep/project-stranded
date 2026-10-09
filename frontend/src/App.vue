@@ -5,12 +5,17 @@ import Register from "./views/Auth/Register.vue";
 
 <template>
   <header>
-    <h1 class="title">Stranded</h1>
+    <h1>Stranded</h1>
   </header>
 
   <main class="main-content">
     <RouterView />
   </main>
+
+  <footer>
+    <p class="footer-text">© 2026 Stranded. All rights reserved.</p>
+    <p>Made with ❤️ by Caroline, Gabriela och Torsten</p>
+  </footer>
 </template>
 
 <style scoped></style>
