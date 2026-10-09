@@ -18,7 +18,7 @@ const fetchQuestions = async () => {
   loading.value = true;
   try {
     const response = await fetch(
-      "http://localhost:3000/api/levels/1/questions",
+      "http://localhost:3000/api/levels/2/questions",
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -43,7 +43,9 @@ onMounted(() => {
 
     <div v-if="currentQuestion">
       <div class="question">
-        <p>{{ currentQuestion.level_id }}</p>
+        <p>{{ currentQuestion.level_name }}</p>
+        <progress :value="currentIndex + 1" :max="questions.length"></progress>
+
         <p>Fråga {{ currentIndex + 1 }} / {{ questions.length }}</p>
 
         <img
@@ -71,6 +73,8 @@ onMounted(() => {
         </ul>
       </div>
 
+      //Denna tars bort när vi implementerar pop up fönstrerna för rätt och fel
+      svar.
       <button @click="nextQuestion" :disabled="isLast">Nästa</button>
       <p v-if="isLast">Det var sista frågan!</p>
     </div>
@@ -93,15 +97,14 @@ onMounted(() => {
 }
 
 ul {
-  list-style-type: none; /* Tar bort punktlistans prickar */
-  padding: 0; /* Tar bort standardindraget till vänster */
-  margin: 0; /* Tar bort standardmarginaler */
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
 .question {
   margin-bottom: 20px;
   padding: 10px;
-  
 }
 .answers {
   margin-bottom: 20px;
