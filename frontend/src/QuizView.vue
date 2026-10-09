@@ -1,9 +1,24 @@
 <script setup>
+import "./Assets/quiz.css";
+
 import { ref, onMounted, computed } from "vue";
 const loading = ref(false);
 const error = ref(null);
 const questions = ref([]);
 const currentIndex = ref(0);
+
+const letters = ["A", "B", "C"];
+
+//Ändra bakgrundsbild beroende på level_name
+const getBackgroundId = computed(() => {
+if (!currentQuestion.value) return '';
+
+const name = currentQuestion.value.level_name?.toLowerCase();
+  if (name?.includes('skog') || name?.includes('swedish')) return 'level-background-svensk-skog';
+  if (name?.includes('amazonas')) return 'level-background-amazonas';
+  if (name?.includes('sahara')) return 'level-background-sahara';
+  return '';
+});
 
 const currentQuestion = computed(() => questions.value[currentIndex.value]);
 const isLast = computed(
@@ -18,7 +33,7 @@ const fetchQuestions = async () => {
   loading.value = true;
   try {
     const response = await fetch(
-      "http://localhost:3000/api/levels/2/questions",
+      "http://localhost:3000/api/levels/1/questions",
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -37,82 +52,66 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="quiz-container">
-    <p v-if="loading">Laddar...</p>
-    <p v-if="error">Fel: {{ error }}</p>
+  <div class="quiz-container" :id="getBackgroundId">
+    <p v-if="loading" class="status-msg">Laddar...</p>
+    <p v-if="error" class="status-msg error">Fel: {{ error }}</p>
 
-    <div v-if="currentQuestion">
-      <div class="question">
-        <p>{{ currentQuestion.level_name }}</p>
+    <div v-if="currentQuestion" class="quiz-content">
+      <div class="quiz-header">
+        <div class="level-info">
+          <p class="level-badge">
+            {{ currentQuestion.level_name }}
+          </p>
+          <span class="counter-text">
+            {{ currentIndex + 1 }}/{{ questions.length }} Questions
+          </span>
+        </div>
         <progress :value="currentIndex + 1" :max="questions.length"></progress>
+      </div>
 
-        <p>Fråga {{ currentIndex + 1 }} / {{ questions.length }}</p>
-
+      <!-- Frågeruta -->
+      <div class="question-card">
+        <p class="question-subtitle">{{ currentQuestion.question_title }}</p>
+        <h2 class="question-text">{{ currentQuestion.question_text }}</h2>
         <img
           v-if="currentQuestion.question_img"
           :src="currentQuestion.question_img"
           alt="Frågebild"
-          width="150"
+          class="question-img"
         />
-        <h2>{{ currentQuestion.question_title }}</h2>
-        <h3>{{ currentQuestion.question_text }}</h3>
       </div>
+
+      <!-- Svarsalternativ -->
       <div class="answers">
         <ul>
-          <li v-for="answer in currentQuestion.answers" :key="answer.answer_id">
-            <img
-              v-if="answer.answer_img"
-              :src="answer.answer_img"
-              alt="Svarsalternativ"
-              width="150"
-            />
-            <button>
-              {{ answer.answer_text }}
+          <li
+            v-for="(answer, i) in currentQuestion.answers"
+            :key="answer.answer_id"
+          >
+            <button class="answer-btn">
+              <span class="letter">{{ letters[i] }}</span>
+              <div class="answer-content">
+                <span class="answer-text">{{ answer.answer_text }}</span>
+                <img
+                  v-if="answer.answer_img"
+                  :src="answer.answer_img"
+                  alt="Svarsalternativ"
+                  class="answer-img"
+                />
+              </div>
             </button>
           </li>
         </ul>
       </div>
 
-      //Denna tars bort när vi implementerar pop up fönstrerna för rätt och fel
-      svar.
-      <button @click="nextQuestion" :disabled="isLast">Nästa</button>
-      <p v-if="isLast">Det var sista frågan!</p>
+      <!-- Tillfällig nästa-knapp för testning -->
+      <!-- Denna tas bort när vi implementerar pop up-fönstren för rätt/fel svar -->
+      <div class="temp-nav">
+        <button @click="nextQuestion" :disabled="isLast" class="next-btn">
+          Nästa
+        </button>
+        <p v-if="isLast" class="last-msg">Det var sista frågan!</p>
+      </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.quiz-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 20px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.question {
-  margin-bottom: 20px;
-  padding: 10px;
-}
-.answers {
-  margin-bottom: 20px;
-}
-
-button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  cursor: pointer;
-}
-</style>
