@@ -1,6 +1,4 @@
 <script setup>
-import Login from "./views/Auth/Login.vue";
-import Register from "./views/Auth/Register.vue";
 </script>
 
 <template>
