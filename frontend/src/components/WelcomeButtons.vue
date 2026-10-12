@@ -34,28 +34,6 @@ p {
   margin-bottom: 30px;
 }
 
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  font-size: 0.8rem;
-  gap: 16px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 5px 20px;
-  color: var(--text-light);
-  text-align: left;
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
- 
-.button:hover {
-  border-color: var(--accent-gold);
-  background-color: #21331f;
-}
-
 @media (min-width: 768px) and (max-width: 1023px) {
   p {
     font-size: 1.15rem;
