@@ -30,6 +30,18 @@ async function handleSubmit() {
 
     const data = await response.json();
 
+    if(!form.username && !form.password) {
+      throw new Error("Användarnamn och lösenord krävs");
+    }
+
+    if(!form.username) {
+      throw new Error("Användarnamn krävs");
+    }
+
+    if(!form.password) {
+      throw new Error("Lösenord krävs");
+    }
+
     if (!response.ok) {
       throw new Error(data.message || "Fel användarnamn eller lösenord");
     }
