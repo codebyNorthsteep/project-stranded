@@ -90,7 +90,7 @@ onMounted(() => {
             v-for="(answer, i) in currentQuestion.answers"
             :key="answer.answer_id"
           >
-            <button class="answer-btn">
+            <button class="button">
               <span class="letter">{{ letters[i] }}</span>
               <div class="answer-content">
                 <span class="answer-text">{{ answer.answer_text }}</span>
