@@ -17,6 +17,10 @@ app.use(express.static('public'));
 const quizRoute = require('./routes/quizRoutes');
 app.use(quizRoute);
 
+// Use the user routes
+const userRoute = require('./routes/userRoutes');
+app.use(userRoute);
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);   
 });

@@ -17,7 +17,7 @@ async function handleSubmit() {
 
   try {
     // Simulate an API call to a mock endpoint
-    const response = await fetch("https://reqres.in/api/login", {
+    const response = await fetch("https://localhost:3000/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
