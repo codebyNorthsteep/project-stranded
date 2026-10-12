@@ -1,28 +1,64 @@
-root {
-    --primary-color: #3498db;
-    --secondary-color: #2ecc71;
-    --error-color: #681707;
-}
-body{
-    background-color: #f5f5f5;
-}
-h1{
-    font-family: 'Arial', sans-serif;
-    font-size: 1em;
-    color: #000000;
-}
-h2{
-    font-family: 'Arial', sans-serif;
-    font-size: 0.9em;
-    color: #000000;
-}
-h3{
-    font-family: 'Arial', sans-serif;
-    font-size: 0.8em;
-    color: #000000;
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Distressed&family=Syne+Mono&family=Winky+Rough:ital,wght@0,300..900;1,300..900&display=swap%27');
+
+:root {
+  --bg-dark: #121d11;
+  --card-bg: #1a2818;
+  --accent-gold: #dca337;
+  --text-light: #f0f4f0;
+  --text-muted: #8ea38b;
+  --border-color: #273b24;
 }
 
-.error-message {
-    color: var(--error-color);
-    font-size: 0.9em;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: var(--bg-dark);
+  padding: 20px;
+}
+
+h1 {
+  font-family: 'Rubik Distressed', cursive;
+  font-size: 1.8rem;
+  color: var(--accent-gold);
+  letter-spacing: 6px;
+  font-weight: 100;
+}
+
+p {
+  color: var(--accent-gold);
+}
+
+main {
+  background-color: var(--card-bg);
+  border-top: 2px solid var(--accent-gold);
+  padding-top: 10px;
+  padding-bottom: 20px;
+  font-family: 'Syne Mono', monospace;
+}
+
+footer {
+  background-color: var(--bg-dark);
+  border-top: 2px solid var(--accent-gold);
+  padding-top: 10px;
+  font-size: 0.5rem;
+  text-align: center;
+  padding-bottom: 15px;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+
+  h1 {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+
+  h1 {
+    font-size: 4rem;
+  }
 }

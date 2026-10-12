@@ -40,6 +40,21 @@ function getQuestionsByLevel(levelId) {
   });
 }
 
+function getAnswerValidation(anwerId) {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT is_correct
+            FROM answers
+            WHERE answer_id = ?;
+        `;
+        connectionMySQL.query(sql, [anwerId], (err, rows) => {
+            if (err) reject(err);
+            resolve(rows[0]); 
+        });
+    });
+}
+
 module.exports = {
   getQuestionsByLevel,
+  getAnswerValidation,
 };

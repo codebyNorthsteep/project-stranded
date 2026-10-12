@@ -1,11 +1,19 @@
-<script setup></script>
+<script setup>
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <header>
+    <h1>Stranded</h1>
+  </header>
+
+  <main class="main-content">
+    <RouterView />
+  </main>
+
+  <footer>
+    <p class="footer-text">© 2026 Stranded. All rights reserved.</p>
+    <p>Made with ❤️ by Caroline, Gabriela och Torsten</p>
+  </footer>
 </template>
 
 <style scoped></style>
