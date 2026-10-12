@@ -1,14 +1,3 @@
-/* Färgvariabler anpassade efter skärmdumpen */
-.quiz-container {
-  --bg-dark: #121d11;
-  --card-bg: #1a2818;
-  --accent-gold: #dca337;
-  --text-light: #f0f4f0;
-  --text-muted: #8ea38b;
-  --border-color: #273b24;
-}
-
-
 .quiz-container {
   max-width: 420px;
   min-height: 100vh;
@@ -90,7 +79,6 @@
   border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 600;
-
 }
 
 /* Progress bar styling */
@@ -122,16 +110,13 @@ progress::-moz-progress-bar {
 
 .question-subtitle {
   color: var(--accent-gold);
-  font-size: 0.75rem;
-  font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin: 0 0 10px 0;
 }
 
 .question-text {
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: 14px;
   line-height: 1.4;
   margin: 0;
   color: var(--text-light);
@@ -145,7 +130,7 @@ progress::-moz-progress-bar {
   margin-top: 14px;
 }
 
-/* Svarsalternativ */
+/* Svarsalternativen */
 ul {
   list-style: none;
   padding: 0;
@@ -153,27 +138,6 @@ ul {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-/* ersätts med main.css */
-.answer-btn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 16px;
-  color: var(--text-light);
-  text-align: left;
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.answer-btn:hover {
-  border-color: var(--accent-gold);
-  background-color: #21331f;
 }
 
 .letter {
@@ -211,10 +175,10 @@ ul {
 }
 
 /* ==========================================================================
-   MEDIA QUERIES FOR TABLET & DESKTOP
+   MEDIA QUERIES FOR TABLET & DESKTOP :)
    ========================================================================== */
 
-/* Tablet och uppåt (Från 768px och uppåt) */
+
 @media (min-width: 768px) {
   .quiz-container {
     max-width: 950px;
@@ -224,18 +188,15 @@ ul {
     align-items: center;
   }
 
-  /* Gör om huvudytan till två kolumner */
+
   .quiz-content {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr; /* Vänster kolumn lite bredare för frågor/svar */
+    grid-template-columns: 1.2fr 0.8fr;
     gap: 32px;
     width: 100%;
     align-items: start;
   }
 
-  /* -----------------------------------------------------------------
-     1. VÄNSTER KOLUMN: Frågan och Svarsalternativen (Kolumn 1)
-     ----------------------------------------------------------------- */
   .question-card {
     grid-column: 1;
     grid-row: 1;
@@ -246,32 +207,26 @@ ul {
     grid-row: 2;
   }
 
-  /* -----------------------------------------------------------------
-     2. HÖGER KOLUMN: Header / Progressbar (Kolumn 2)
-     ----------------------------------------------------------------- */
   .quiz-header {
     grid-column: 2;
-    grid-row: 1 / span 2; /* Låter headern sträcka sig över hela högerkanten */
-    
-    /* Gör headern till ett eget kort precis som på skissen */
+    grid-row: 1 / span 2; 
+
+  
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 24px 20px;
-    
+
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centrerar elementen internt enligt skissen */
+    align-items: center;
     gap: 16px;
   }
 
-  /* Justera layouten inuti .level-info så elementen hamnar vertikalt i högerkortet */
   .level-info {
     flex-direction: column;
     align-items: center;
     gap: 20px;
     width: 100%;
   }
-
-
 }

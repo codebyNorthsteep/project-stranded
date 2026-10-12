@@ -32,6 +32,8 @@ const nextQuestion = () => {
 const fetchQuestions = async () => {
   loading.value = true;
   try {
+    // Hämta frågorna från API:et, denna kommer vara dynamisk med ${levelId} när vi implementerar 
+    //av att hämta levelId från URL:en baserat på när man klarat en level och går vidare till nästa (ref[])
     const response = await fetch(
       "http://localhost:3000/api/levels/1/questions",
     );
