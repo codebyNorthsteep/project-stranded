@@ -20,20 +20,20 @@ const emit = defineEmits(['restart'])
 
 <style scoped>
 .game-over {
-  text-align: center;
   box-sizing: border-box;
-  width: min(100%, 26rem);
+  width: 100%;
+  max-width: 416px;
   margin-inline: auto;
   text-align: center;
   background-color: #16230E;
-  padding: 1.5rem 1rem;
+  padding: 24px 16px;
   border-radius: 8px;
 }
 
 .game-over-title {
   margin-top: 0;
   color: #D1982A;
-  font-size: 1.5rem;
+  font-size: 24px;
 }
 
 .status-message {
@@ -48,7 +48,7 @@ const emit = defineEmits(['restart'])
 .game-over button {
   width: 100%;
   min-height: 48px;
-  padding: 0.75rem 1rem;
+  padding: 12px 16px;
   border: 0;
   border-radius: 4px;
   background-color: #28391C;
@@ -59,14 +59,14 @@ const emit = defineEmits(['restart'])
   touch-action: manipulation;
 }
 
-@media (min-width: 40rem) {
+@media (min-width: 640px) {
   .game-over {
-    padding: 2rem;
+    padding: 32px;
   }
 
   .game-over button {
     width: auto;
-    min-width: 10rem;
+    min-width: 160px;
   }
 }
 </style>
