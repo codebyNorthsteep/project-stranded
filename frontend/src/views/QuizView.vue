@@ -108,7 +108,7 @@ onMounted(() => {
       </div>
 
       <!-- Svarsalternativ -->
-      <div class="answers">
+      <div class="answers" >
         <ul>
           <li
             v-for="(answer, i) in currentQuestion.answers"
