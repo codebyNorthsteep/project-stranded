@@ -119,7 +119,18 @@ onMounted(() => {
               @click="fetchAnswerValidation(answer.answer_id)"
               :disabled="validatedAnswer"
             >
-              <span class="letter">{{ letters[i] }}</span>
+              <span class="letter">
+                <span
+                  v-if="
+                    validatedAnswer &&
+                    answer.answer_id === selectedAnswerId &&
+                    validatedAnswer.is_correct
+                  "
+                  >✔</span
+                >
+                <span v-else>{{ letters[i] }}</span>
+              </span>
+
               <div class="answer-content">
                 <span class="answer-text">{{ answer.answer_text }}</span>
                 <img
