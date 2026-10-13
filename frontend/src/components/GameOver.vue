@@ -1,4 +1,6 @@
 <script setup>
+import { useRouter } from 'vue-router'
+
 defineProps({
   score: {
     type: Number,
@@ -7,14 +9,20 @@ defineProps({
 })
 
 const emit = defineEmits(['restart'])
+const router = useRouter()
+
+function goToMenu() {
+  router.push({ name: 'Welcome' })
+}
 </script>
 
 <template>
   <section class="game-over">
     <h2 class="game-over-title">Spelet är slut</h2>
-    <p class="status-message">Du förlorade!</p>
+    <p class="status-message">Du skulle dö!</p>
     <p class="score">Poäng: {{ score }}</p>
     <button @click="emit('restart')">Spela igen</button>
+    <button @click="goToMenu">Till startmenyn</button>
   </section>
 </template>
 
@@ -63,7 +71,8 @@ const emit = defineEmits(['restart'])
   .game-over {
     padding: 32px;
   }
-
+  }
+@media (min-width: 640px) {
   .game-over button {
     width: auto;
     min-width: 160px;
