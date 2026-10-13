@@ -12,46 +12,52 @@ const form = reactive({
 });
 
 async function handleSubmit() {
-  isSubmitting.value = true;
   errorMessage.value = "";
 
+  // Validate form inputs
+  if (!form.username && !form.password) {
+    throw new Error("Användarnamn och lösenord krävs");
+  }
+
+  if (!form.username) {
+    throw new Error("Användarnamn krävs");
+  }
+
+  if (!form.password) {
+    throw new Error("Lösenord krävs");
+  }
+
+  isSubmitting.value = true;
+
+  // Send login request to the backend
   try {
-    // Simulate an API call to a mock endpoint
-    const response = await fetch("https://localhost:3000/api/login", {
+    const response = await fetch("http://localhost:3000/api/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: form.username,
+        usernameOrEmail: form.username,
         password: form.password,
       }),
     });
 
     const data = await response.json();
 
-    if(!form.username && !form.password) {
-      throw new Error("Användarnamn och lösenord krävs");
-    }
-
-    if(!form.username) {
-      throw new Error("Användarnamn krävs");
-    }
-
-    if(!form.password) {
-      throw new Error("Lösenord krävs");
-    }
-
     if (!response.ok) {
-      throw new Error(data.message || "Fel användarnamn eller lösenord");
+      throw new Error(data.message || data.error || "Fel användarnamn eller lösenord");
     }
 
+    //Save the token in localStorage for future authenticated requests
     if (data.token) {
       localStorage.setItem("user_token", data.token);
+      if (data.user) {
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
     }
 
-    // Redirect to the quiz 'my-page' after successful login
-    router.push("/quiz"); 
+    // Redirect to the quiz after successful login
+    router.push("/quiz");
 
   } catch (error) {
     errorMessage.value = error.message;
@@ -64,7 +70,6 @@ async function handleSubmit() {
 <template>
   <div class="login-form">
     <form @submit.prevent="handleSubmit" novalidate>
-      
       <div class="field">
         <label for="username" class="form-label"
           >Användarnamn eller e-postadress</label
