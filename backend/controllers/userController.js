@@ -10,19 +10,19 @@ exports.loginUser = async (req, res) => {
     if (!usernameOrEmail || !password) {
       return res
         .status(400)
-        .json({ error: "Username/email and password are required" });
+        .json({ error: "Användarnamn/e-post och lösenord krävs." });
     }
     
     //2. Check if user exists in database
     const user = await userService.getUserByUsernameOrEmail(usernameOrEmail);
     if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: "Ogiltiga inloggningsuppgifter" });
     }
 
     //3. Compare password with hashed password in database
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return res.status(401).json({ error: "Ogiltiga inloggningsuppgifter" });
     }
 
     //4. Generate JWT token
