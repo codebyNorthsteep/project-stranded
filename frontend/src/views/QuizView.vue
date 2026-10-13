@@ -108,6 +108,8 @@ onMounted(() => {
             v-for="(answer, i) in currentQuestion.answers"
             :key="answer.answer_id"
           >
+          <!-- Eftersom att vi vid fel svar kommer visa att det är fel via en popup-ruta, 
+           så finns det just nu endast logik för svar som är korrekta -->
             <button
               class="button"
               :class="{
