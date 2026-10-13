@@ -3,7 +3,7 @@ const connectionMySQL = require("./../connectionMySQL");
 function getUserByUsernameOrEmail(usernameOrEmail) {
   return new Promise((resolve, reject) => {
     const sql = `
-        SELECT id, username, email, password 
+        SELECT user_id, username, email, password_hash
         FROM users 
         WHERE username = ? OR email = ?
         LIMIT 1;
@@ -12,7 +12,9 @@ function getUserByUsernameOrEmail(usernameOrEmail) {
       sql,
       [usernameOrEmail, usernameOrEmail],
       (err, rows) => {
-        if (err) reject(err);
+        if (err) {
+          return reject(err);
+        }
         resolve(rows.length > 0 ? rows[0] : null);
       },
     );
