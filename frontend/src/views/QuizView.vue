@@ -115,6 +115,8 @@ onMounted(() => {
                   validatedAnswer &&
                   answer.answer_id === selectedAnswerId &&
                   validatedAnswer.is_correct,
+                'dimmed-answer':
+                  validatedAnswer && answer.answer_id !== selectedAnswerId,
               }"
               @click="fetchAnswerValidation(answer.answer_id)"
               :disabled="validatedAnswer"
@@ -145,7 +147,8 @@ onMounted(() => {
         </ul>
       </div>
 
-      <div class="temp-nav" v-if="validatedAnswer">
+      <div class="next-question" v-if="validatedAnswer && validatedAnswer.is_correct">
+        <div class="correct-msg">Korrekt svar!</div>
         <button @click="nextQuestion" class="button">Nästa fråga</button>
       </div>
     </div>
