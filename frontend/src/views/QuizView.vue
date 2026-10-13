@@ -62,10 +62,10 @@ onMounted(() => {
       <div class="quiz-header">
         <div class="level-info">
           <p class="level-badge">
-            {{ currentQuestion.level_name }}
+          Nivå:  {{ currentQuestion.level_name }}
           </p>
           <span class="counter-text">
-            {{ currentIndex + 1 }}/{{ questions.length }} Questions
+           Fråga {{ currentIndex + 1 }}/{{ questions.length }}
           </span>
         </div>
         <progress :value="currentIndex + 1" :max="questions.length"></progress>
