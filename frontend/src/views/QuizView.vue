@@ -7,6 +7,7 @@ const error = ref(null);
 const questions = ref([]);
 const currentIndex = ref(0);
 
+const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
 
 const letters = ["A", "B", "C"];
@@ -31,13 +32,12 @@ const isLast = computed(
 const nextQuestion = () => {
   currentIndex.value++;
   validatedAnswer.value = null;
+  selectedAnswerId.value = null;
 };
 
 const fetchQuestions = async () => {
   loading.value = true;
   try {
-    // Hämta frågorna från API:et, denna kommer vara dynamisk med ${levelId} när vi implementerar
-    //av att hämta levelId från URL:en baserat på när man klarat en level och går vidare till nästa (ref[])
     const response = await fetch(
       "http://localhost:3000/api/levels/1/questions",
     );
@@ -52,25 +52,19 @@ const fetchQuestions = async () => {
   }
 };
 
-const fetchAnswerValidation = async (ANSWER_ID) => {
-  loading.value = true;
+const fetchAnswerValidation = async (answerId) => {
+  selectedAnswerId.value = answerId;
+
   try {
     const response = await fetch(
-      `http://localhost:3000/api/answers/${ANSWER_ID}/validate`,
+      `http://localhost:3000/api/answers/${answerId}/validate`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     validatedAnswer.value = await response.json();
-    if (validatedAnswer.value.is_correct) {
-      alert("Rätt svar!");
-    } else {
-      alert("Fel svar. Försök igen!");
-    }
   } catch (err) {
     error.value = err.message;
-  } finally {
-    loading.value = false;
   }
 };
 
@@ -108,7 +102,7 @@ onMounted(() => {
       </div>
 
       <!-- Svarsalternativ -->
-      <div class="answers" >
+      <div class="answers">
         <ul>
           <li
             v-for="(answer, i) in currentQuestion.answers"
@@ -116,6 +110,12 @@ onMounted(() => {
           >
             <button
               class="button"
+              :class="{
+                'correct-answer':
+                  validatedAnswer &&
+                  answer.answer_id === selectedAnswerId &&
+                  validatedAnswer.is_correct,
+              }"
               @click="fetchAnswerValidation(answer.answer_id)"
               :disabled="validatedAnswer"
             >
