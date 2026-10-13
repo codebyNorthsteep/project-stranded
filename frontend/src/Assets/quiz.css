@@ -118,8 +118,10 @@ progress::-moz-progress-bar {
 .question-text {
   font-size: 14px;
   line-height: 1.4;
+  letter-spacing: 0.08em;
   margin: 0;
   color: var(--text-light);
+  font-weight: 300;
 }
 
 .question-img {
@@ -199,11 +201,13 @@ ul {
 }
 
 .correct-msg {
-  padding: 8px 12px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #1ad920;
-  border: 1px solid #1ad920;
-  background-color: black;
+  border-color: #1ad920;
+  padding: 5px 20px;
+  color: var(--text-light);
+
 }
 
 .next-question {
@@ -211,6 +215,10 @@ ul {
   flex-direction: column;
   align-items: center;
   gap: 16px;
+}
+
+.next-question .button {
+width: 40%;
 }
 
 /* ==========================================================================
