@@ -30,7 +30,7 @@ exports.loginUser = async (req, res) => {
     const token = jwt.sign(
       { id: user.user_id, username: user.username },
       secretKey,
-      { expiresIn: "7d" },
+      { expiresIn: '1h' },
     );
 
     //5. Return token and user info
