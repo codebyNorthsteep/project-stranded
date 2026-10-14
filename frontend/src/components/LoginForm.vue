@@ -15,17 +15,18 @@ async function handleSubmit() {
   errorMessage.value = "";
 
   // Validate form inputs
-  if (!form.username && !form.password) {
-    throw new Error("Användarnamn och lösenord krävs");
-  }
-
-  if (!form.username) {
-    throw new Error("Användarnamn krävs");
-  }
-
-  if (!form.password) {
-    throw new Error("Lösenord krävs");
-  }
+if (!form.username && !form.password) {
+  errorMessage.value = "Användarnamn och lösenord krävs";
+  return;
+}
+if (!form.username) {
+  errorMessage.value = "Användarnamn krävs";
+  return;
+}
+if (!form.password) {
+  errorMessage.value = "Lösenord krävs";
+  return;
+}
 
   isSubmitting.value = true;
 
