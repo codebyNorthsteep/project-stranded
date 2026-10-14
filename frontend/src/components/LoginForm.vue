@@ -11,28 +11,30 @@ const form = reactive({
   password: "",
 });
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+
 async function handleSubmit() {
   errorMessage.value = "";
 
   // Validate form inputs
-if (!form.username && !form.password) {
-  errorMessage.value = "Användarnamn och lösenord krävs";
-  return;
-}
-if (!form.username) {
-  errorMessage.value = "Användarnamn krävs";
-  return;
-}
-if (!form.password) {
-  errorMessage.value = "Lösenord krävs";
-  return;
-}
+  if (!form.username && !form.password) {
+    errorMessage.value = "Användarnamn och lösenord krävs";
+    return;
+  }
+  if (!form.username) {
+    errorMessage.value = "Användarnamn krävs";
+    return;
+  }
+  if (!form.password) {
+    errorMessage.value = "Lösenord krävs";
+    return;
+  }
 
   isSubmitting.value = true;
 
   // Send login request to the backend
   try {
-    const response = await fetch("http://localhost:3000/api/login", {
+    const response = await fetch(`${apiBaseUrl}/api/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,7 +48,9 @@ if (!form.password) {
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.message || data.error || "Fel användarnamn eller lösenord");
+      throw new Error(
+        data.message || data.error || "Fel användarnamn eller lösenord",
+      );
     }
 
     //Save the token in localStorage for future authenticated requests
@@ -59,7 +63,6 @@ if (!form.password) {
 
     // Redirect to the quiz after successful login
     router.push("/quiz");
-
   } catch (error) {
     errorMessage.value = error.message;
   } finally {
