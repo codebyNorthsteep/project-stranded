@@ -6,6 +6,10 @@ defineProps({
     type: Number,
     default: 0,
   },
+  explanation: {
+    type: String,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['restart'])
@@ -20,6 +24,7 @@ function goToMenu() {
   <section class="game-over">
     <h2 class="game-over-title">Spelet är slut</h2>
     <p class="status-message">Du skulle dö!</p>
+    <p v-if="explanation" class="explanation">{{ explanation }}</p>
     <p class="score">Poäng: {{ score }}</p>
     <button @click="emit('restart')">Spela igen</button>
     <button @click="goToMenu">Till startmenyn</button>
