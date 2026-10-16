@@ -3,14 +3,14 @@
     <div class="login">
       <p>Logga in och börja din resa</p>
       <router-link to="/login" class="button" role="button">
-        log in
+        Logga in
       </router-link>
     </div>
 
     <div class="register">
       <p>eller registrera dig</p>
       <router-link to="/register" class="button" role="button">
-        register
+        Registrera dig
       </router-link>
     </div>
   </div>
