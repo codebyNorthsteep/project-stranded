@@ -7,17 +7,21 @@ const error = ref(null);
 const questions = ref([]);
 const currentIndex = ref(0);
 
+const selectedAnswerId = ref(null);
+const validatedAnswer = ref(null);
+
 const letters = ["A", "B", "C"];
 
 //Ändra bakgrundsbild beroende på level_name
 const getBackgroundId = computed(() => {
-if (!currentQuestion.value) return '';
+  if (!currentQuestion.value) return "";
 
-const name = currentQuestion.value.level_name?.toLowerCase();
-  if (name?.includes('skog') || name?.includes('swedish')) return 'level-background-svensk-skog';
-  if (name?.includes('amazonas')) return 'level-background-amazonas';
-  if (name?.includes('sahara')) return 'level-background-sahara';
-  return '';
+  const name = currentQuestion.value.level_name?.toLowerCase();
+  if (name?.includes("skog") || name?.includes("swedish"))
+    return "level-background-svensk-skog";
+  if (name?.includes("amazonas")) return "level-background-amazonas";
+  if (name?.includes("sahara")) return "level-background-sahara";
+  return "";
 });
 
 const currentQuestion = computed(() => questions.value[currentIndex.value]);
@@ -26,14 +30,17 @@ const isLast = computed(
 );
 
 const nextQuestion = () => {
-  if (!isLast.value) currentIndex.value++;
+  if (!isLast.value) {
+    currentIndex.value++;
+      validatedAnswer.value = null;
+  selectedAnswerId.value = null;
+  }
+
 };
 
 const fetchQuestions = async () => {
   loading.value = true;
   try {
-    // Hämta frågorna från API:et, denna kommer vara dynamisk med ${levelId} när vi implementerar 
-    //av att hämta levelId från URL:en baserat på när man klarat en level och går vidare till nästa (ref[])
     const response = await fetch(
       "http://localhost:3000/api/levels/1/questions",
     );
@@ -45,6 +52,26 @@ const fetchQuestions = async () => {
     error.value = err.message;
   } finally {
     loading.value = false;
+  }
+};
+
+const fetchAnswerValidation = async (answerId) => {
+  selectedAnswerId.value = answerId;
+
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/answers/${answerId}/validate`,
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const result = await response.json();
+
+    if (selectedAnswerId.value === answerId) {
+      validatedAnswer.value = result;
+    }
+  } catch (err) {
+    error.value = err.message;
   }
 };
 
@@ -61,11 +88,9 @@ onMounted(() => {
     <div v-if="currentQuestion" class="quiz-content">
       <div class="quiz-header">
         <div class="level-info">
-          <p class="level-badge">
-          Nivå:  {{ currentQuestion.level_name }}
-          </p>
+          <p class="level-badge">Nivå: {{ currentQuestion.level_name }}</p>
           <span class="counter-text">
-           Fråga {{ currentIndex + 1 }}/{{ questions.length }}
+            Fråga {{ currentIndex + 1 }}/{{ questions.length }}
           </span>
         </div>
         <progress :value="currentIndex + 1" :max="questions.length"></progress>
@@ -90,8 +115,33 @@ onMounted(() => {
             v-for="(answer, i) in currentQuestion.answers"
             :key="answer.answer_id"
           >
-            <button class="button">
-              <span class="letter">{{ letters[i] }}</span>
+          <!-- Eftersom att vi vid fel svar kommer visa att det är fel via en popup-ruta, 
+           så finns det just nu endast logik för svar som är korrekta -->
+            <button
+              class="button"
+              :class="{
+                'correct-answer':
+                  validatedAnswer &&
+                  answer.answer_id === selectedAnswerId &&
+                  validatedAnswer.is_correct,
+                'dimmed-answer':
+                  validatedAnswer && answer.answer_id !== selectedAnswerId,
+              }"
+              @click="fetchAnswerValidation(answer.answer_id)"
+              :disabled="validatedAnswer"
+            >
+              <span class="letter">
+                <span
+                  v-if="
+                    validatedAnswer &&
+                    answer.answer_id === selectedAnswerId &&
+                    validatedAnswer.is_correct
+                  "
+                  >✔</span
+                >
+                <span v-else>{{ letters[i] }}</span>
+              </span>
+
               <div class="answer-content">
                 <span class="answer-text">{{ answer.answer_text }}</span>
                 <img
@@ -106,13 +156,9 @@ onMounted(() => {
         </ul>
       </div>
 
-      <!-- Tillfällig nästa-knapp för testning -->
-      <!-- Denna tas bort när vi implementerar pop up-fönstren för rätt/fel svar -->
-      <div class="temp-nav">
-        <button @click="nextQuestion" :disabled="isLast" class="next-btn">
-          Nästa
-        </button>
-        <p v-if="isLast" class="last-msg">Det var sista frågan!</p>
+      <div class="next-question" v-if="validatedAnswer && validatedAnswer.is_correct">
+        <div class="correct-msg">Korrekt svar!</div>
+        <button v-if="!isLast" @click="nextQuestion" class="button">Nästa fråga</button>
       </div>
     </div>
   </div>

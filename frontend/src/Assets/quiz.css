@@ -9,7 +9,7 @@
 }
 
 #level-background-svensk-skog {
-  background-image: url(https://images.pexels.com/photos/7341995/pexels-photo-7341995.jpeg?cs=srgb&dl=pexels-l-a-17372988-7341995.jpg&fm=jpg&w=2736&h=3648&_gl=1*8cglxj*_ga*MTg0OTE1NzY4My4xNzg5NTYwMDIx*_ga_8JE65Q40S6*czE3OTE0NTk1NDQkbzMkZzAkdDE3OTE0NTk1NDQkajYwJGwwJGgw);
+  background-image: url(https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Stig_i_svensk_skog.jpg/960px-Stig_i_svensk_skog.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20220531181304);
   background-size: cover;
   background-position: center;
 }
@@ -118,8 +118,10 @@ progress::-moz-progress-bar {
 .question-text {
   font-size: 14px;
   line-height: 1.4;
+  letter-spacing: 0.08em;
   margin: 0;
   color: var(--text-light);
+  font-weight: 300;
 }
 
 .question-img {
@@ -172,6 +174,51 @@ ul {
   max-height: 120px;
   object-fit: cover;
   border-radius: 6px;
+}
+
+.correct-answer {
+  border-color: #1ad920;
+  color: #1ad920;
+  transform: scale(1.10);
+}
+
+.button.dimmed-answer {
+  filter: blur(2px);     /* Gör knappen suddig */
+  opacity: 0.8;          /* Drar ner genomskinligheten lite */
+  pointer-events: none;  /* Gör att man inte kan klicka på de andra knapparna mer */
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+
+.button.correct-answer .letter {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #1ad920;
+}
+
+.correct-msg {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  border-color: #1ad920;
+  padding: 5px 20px;
+  color: var(--text-light);
+
+}
+
+.next-question {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.next-question .button {
+width: 40%;
 }
 
 /* ==========================================================================

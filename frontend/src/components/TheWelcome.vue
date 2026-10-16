@@ -5,7 +5,7 @@ import EnvironmentCard from './EnvironmentCard.vue'
 const quizImages = ref([
   {
     id: 1,
-    src: "https://images.pexels.com/photos/7341995/pexels-photo-7341995.jpeg?cs=srgb&dl=pexels-l-a-17372988-7341995.jpg&fm=jpg&w=2736&h=3648&_gl=1*8cglxj*_ga*MTg0OTE1NzY4My4xNzg5NTYwMDIx*_ga_8JE65Q40S6*czE3OTE0NTk1NDQkbzMkZzAkdDE3OTE0NTk1NDQkajYwJGwwJGgw",
+    src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Stig_i_svensk_skog.jpg/960px-Stig_i_svensk_skog.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20220531181304",
     alt: "Svensk Skog nivå 1",
     info: "Den svenska skogen är en av de mest artrika miljöerna i Sverige. Här finns många olika växter och djur som lever i symbios med varandra.",
     title: "Svensk Skog",
