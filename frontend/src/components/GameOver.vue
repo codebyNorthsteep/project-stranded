@@ -2,10 +2,6 @@
 import { useRouter } from 'vue-router'
 
 defineProps({
-  score: {
-    type: Number,
-    default: 0,
-  },
   explanation: {
     type: String,
     default: '',
@@ -25,14 +21,40 @@ function goToMenu() {
     <h2 class="game-over-title">Spelet är slut</h2>
     <p class="status-message">Du skulle dö!</p>
     <p v-if="explanation" class="explanation">{{ explanation }}</p>
-    <p class="score">Poäng: {{ score }}</p>
     <button @click="emit('restart')">Spela igen</button>
     <button @click="goToMenu">Till startmenyn</button>
   </section>
 </template>
 
 <style scoped>
+:global(html),
+:global(body) {
+  min-height: 100%;
+  background-color: var(--bg-dark);
+}
+
+:global(#app) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+:global(header),
+:global(footer) {
+  flex-shrink: 0;
+}
+
+:global(main) {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
 .game-over {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
   width: 100%;
   max-width: 416px;
   margin-inline: auto;
@@ -47,8 +69,8 @@ function goToMenu() {
   font-size: 24px;
 }
 
-.score {
-  font-weight: 700;
+.game-over button:first-of-type {
+  margin-top: auto;
 }
 
 .game-over button {
@@ -65,6 +87,10 @@ function goToMenu() {
   touch-action: manipulation;
 }
 
+.game-over button + button {
+  margin-top: 12px;
+}
+
 @media (min-width: 640px) {
   .game-over {
     padding: 32px;
@@ -73,6 +99,10 @@ function goToMenu() {
   .game-over button {
     width: auto;
     min-width: 160px;
+  }
+
+  .game-over button + button {
+    margin-top: 12px;
   }
 }
 </style>
