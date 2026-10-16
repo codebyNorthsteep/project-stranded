@@ -24,13 +24,13 @@ function getUserByUsernameOrEmail(username, email) {
 function createUser (username, email, hashedPassword){
   return new Promise((resolve, reject) => {
     const sql = `
-        INSERT INTO username, email, password_hash
+        INSERT INTO users (username, email, password_hash)
         VALUES (?, ?, ?)
         `;
     connectionMySQL.query(
       sql,
       [username, email, hashedPassword],
-      (err, rows) => {
+      (err, result) => {
         if (err) {
           return reject(err);
         }
@@ -46,4 +46,5 @@ function createUser (username, email, hashedPassword){
 
 module.exports = {
   getUserByUsernameOrEmail,
+  createUser
 };
