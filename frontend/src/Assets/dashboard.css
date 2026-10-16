@@ -38,6 +38,25 @@
   margin-bottom: 15px;
 }
 
+
+#level-background-svensk-skog {
+  background-image: url(https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Stig_i_svensk_skog.jpg/960px-Stig_i_svensk_skog.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20220531181304);
+  background-size: cover;
+  background-position: center;
+}
+
+#level-background-amazonas {
+  background-image: url(https://betterwood.se/wp-content/uploads/2020/12/Amazonas-Peru.jpg);
+  background-size: cover;
+  background-position: center;
+}
+
+#level-background-sahara {
+  background-image: url(https://images.pexels.com/photos/1731660/pexels-photo-1731660.jpeg?cs=srgb&dl=pexels-the-trvlr-1731660.jpg&fm=jpg&_gl=1*1hnacrd*_ga*MTg0OTE1NzY4My4xNzg5NTYwMDIx*_ga_8JE65Q40S6*czE3OTE0NTk1NDQkbzMkZzEkdDE3OTE0NTk3ODMkajYwJGwwJGgw);
+  background-size: cover;
+  background-position: center;
+}
+
 .dashboard-quiz-content h3 {
   color: var(--accent-gold);
   margin-bottom: 10px;
@@ -46,3 +65,4 @@
 .dashboard-quiz-content p {
   margin-bottom: 12px;
 }
+
