@@ -70,6 +70,18 @@ content: '';
   font-weight: bold;
 }
 
+.locked-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lock-icon {
+  font-size: 2.5rem; /* Justera storleken på hänglåset efter smak */
+}
+
 #level-background-svensk-skog {
   background-image: url(https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Stig_i_svensk_skog.jpg/960px-Stig_i_svensk_skog.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20220531181304);
   background-size: cover;

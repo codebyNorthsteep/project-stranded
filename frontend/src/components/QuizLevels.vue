@@ -36,23 +36,30 @@ onMounted(() => {
 </script>
 
 <template>
-        <div class="dashboard-quiz-card" v-if="!loading && !error">
+  <div class="dashboard-quiz-card" v-if="!loading && !error">
     <p v-if="loading">Laddar nivåer...</p>
     <p v-if="error" class="error-text">{{ error }}</p>
-      <div
-        v-for="level in levels"
-        :key="level.id"
-        class="dashboard-level"
-        :id="getBackgroundId(level.env_name)"
+    <div
+      v-for="(level, index) in levels"
+      :key="level.id"
+      class="dashboard-level"
+      :id="getBackgroundId(level.env_name)"
+    >
+      <p>{{ level.env_name }}</p>
+      <!-- Visa "Starta quiz"-knappen på nivå 1 och nivåer som är upplåsta -->
+      <router-link
+        v-if="index === 0 || level.unlocked"
+        :to="`/quiz/${level.env_name}`"
+        class="button"
+        role="button"
       >
-        <p>{{ level.env_name }}</p>
-        <router-link
-          :to="`/quiz/${level.env_name}`"
-          class="button"
-          role="button"
-        >
-          Starta Quiz
-        </router-link>
+        Starta quiz
+      </router-link>
+
+      <!-- Annars visas hänglåset -->
+      <div v-else class="locked-content">
+        <span class="lock-icon" role="img" aria-label="Låst nivå">🔒</span>
       </div>
     </div>
-    </template>
+  </div>
+</template>
