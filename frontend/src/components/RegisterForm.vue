@@ -81,6 +81,7 @@ const handleRegister = async () => {
 
   isSubmitting.value = true;
 
+  //MOCK DELETE THIS WHEN START WITH BACKEND FOR REGISTER
   setTimeout(() => {
     isSubmitting.value = false;
     successMessage.value =
