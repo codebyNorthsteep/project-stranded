@@ -1,15 +1,15 @@
 <script setup>
 import "@/Assets/dashboard.css";
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from "vue";
 
-const username = ref('Alice') // ersätt med det faktiska användarnamnet från backend
+const username = ref("Alice"); // ersätt med det faktiska användarnamnet från backend
 
 const loading = ref(false);
 const error = ref(null);
 const levels = ref([]);
 
 // Hjälpfunktion för att få rätt CSS-klass baserat på miljöns namn
-const getBackgroundClass = (envName) => {
+const getBackgroundId = (envName) => {
   const name = envName?.toLowerCase();
   if (name?.includes("skog") || name?.includes("swedish"))
     return "level-background-svensk-skog";
@@ -51,19 +51,20 @@ onMounted(() => {
 
     <!-- Quiz Card -->
     <div class="dashboard-quiz-card" v-if="!loading && !error">
-      <div class="dashboard-quiz-content">
-        <h3>Quiz</h3>
-      </div>
-      
-      <div 
-        v-for="level in levels" 
-        :key="level.id" 
-        class="dashboard-level" 
-        :id="getBackgroundClass(level.env_name)"
+
+      <div
+        v-for="level in levels"
+        :key="level.id"
+        class="dashboard-level"
+        :id="getBackgroundId(level.env_name)"
       >
         <p>{{ level.env_name }}</p>
-        <router-link :to="`/quiz/${level.env_name}`" class="button" role="button">
-          Starta Quiz   
+        <router-link
+          :to="`/quiz/${level.env_name}`"
+          class="button"
+          role="button"
+        >
+          Starta Quiz
         </router-link>
       </div>
     </div>
