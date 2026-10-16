@@ -1,5 +1,17 @@
 const userService = require("../services/quizService");
 
+exports.getAllLevels = async (req, res) => {
+  try {
+    const levels = await userService.getAllLevels();
+    res.json(levels);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "An error occurred while fetching levels" + err.message,
+    });
+  }
+};
+
 exports.getQuestionsByLevel = async (req, res) => {
   try {
     const questions = await userService.getQuestionsByLevel(req.params.levelId);
