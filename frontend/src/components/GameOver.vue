@@ -33,28 +33,21 @@ function goToMenu() {
 
 <style scoped>
 .game-over {
-  box-sizing: border-box;
   width: 100%;
   max-width: 416px;
   margin-inline: auto;
   text-align: center;
-  background-color: #16230E;
+  background-color: var(--bg-dark);
   padding: 24px 16px;
   border-radius: 8px;
 }
 
 .game-over-title {
-  margin-top: 0;
-  color: #D1982A;
+  color: var(--accent-gold);
   font-size: 24px;
 }
 
-.status-message {
-  color: #D1982A;
-}
-
 .score {
-  color: #D1982A;
   font-weight: 700;
 }
 
@@ -62,10 +55,10 @@ function goToMenu() {
   width: 100%;
   min-height: 48px;
   padding: 12px 16px;
-  border: 0;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  background-color: #28391C;
-  color: #D1982A;
+  background-color: var(--card-bg);
+  color: var(--accent-gold);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -76,8 +69,7 @@ function goToMenu() {
   .game-over {
     padding: 32px;
   }
-  }
-@media (min-width: 640px) {
+
   .game-over button {
     width: auto;
     min-width: 160px;
