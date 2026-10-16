@@ -26,8 +26,8 @@ function goToMenu() {
     <p class="status-message">Du skulle dö!</p>
     <p v-if="explanation" class="explanation">{{ explanation }}</p>
     <p class="score">Poäng: {{ score }}</p>
-    <button @click="emit('restart')">Spela igen</button>
-    <button @click="goToMenu">Till startmenyn</button>
+    <button class="button" @click="emit('restart')">Spela igen</button>
+    <button class="button" @click="goToMenu">Till startmenyn</button>
   </section>
 </template>
 
@@ -54,14 +54,7 @@ function goToMenu() {
 .game-over button {
   width: 100%;
   min-height: 48px;
-  padding: 12px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background-color: var(--card-bg);
-  color: var(--accent-gold);
-  font: inherit;
   font-weight: 700;
-  cursor: pointer;
   touch-action: manipulation;
 }
 
@@ -70,9 +63,15 @@ function goToMenu() {
     padding: 32px;
   }
 
-  .game-over button {
-    width: auto;
-    min-width: 160px;
-  }
+  .game-over button:first-of-type {
+  margin-top: 16px;
+}
+ .game-over button {
+  display: flex;
+  margin-inline: auto;
+}
+ .game-over button + button {
+  margin-top: 16px;
+}
 }
 </style>
