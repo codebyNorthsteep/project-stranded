@@ -35,9 +35,12 @@ const validateForm = () => {
   if (!form.username.trim()) {
     formErrors.username = "Användarnamn krävs";
     isValid = false;
-  } else if (form.username.length < 3) {
+  } else if (form.username.trim().length < 3) {
     formErrors.username = "Användarnamnet måste vara minst 3 tecken";
     isValid = false;
+  } else if (/\s/.test(form.username)) {
+  formErrors.username = "Användarnamnet får inte innehålla mellanslag";
+  isValid = false;
   }
 
   // Email
@@ -175,8 +178,8 @@ const handleRegister = async () => {
           {{ formErrors.confirmPassword }}
         </p>
       </div>
-      <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
-      <p v-if="serverError" class="error-message">{{ serverError }}</p>
+      <p v-if="successMessage" class="success-message" role="status">{{ successMessage }}</p>
+      <p v-if="serverError" class="error-message" role="alert">{{ serverError }}</p>
 
       <button type="submit" class="button" :disabled="isSubmitting">
         {{ isSubmitting ? "Skapar konto..." : "skapa konto" }}
