@@ -1,3 +1,8 @@
+require('dotenv').config();
+if (!process.env.JWT_SECRET) {
+  throw new Error("JWT_SECRET is not configured");
+}
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -16,6 +21,10 @@ app.use(express.static('public'));
 // Use the quiz routes
 const quizRoute = require('./routes/quizRoutes');
 app.use(quizRoute);
+
+// Use the user routes
+const userRoute = require('./routes/userRoutes');
+app.use(userRoute);
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);   

@@ -3,3 +3,5 @@ node_modules
 
 # connection to the database
 connectionMySQL.js
+
+.env
