@@ -1,5 +1,5 @@
 <script setup>
-import QuizLevels from "@/components/QuizLevels.vue";
+import QuizLevels from "@/components/dashboard/QuizLevels.vue";
 import "@/Assets/dashboard.css";
 import { ref} from "vue";
 
