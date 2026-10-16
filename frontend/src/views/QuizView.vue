@@ -30,9 +30,12 @@ const isLast = computed(
 );
 
 const nextQuestion = () => {
-  currentIndex.value++;
-  validatedAnswer.value = null;
+  if (!isLast.value) {
+    currentIndex.value++;
+      validatedAnswer.value = null;
   selectedAnswerId.value = null;
+  }
+
 };
 
 const fetchQuestions = async () => {
@@ -62,7 +65,11 @@ const fetchAnswerValidation = async (answerId) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    validatedAnswer.value = await response.json();
+    const result = await response.json();
+
+    if (selectedAnswerId.value === answerId) {
+      validatedAnswer.value = result;
+    }
   } catch (err) {
     error.value = err.message;
   }
@@ -151,7 +158,7 @@ onMounted(() => {
 
       <div class="next-question" v-if="validatedAnswer && validatedAnswer.is_correct">
         <div class="correct-msg">Korrekt svar!</div>
-        <button @click="nextQuestion" class="button">Nästa fråga</button>
+        <button v-if="!isLast" @click="nextQuestion" class="button">Nästa fråga</button>
       </div>
     </div>
   </div>
