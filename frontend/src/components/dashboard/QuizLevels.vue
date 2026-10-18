@@ -36,9 +36,9 @@ onMounted(() => {
 </script>
 
 <template>
+  <p v-if="loading">Laddar nivåer...</p>
+  <p v-if="error" class="error-text">{{ error }}</p>
   <div class="dashboard-quiz-card" v-if="!loading && !error">
-    <p v-if="loading">Laddar nivåer...</p>
-    <p v-if="error" class="error-text">{{ error }}</p>
     <div
       v-for="(level, index) in levels"
       :key="level.id"
@@ -46,7 +46,9 @@ onMounted(() => {
       :id="getBackgroundId(level.env_name)"
     >
       <p>{{ level.env_name }}</p>
-      <!-- Visa "Starta quiz"-knappen på nivå 1 och nivåer som är upplåsta -->
+      <!-- Visa "Starta quiz"-knappen på nivå 1 och nivåer som är upplåsta 
+       Todo: visa en progressbar
+       todo: visa fortsätt quiz om man har ett pågående quiz -->
       <router-link
         v-if="index === 0 || level.unlocked"
         :to="`/quiz/${level.env_name}`"

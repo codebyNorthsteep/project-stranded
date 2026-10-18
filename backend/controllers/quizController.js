@@ -7,7 +7,7 @@ exports.getAllLevels = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({
-      error: "An error occurred while fetching levels" + err.message,
+      error: "An error occurred while fetching levels",
     });
   }
 };
@@ -19,7 +19,7 @@ exports.getQuestionsByLevel = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({
-      error: "An error occurred while fetching questions" + err.message,
+      error: "An error occurred while fetching questions",
     });
   }
 };
@@ -31,7 +31,7 @@ exports.getAnswerValidation = async (req, res) => {
   } catch (err) {
     console.error(err);
     return res.status(500).json({
-      error: "An error occurred while validating the answer" + err.message,
+      error: "An error occurred while validating the answer",
     });
   }
 };
