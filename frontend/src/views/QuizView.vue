@@ -45,13 +45,15 @@ const nextQuestion = () => {
 
 };
 
-const fetchQuestions = async () => {
+const fetchQuestions = async (requestedLevelId = route.params.levelId) => {
   loading.value = true;
-  const levelId = route.params.levelId; //Hämta levelId från URL-parametern
-
+error.value = null;
+// Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
+const isCurrentRequestedLevel = () =>
+String(route.params.levelId) === String(requestedLevelId);
   try {
     const response = await fetch(
-      `http://localhost:3000/api/levels/${levelId}/questions`,
+      `http://localhost:3000/api/levels/${requestedLevelId}/questions`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -59,14 +61,16 @@ const fetchQuestions = async () => {
     const data = await response.json();
 
     // Blanda svarsalternativen en gång per fråga när de laddas in
-    questions.value = data.map((q) => ({
-      ...q,
-      answers: [...q.answers].sort(() => Math.random() - 0.5),
-    }));;
+    if (isCurrentRequestedLevel()) {
+      questions.value = data.map((q) => ({
+        ...q,
+        answers: [...q.answers].sort(() => Math.random() - 0.5),
+      }));
+    }
   } catch (err) {
-    error.value = err.message;
+    if (isCurrentRequestedLevel()) error.value = err.message;
   } finally {
-    loading.value = false;
+    if (isCurrentRequestedLevel()) loading.value = false;
   }
 };
 
@@ -105,7 +109,7 @@ watch(
       validatedAnswer.value = null;
       selectedAnswerId.value = null;
       currentIndex.value = 0;
-      fetchQuestions(); // Hämta nya frågor för den nya nivån
+      fetchQuestions(newLevelId); // Hämta nya frågor för den nya nivån
     }
   }
 );
