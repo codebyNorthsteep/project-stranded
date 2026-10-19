@@ -109,6 +109,7 @@ watch(
       validatedAnswer.value = null;
       selectedAnswerId.value = null;
       currentIndex.value = 0;
+      questions.value = [];
       fetchQuestions(newLevelId); // Hämta nya frågor för den nya nivån
     }
   }
