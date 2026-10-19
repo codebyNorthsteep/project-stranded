@@ -58,10 +58,10 @@ function goToMenu() {
   width: 100%;
   max-width: 416px;
   margin-inline: auto;
-  text-align: center;
-  background-color: var(--bg-dark);
   padding: 24px 16px;
   border-radius: 8px;
+  background-color: var(--bg-dark);
+  text-align: center;
 }
 
 .game-over-title {
@@ -91,7 +91,7 @@ function goToMenu() {
   margin-top: 12px;
 }
 
-@media (min-width: 640px) and (max-width: 1024px) {
+@media (min-width: 768px) and (max-width: 1023px) {
   .game-over {
     padding: 32px;
   }
@@ -100,9 +100,16 @@ function goToMenu() {
     width: auto;
     min-width: 160px;
   }
+}
 
-  .game-over button + button {
-    margin-top: 12px;
+@media (min-width: 1024px) {
+  .game-over {
+    padding: 32px;
+  }
+
+  .game-over button {
+    width: auto;
+    min-width: 160px;
   }
 }
 </style>
