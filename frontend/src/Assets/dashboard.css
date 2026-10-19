@@ -1,0 +1,121 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  text-align: center;
+  background-color: var(--bg-dark);
+}
+
+.dashboard-welcome {
+  margin-bottom: 20px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dashboard-welcome h1 {
+  margin-bottom: 10px;
+}
+
+.dashboard-quiz-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--card-bg);
+  border-top: 2px solid var(--accent-gold);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 10px;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.dashboard-level {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0px;
+}
+
+.dashboard-level::before {
+content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 29, 17, 0.65); /* Mörkar ner bilden lite för bättre kontrast */
+  z-index: 1;
+}
+
+/* Se till att text och knapp hamnar ovanför det mörka lagret */
+.dashboard-level p,
+.dashboard-level .button {
+  position: relative;
+  z-index: 2;
+}
+
+.dashboard-level p {
+  font-weight: bold;
+}
+
+.locked-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lock-icon {
+  font-size: 2.5rem; /* Justera storleken på hänglåset efter smak */
+}
+
+#level-background-svensk-skog {
+  background-image: url(https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Stig_i_svensk_skog.jpg/960px-Stig_i_svensk_skog.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20220531181304);
+  background-size: cover;
+  background-position: center;
+}
+
+#level-background-amazonas {
+  background-image: url(https://betterwood.se/wp-content/uploads/2020/12/Amazonas-Peru.jpg);
+  background-size: cover;
+  background-position: center;
+}
+
+#level-background-sahara {
+  background-image: url(https://images.pexels.com/photos/1731660/pexels-photo-1731660.jpeg?cs=srgb&dl=pexels-the-trvlr-1731660.jpg&fm=jpg&_gl=1*1hnacrd*_ga*MTg0OTE1NzY4My4xNzg5NTYwMDIx*_ga_8JE65Q40S6*czE3OTE0NTk1NDQkbzMkZzEkdDE3OTE0NTk3ODMkajYwJGwwJGgw);
+  background-size: cover;
+  background-position: center;
+}
+
+@media (min-width: 768px) {
+  .dashboard-quiz-card {
+    flex-direction: row;
+    max-width: 700px;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .dashboard-level {
+    flex-direction: column;
+    width: 100%;
+    height: 250px;
+    margin-bottom: 0;
+  }
+
+  .dashboard-level p {
+  font-size: 20px;
+}
+}

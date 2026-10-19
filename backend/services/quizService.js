@@ -1,5 +1,19 @@
 const connectionMySQL = require("./../connectionMySQL"); // Import the MySQL connection
 
+function getAllLevels() {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT *
+      FROM level
+      ORDER BY level_id;
+    `;
+    connectionMySQL.query(sql, (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows);
+    });
+  });
+}
+
 function getQuestionsByLevel(levelId) {
   return new Promise((resolve, reject) => {
     const sql = `
@@ -57,6 +71,7 @@ function getAnswerValidation(anwerId) {
 }
 
 module.exports = {
+  getAllLevels,
   getQuestionsByLevel,
   getAnswerValidation,
 };
