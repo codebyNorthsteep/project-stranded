@@ -84,18 +84,6 @@ const handleRegister = async () => {
 
   isSubmitting.value = true;
 
-  //MOCK DELETE THIS WHEN START WITH BACKEND FOR REGISTER
-  setTimeout(() => {
-    isSubmitting.value = false;
-    successMessage.value =
-      "Kontot har skapats! Omdirigerar till inloggningen...";
-
-    setTimeout(() => {
-      router.push("/login");
-    }, 2000);
-  }, 1000);
-
-  /*
   try {
     const response = await fetch(`${apiBaseUrl}/api/register`, {
       method: "POST",
@@ -123,7 +111,6 @@ const handleRegister = async () => {
   } finally {
     isSubmitting.value = false; 
   }
-  */
 };
 </script>
 
