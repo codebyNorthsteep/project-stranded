@@ -19,11 +19,14 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register,
+<<<<<<< HEAD
   },
   {
     path: '/gameover',
     name: 'GameOver',
     component: GameOver,
+=======
+>>>>>>> a559643d2600fd1ebb596f0be77d38ccc683acbf
   }
 ]
 
