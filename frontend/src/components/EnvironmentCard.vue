@@ -69,15 +69,10 @@ const showInfo = ref(false);
   line-height: 1.5;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 640px) and (max-width: 1024px) {
   .environment-card {
     height: 400px;
     aspect-ratio: auto;
   }
 }
 </style>
-
-
-
-
-

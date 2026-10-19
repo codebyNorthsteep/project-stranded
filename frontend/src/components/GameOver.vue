@@ -91,7 +91,7 @@ function goToMenu() {
   margin-top: 12px;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 640px) and (max-width: 1024px) {
   .game-over {
     padding: 32px;
   }
