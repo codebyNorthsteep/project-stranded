@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Welcome from '../views/Welcome.vue'
 import Login from '../views/Auth/Login.vue'
 import Register from '../views/Auth/Register.vue'
-import GameOver from '../components/GameOver.vue'
+import MyDashboard from '../views/MyDashboard.vue'
+import Quiz from '../views/QuizView.vue'
 
 const routes = [
   {
@@ -19,14 +20,16 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register,
-<<<<<<< HEAD
   },
   {
-    path: '/gameover',
-    name: 'GameOver',
-    component: GameOver,
-=======
->>>>>>> a559643d2600fd1ebb596f0be77d38ccc683acbf
+    path: '/dashboard',
+    name: 'MyDashboard',
+    component: MyDashboard,
+  },
+  {
+    path: '/quiz/:levelName',
+    name: 'Quiz',
+    component: Quiz,
   }
 ]
 
