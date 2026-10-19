@@ -4,6 +4,7 @@ import Login from '../views/Auth/Login.vue'
 import Register from '../views/Auth/Register.vue'
 import MyDashboard from '../views/MyDashboard.vue'
 import Quiz from '../views/QuizView.vue'
+import GameOver from '../components/GameOver.vue'
 
 const routes = [
   {
@@ -30,7 +31,12 @@ const routes = [
     path: '/quiz/:levelName',
     name: 'Quiz',
     component: Quiz,
-  }
+  },
+  {
+    path: '/gameover',
+    name: 'GameOver',
+    component: GameOver,
+  },
 ]
 
 const router = createRouter({
