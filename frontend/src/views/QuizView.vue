@@ -1,7 +1,11 @@
 <script setup>
 import "@/Assets/quiz.css";
+import { useRoute } from "vue-router";
 
 import { ref, onMounted, computed } from "vue";
+const route = useRoute();
+const levelId = route.params.levelId; //Hämta levelId från URL-parametern
+
 const loading = ref(false);
 const error = ref(null);
 const questions = ref([]);
@@ -42,7 +46,7 @@ const fetchQuestions = async () => {
   loading.value = true;
   try {
     const response = await fetch(
-      "http://localhost:3000/api/levels/:levelId/questions",
+      `http://localhost:3000/api/levels/${levelId}/questions`,
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
