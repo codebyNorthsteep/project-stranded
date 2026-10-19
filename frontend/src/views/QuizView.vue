@@ -1,10 +1,10 @@
 <script setup>
 import "@/Assets/quiz.css";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 const route = useRoute();
-const levelId = route.params.levelId; //Hämta levelId från URL-parametern
+const router = useRouter(); //Hämta router-instansen för att kunna navigera till nästa level efter att man har klarat alla frågor i en nivå
 
 const loading = ref(false);
 const error = ref(null);
@@ -38,12 +38,17 @@ const nextQuestion = () => {
     currentIndex.value++;
       validatedAnswer.value = null;
   selectedAnswerId.value = null;
+  } else {
+    //todo: visa en popup-ruta som säger att man har klarat alla frågor i en nivå och navigera till nästa level eller dashboard
+    nextLevel(); // Navigera till nästa level efter att man har klarat alla frågor i en nivå
   }
 
 };
 
 const fetchQuestions = async () => {
   loading.value = true;
+  const levelId = route.params.levelId; //Hämta levelId från URL-parametern
+
   try {
     const response = await fetch(
       `http://localhost:3000/api/levels/${levelId}/questions`,
@@ -57,6 +62,13 @@ const fetchQuestions = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const nextLevel = () => {
+  // Navigera till nästa level efter att man har klarat alla frågor i en nivå
+  const currentLevelId = parseInt(route.params.levelId);
+  const nextLevelId = currentLevelId + 1;
+  router.push(`/quiz/${nextLevelId}/questions`);
 };
 
 const fetchAnswerValidation = async (answerId) => {
@@ -78,6 +90,19 @@ const fetchAnswerValidation = async (answerId) => {
     error.value = err.message;
   }
 };
+
+// Lyssna på om URL:en ändras (exempelvisnär man byter nivå)
+watch(
+  () => route.params.levelId,
+  (newLevelId) => {
+    if (newLevelId) {
+      validatedAnswer.value = null;
+      selectedAnswerId.value = null;
+      currentIndex.value = 0;
+      fetchQuestions(); // Hämta nya frågor för den nya nivån
+    }
+  }
+);
 
 onMounted(() => {
   fetchQuestions();
@@ -163,6 +188,7 @@ onMounted(() => {
       <div class="next-question" v-if="validatedAnswer && validatedAnswer.is_correct">
         <div class="correct-msg">Korrekt svar!</div>
         <button v-if="!isLast" @click="nextQuestion" class="button">Nästa fråga</button>
+        <button v-else @click="nextLevel" class="button">Nästa nivå</button>
       </div>
     </div>
   </div>
