@@ -29,6 +29,8 @@ function closeOnBackdrop(event) {
   <article class="environment-card">
     <img :src="environment.src" :alt="environment.alt" class="card-image" />
 
+    <h2 class="environment-title">{{ environment.title }}</h2>
+
     <button
       type="button"
       class="button info-button"
@@ -58,26 +60,61 @@ function closeOnBackdrop(event) {
 
 <style scoped>
 .environment-card {
+  position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   flex: 1;
   min-width: 0;
+  min-height: 320px;
+  padding: 24px;
   overflow: hidden;
   border: 1.5px solid var(--accent-gold);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
 }
 
+.environment-card::before {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(rgb(18 29 17 / 25%), rgb(18 29 17 / 55%));
+  content: "";
+  pointer-events: none;
+}
+
 .card-image {
-  display: block;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  height: 100%;
   object-fit: cover;
 }
 
-.info-button,
+.environment-title,
+.info-button {
+  position: relative;
+  z-index: 2;
+}
+
+.environment-title {
+  color: var(--accent-gold);
+  text-align: center;
+}
+
+.info-button {
+  width: auto;
+  align-self: center;
+  min-height: 44px;
+  font-weight: 700;
+  touch-action: manipulation;
+}
 .close-button {
   width: 100%;
+  align-self: center;
   min-height: 44px;
   font-weight: 700;
   touch-action: manipulation;
