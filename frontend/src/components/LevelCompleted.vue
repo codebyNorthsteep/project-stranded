@@ -1,5 +1,7 @@
 <script setup>
 import { useRouter } from "vue-router";
+import { onMounted } from "vue";
+import confetti from "canvas-confetti";
 
 defineProps({
   message: {
@@ -14,6 +16,33 @@ const router = useRouter();
 function goToDashboard() {
   router.push({ name: "MyDashboard" });
 }
+
+// Confetti
+
+var duration = 5 * 1000;
+var end = Date.now() + duration;
+
+(function frame() {
+  // launch a few confetti from the left edge
+  confetti({
+    particleCount: 4,
+    angle: 60,
+    spread: 55,
+    origin: { x: 0 }
+  });
+  // and launch a few from the right edge
+  confetti({
+    particleCount: 4,
+    angle: 120,
+    spread: 55,
+    origin: { x: 1 }
+  });
+
+  // keep going until we are out of time
+  if (Date.now() < end) {
+    requestAnimationFrame(frame);
+  }
+}());
 </script>
 
 <template>
@@ -73,12 +102,12 @@ function goToDashboard() {
 .button-group {
   display: flex;
   gap: 12px;
-  margin-top: auto; 
+  margin-top: auto;
   width: 100%;
 }
 
 .button-group button {
-  flex: 1; 
+  flex: 1;
   min-height: 48px;
   padding: 12px 16px;
   border: 1px solid var(--border-color);
