@@ -51,7 +51,7 @@ onMounted(() => {
        todo: visa fortsätt quiz om man har ett pågående quiz -->
       <router-link
         v-if="index === 0 || level.unlocked"
-        :to="`/quiz/${level.env_name}`"
+        :to="`/quiz/${level.level_id}/questions`"
         class="button"
         role="button"
       >

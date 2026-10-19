@@ -42,7 +42,7 @@ const fetchQuestions = async () => {
   loading.value = true;
   try {
     const response = await fetch(
-      "http://localhost:3000/api/levels/1/questions",
+      "http://localhost:3000/api/levels/:levelId/questions",
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
