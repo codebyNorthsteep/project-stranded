@@ -32,9 +32,11 @@ const quizImages = ref([
     <p class="slogan">your knowledge is your survival tool</p>
 
     <div class="cards-grid">
-      <div v-for="image in quizImages" :key="image.id" class="card">
-        <img :src="image.src" :alt="image.alt" class="card-image" />
-      </div>
+      <EnvironmentCard
+        v-for="environment in quizImages"
+        :key="environment.id"
+        :environment="environment"
+      />
     </div>
 
     <div>
@@ -84,21 +86,6 @@ const quizImages = ref([
   padding: 20px;
 }
 
-.card {
-  flex: 1;
-  border: 1.5px solid var(--accent-gold);
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgb(0, 0, 0.1);
-}
-
-.card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
 @media (min-width: 768px) and (max-width: 1023px) {
   .cards-grid {
     gap: 22px;
@@ -126,10 +113,6 @@ const quizImages = ref([
     gap: 25px;
     max-width: 850px;
     margin: 0 auto;
-  }
-
-  .card {
-    height: 400px;
   }
 
   .slogan {

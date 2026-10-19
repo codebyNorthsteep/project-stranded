@@ -8,30 +8,60 @@ defineProps({
   },
 });
 
-const showInfo = ref(false);
+const infoDialog = ref(null);
+
+function openInfo() {
+  infoDialog.value?.showModal();
+}
+
+function closeInfo() {
+  infoDialog.value?.close();
+}
+
+function closeOnBackdrop(event) {
+  if (event.target === event.currentTarget) {
+    closeInfo();
+  }
+}
 </script>
 
 <template>
-  <article
-    class="environment-card"
-    @mouseenter="showInfo = true"
-    @mouseleave="showInfo = false"
-  >
+  <article class="environment-card">
     <img :src="environment.src" :alt="environment.alt" class="card-image" />
 
-    <div v-if="showInfo" class="info-overlay">
-      <h2>{{ environment.title }}</h2>
-      <p>{{ environment.info }}</p>
-    </div>
+    <button
+      type="button"
+      class="button info-button"
+      :aria-label="`Läs mer om ${environment.title}`"
+      @click="openInfo"
+    >
+      Läs mer
+    </button>
+
+    <dialog
+      ref="infoDialog"
+      class="info-dialog"
+      :aria-labelledby="`environment-title-${environment.id}`"
+      :aria-describedby="`environment-info-${environment.id}`"
+      @click="closeOnBackdrop"
+    >
+      <h2 :id="`environment-title-${environment.id}`">
+        {{ environment.title }}
+      </h2>
+      <p :id="`environment-info-${environment.id}`">{{ environment.info }}</p>
+      <button type="button" class="button close-button" @click="closeInfo">
+        Stäng
+      </button>
+    </dialog>
   </article>
 </template>
 
 <style scoped>
 .environment-card {
-  position: relative;
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-width: 0;
-  aspect-ratio: 3 / 4;
   overflow: hidden;
   border: 1.5px solid var(--accent-gold);
   border-radius: 8px;
@@ -41,43 +71,62 @@ const showInfo = ref(false);
 .card-image {
   display: block;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 3 / 4;
   object-fit: cover;
 }
 
-.info-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  box-sizing: border-box;
-  background-color: rgb(0 0 0 / 75%);
-  color: #fff;
-  text-align: center;
+.info-button,
+.close-button {
+  width: 100%;
+  min-height: 44px;
+  font-weight: 700;
+  touch-action: manipulation;
 }
 
-.info-overlay h2 {
-  margin: 0 0 10px;
+.info-button:focus-visible,
+.close-button:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
+.info-dialog {
+  width: min(90vw, 420px);
+  max-height: 80vh;
+  margin: auto;
+  padding: 24px;
+  border: 1px solid var(--accent-gold);
+  border-radius: 8px;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  text-align: center;
+  font-family: inherit;
+}
+
+.info-dialog::backdrop {
+  background-color: rgb(0 0 0 / 70%);
+}
+
+.info-dialog h2 {
+  margin: 0 0 12px;
+  color: var(--accent-gold);
   font-size: 1.5rem;
 }
 
-.info-overlay p {
-  color: inherit;
+.info-dialog p {
+  margin-bottom: 20px;
+  color: var(--text-light);
   line-height: 1.5;
 }
 
 @media (min-width: 1024px) {
   .environment-card {
     height: 400px;
+  }
+
+  .card-image {
+    flex: 1;
+    min-height: 0;
     aspect-ratio: auto;
   }
 }
 </style>
-
-
-
-
-
