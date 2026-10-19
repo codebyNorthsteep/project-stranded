@@ -12,7 +12,7 @@ const emit = defineEmits(['restart'])
 const router = useRouter()
 
 function goToMenu() {
-  router.push({ name: 'Welcome' })
+  router.push({ name: 'MyDashboard' })
 }
 </script>
 
