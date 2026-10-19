@@ -56,7 +56,13 @@ const fetchQuestions = async () => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    questions.value = await response.json();
+    const data = await response.json();
+
+    // Blanda svarsalternativen en gång per fråga när de laddas in
+    questions.value = data.map((q) => ({
+      ...q,
+      answers: [...q.answers].sort(() => Math.random() - 0.5),
+    }));;
   } catch (err) {
     error.value = err.message;
   } finally {
