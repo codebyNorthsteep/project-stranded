@@ -83,6 +83,7 @@ const nextLevel = () => {
 
 const fetchAnswerValidation = async (answerId) => {
   selectedAnswerId.value = answerId;
+  const validationLevelId = route.params.levelId; // Spara nuvarande nivå när anropet startar för att säkerställa att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
 
   try {
     const response = await fetch(
@@ -93,15 +94,25 @@ const fetchAnswerValidation = async (answerId) => {
     }
     const result = await response.json();
 
-    if (selectedAnswerId.value === answerId) {
+    // Kontrollera att vi är kvar på samma nivå och att samma svar fortfarande är aktivt
+    if (
+      String(route.params.levelId) === String(validationLevelId) &&
+      selectedAnswerId.value === answerId
+    ) {
       validatedAnswer.value = result;
     }
   } catch (err) {
-    error.value = err.message;
+    // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
+    if (
+      String(route.params.levelId) === String(validationLevelId) &&
+      selectedAnswerId.value === answerId
+    ) {
+      error.value = err.message;
+    }
   }
 };
 
-// Lyssna på om URL:en ändras (exempelvisnär man byter nivå)
+// Lyssna på om URL:en ändras (i detta fallnär man byter nivå)
 watch(
   () => route.params.levelId,
   (newLevelId) => {
