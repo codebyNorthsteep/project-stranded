@@ -114,7 +114,7 @@ onMounted(() => {
 
       <!-- Om nivån är avklarad -->
       <div v-if="getLevelStatus(level, index) === 'completed'">
-        <span class="badge-completed">Avklarad ✅</span>
+        <span class="badge-completed">Avklarad</span>
       </div>
 
       <!-- Om användaren är på denna nivå (Fortsätt quiz) -->
