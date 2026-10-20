@@ -2,7 +2,7 @@ const statisticsService = require("../services/statisticsService");
 
 exports.getCurrentQuestionForUser = async (req, res) => {
   try {
-    const authenticatedUserId = req.userData?.userId;
+    const authenticatedUserId = req.userData?.id;
 
     if (authenticatedUserId == null) {
       return res.status(401).json({ error: "Authentication required" });
