@@ -10,7 +10,7 @@ import LoginForm from "../../components/LoginForm.vue";
   <div class="register-link">
     <p>
       Har du inget konto?
-      <router-link to="/register" class="button"> register </router-link>
+      <router-link to="/register" class="button">Registrera dig</router-link>
     </p>
   </div>
 </template>
