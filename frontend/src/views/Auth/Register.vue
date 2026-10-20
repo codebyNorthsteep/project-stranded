@@ -10,7 +10,7 @@ import RegisterForm from "../../components/RegisterForm.vue";
   <div class="login-link">
     <p>
       Har du redan ett konto?
-      <router-link to="/login" class="button"> log in </router-link>
+      <router-link to="/login" class="button"> logga in </router-link>
     </p>
   </div>
 </template>
