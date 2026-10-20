@@ -88,6 +88,11 @@ onMounted(() => {
   box-shadow: none;
 }
 
+.button-group button:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 2px;
+}
+
 @media (min-width: 768px) {
   .level-completed-dialog {
     max-width: 440px;
