@@ -1,7 +1,7 @@
 <script setup>
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { onMounted } from "vue";
-import confetti from "canvas-confetti";
+import Confetti from "@/components/Confetti.vue";
 
 defineProps({
   message: {
@@ -12,97 +12,69 @@ defineProps({
 
 const emit = defineEmits(["next-level"]);
 const router = useRouter();
+const levelCompletedDialog = ref(null);
 
 function goToDashboard() {
   router.push({ name: "MyDashboard" });
 }
 
-// Confetti
-
-var duration = 5 * 1000;
-var end = Date.now() + duration;
-
-(function frame() {
-  // launch a few confetti from the left edge
-  confetti({
-    particleCount: 4,
-    angle: 60,
-    spread: 55,
-    origin: { x: 0 }
-  });
-  // and launch a few from the right edge
-  confetti({
-    particleCount: 4,
-    angle: 120,
-    spread: 55,
-    origin: { x: 1 }
-  });
-
-  // keep going until we are out of time
-  if (Date.now() < end) {
-    requestAnimationFrame(frame);
-  }
-}());
+onMounted(() => {
+  levelCompletedDialog.value?.showModal();
+});
 </script>
 
 <template>
-  <section class="level-completed">
-    <h2 class="level-completed-title">Nivå avklarad!</h2>
+  <dialog ref="levelCompletedDialog" class="level-completed-dialog">
+    <Confetti :duration="5000" />
 
-    <div class="button-group">
-      <button @click="emit('next-level')">Börja nästa nivå</button>
-      <button @click="goToDashboard">Gå till meny</button>
+    <div class="level-completed-content">
+      <h2 class="level-completed-title">Nivå avklarad!</h2>
+
+      <div class="button-group">
+        <button type="button" @click="emit('next-level')">Börja nästa nivå</button>
+        <button type="button" @click="goToDashboard">Gå till meny</button>
+      </div>
     </div>
-  </section>
+  </dialog>
 </template>
 
 <style scoped>
-:global(html),
-:global(body) {
-  min-height: 100%;
-  background-color: var(--bg-dark);
-}
-
-:global(#app) {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
-}
-
-:global(header),
-:global(footer) {
-  flex-shrink: 0;
-}
-
-:global(main) {
-  display: flex;
-  flex: 1 0 auto;
-  flex-direction: column;
-}
-
-.level-completed {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  width: 100%;
-  max-width: 416px;
-  margin-inline: auto;
-  text-align: center;
-  background-color: var(--bg-dark);
-  padding: 24px 16px;
+.level-completed-dialog {
+  border: 1px solid var(--accent-gold);
   border-radius: 8px;
+  background-color: var(--bg-dark);
+  padding: 24px;
+  max-width: 416px;
+  width: 90%;
+  margin: auto;
+  color: var(--accent-gold);
+  overflow: visible;
+}
+
+.level-completed-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(2px);
+}
+
+.level-completed-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
 }
 
 .level-completed-title {
   color: var(--accent-gold);
   font-size: 24px;
+  margin: 0;
 }
 
 .button-group {
   display: flex;
   gap: 12px;
-  margin-top: auto;
   width: 100%;
 }
 
@@ -118,5 +90,10 @@ var end = Date.now() + duration;
   font-weight: 700;
   cursor: pointer;
   touch-action: manipulation;
+  outline: none;
+}
+
+.button-group button:focus {
+  outline: none;
 }
 </style>
