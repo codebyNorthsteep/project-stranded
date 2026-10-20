@@ -27,7 +27,7 @@ const routes = [
     component: MyDashboard,
   },
   {
-    path: '/quiz/:levelName',
+    path: '/quiz/:levelId/questions',
     name: 'Quiz',
     component: Quiz,
   }
