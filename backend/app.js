@@ -26,6 +26,10 @@ app.use(quizRoute);
 const userRoute = require('./routes/userRoutes');
 app.use(userRoute);
 
+// Use the statistics routes
+const statisticsRoute = require('./routes/statisticsRoutes');
+app.use(statisticsRoute);
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);   
 });
