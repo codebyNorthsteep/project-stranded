@@ -2,7 +2,18 @@ const statisticsService = require("../services/statisticsService");
 
 exports.getCurrentQuestionForUser = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const authenticatedUserId = req.userData?.userId;
+
+    if (authenticatedUserId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    if (String(req.params.userId) !== String(authenticatedUserId)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const userId = authenticatedUserId;
+
     const currentQuestion =
       await statisticsService.getCurrentQuestionForUser(userId);
     res.json(currentQuestion);
