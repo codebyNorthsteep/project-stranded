@@ -5,6 +5,7 @@ const loading = ref(false);
 const error = ref(null);
 const levels = ref([]);
 const currentQuestion = ref(null);
+const currentQuestionReady = ref(false);
 const loggedInUserId = ref(null);
 
 // Hjälpfunktion för att få rätt CSS-klass baserat på miljöns namn
@@ -61,7 +62,7 @@ const fetchLevels = async () => {
 };
 
 const fetchCurrentQuestionForUser = async (userId) => {
-  
+
   try {
     const response = await fetch(
       `http://localhost:3000/api/users/${userId}/statistics/current-question`,
@@ -78,8 +79,9 @@ const fetchCurrentQuestionForUser = async (userId) => {
     const data = await response.json();
 
     currentQuestion.value = data;
+    currentQuestionReady.value = true;
   } catch (err) {
-    console.error("FEL vid hämtning av statistik:", err);
+    error.value = err.message;
   }
 };
 
@@ -91,6 +93,8 @@ onMounted(() => {
   //om loggedInUserId finns, skicka med den till fetchCurrentQuestionForUser för att hämta den aktuella frågan för användaren
   if (loggedInUserId.value) {
     fetchCurrentQuestionForUser(loggedInUserId.value);
+  } else {
+    currentQuestionReady.value = true;
   }
 });
 </script>
@@ -98,7 +102,7 @@ onMounted(() => {
 <template>
   <p v-if="loading">Laddar nivåer...</p>
   <p v-if="error" class="error-text">{{ error }}</p>
-  <div class="dashboard-quiz-card" v-if="!loading && !error">
+  <div class="dashboard-quiz-card" v-if="!loading && currentQuestionReady && !error">
     <div
       v-for="(level, index) in levels"
       :key="level.id"
