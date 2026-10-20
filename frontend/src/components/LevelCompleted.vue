@@ -43,6 +43,14 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.level-completed-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
 .level-completed-dialog {
   border: 1px solid var(--accent-gold);
   border-radius: 8px;
@@ -53,9 +61,6 @@ onMounted(() => {
   margin: auto;
   color: var(--accent-gold);
   overflow: visible;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .level-completed-dialog::backdrop {
