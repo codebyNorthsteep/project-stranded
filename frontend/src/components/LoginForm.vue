@@ -105,7 +105,7 @@ async function handleSubmit() {
       </p>
 
       <button type="submit" class="button" :disabled="isSubmitting">
-        {{ isSubmitting ? "Loggar in..." : "log in" }}
+        {{ isSubmitting ? "Loggar in..." : "Logga in" }}
       </button>
     </form>
   </div>
