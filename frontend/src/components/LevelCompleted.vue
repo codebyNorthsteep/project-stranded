@@ -35,7 +35,7 @@ onMounted(() => {
           Börja nästa nivå
         </button>
         <button type="button" class="button" @click="goToDashboard">
-          Gå till meny
+          Gå till dashboard
         </button>
       </div>
     </div>
@@ -53,6 +53,9 @@ onMounted(() => {
   margin: auto;
   color: var(--accent-gold);
   overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .level-completed-dialog::backdrop {
@@ -82,7 +85,7 @@ onMounted(() => {
 
 @media (min-width: 768px) {
   .level-completed-dialog {
-    max-width: 360px;
+    max-width: 440px;
   }
 
   .level-completed-title{

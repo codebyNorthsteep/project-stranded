@@ -14,7 +14,7 @@ const currentIndex = ref(0);
 
 const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
-const isLevelCompleted = ref(true);
+const isLevelCompleted = ref(false);
 
 const letters = ["A", "B", "C"];
 
