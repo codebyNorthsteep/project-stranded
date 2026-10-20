@@ -61,9 +61,7 @@ const fetchLevels = async () => {
 };
 
 const fetchCurrentQuestionForUser = async (userId) => {
-  console.log("Försöker hämta statistik för userId:", userId);
-  console.log("Använder token:", localStorage.getItem("user_token"));
-
+  
   try {
     const response = await fetch(
       `http://localhost:3000/api/users/${userId}/statistics/current-question`,
@@ -71,17 +69,14 @@ const fetchCurrentQuestionForUser = async (userId) => {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("user_token")}`,
         },
-      }
+      },
     );
-    
-    console.log("3. Svarsstatus från servern:", response.status);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    console.log("4. Hämtad data från servern:", data);
-    
+
     currentQuestion.value = data;
   } catch (err) {
     console.error("FEL vid hämtning av statistik:", err);
