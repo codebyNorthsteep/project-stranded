@@ -25,14 +25,18 @@ onMounted(() => {
 
 <template>
   <dialog ref="levelCompletedDialog" class="level-completed-dialog">
-    <Confetti :duration="5000" />
+    <Confetti :duration="3000" />
 
     <div class="level-completed-content">
-      <h2 class="level-completed-title">Nivå avklarad!</h2>
+      <p class="level-completed-title">Nivå avklarad!</p>
 
       <div class="button-group">
-        <button type="button" @click="emit('next-level')">Börja nästa nivå</button>
-        <button type="button" @click="goToDashboard">Gå till meny</button>
+        <button type="button" class="button" @click="emit('next-level')">
+          Börja nästa nivå
+        </button>
+        <button type="button" class="button" @click="goToDashboard">
+          Gå till meny
+        </button>
       </div>
     </div>
   </dialog>
@@ -44,7 +48,7 @@ onMounted(() => {
   border-radius: 8px;
   background-color: var(--bg-dark);
   padding: 24px;
-  max-width: 416px;
+  max-width: 240px;
   width: 90%;
   margin: auto;
   color: var(--accent-gold);
@@ -56,44 +60,38 @@ onMounted(() => {
   backdrop-filter: blur(2px);
 }
 
-.level-completed-content {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  text-align: center;
-}
-
 .level-completed-title {
   color: var(--accent-gold);
-  font-size: 24px;
+  font-size: 1.4rem;
   margin: 0;
+  text-align: center;
 }
 
 .button-group {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   width: 100%;
-}
-
-.button-group button {
-  flex: 1;
-  min-height: 48px;
-  padding: 12px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background-color: var(--card-bg);
-  color: var(--accent-gold);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  touch-action: manipulation;
-  outline: none;
+  margin-top: 15px;
 }
 
 .button-group button:focus {
   outline: none;
+  box-shadow: none;
+}
+
+@media (min-width: 768px) {
+  .level-completed-dialog {
+    max-width: 360px;
+  }
+
+  .level-completed-title{
+    font-size: 1.7rem;
+  }
+
+  .button-group {
+    flex-direction: row;
+    gap: 25px;
+  }
 }
 </style>
