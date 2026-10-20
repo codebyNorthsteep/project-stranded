@@ -1,11 +1,12 @@
 <script setup>
+import ClickableHeader from "./components/ClickableHeader.vue";
 </script>
 
 <template>
   <header>
-    <h1>Stranded</h1>
+    <ClickableHeader />
   </header>
-
+  
   <main class="main-content">
     <RouterView />
   </main>
