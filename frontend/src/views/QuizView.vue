@@ -1,5 +1,6 @@
 <script setup>
 import "@/Assets/quiz.css";
+import LevelCompleted from '@/components/LevelCompleted.vue'
 
 import { ref, onMounted, computed } from "vue";
 const loading = ref(false);
@@ -9,6 +10,7 @@ const currentIndex = ref(0);
 
 const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
+const isLevelCompleted = ref(true);
 
 const letters = ["A", "B", "C"];
 
@@ -36,6 +38,15 @@ const nextQuestion = () => {
   selectedAnswerId.value = null;
   }
 
+};
+
+const handleNextLevel = () => {
+  isLevelCompleted.value = false;
+  currentIndex.value = 0;
+  validatedAnswer.value = null;
+  selectedAnswerId.value = null;
+  
+  fetchQuestions();
 };
 
 const fetchQuestions = async () => {
@@ -69,6 +80,10 @@ const fetchAnswerValidation = async (answerId) => {
 
     if (selectedAnswerId.value === answerId) {
       validatedAnswer.value = result;
+
+      if (result.is_correct && isLast.value) {
+        isLevelCompleted.value = true;
+      }
     }
   } catch (err) {
     error.value = err.message;
@@ -161,5 +176,10 @@ onMounted(() => {
         <button v-if="!isLast" @click="nextQuestion" class="button">Nästa fråga</button>
       </div>
     </div>
+
+    <LevelCompleted
+      v-if="isLevelCompleted"
+      @next-level="handleNextLevel"
+    />
   </div>
 </template>
