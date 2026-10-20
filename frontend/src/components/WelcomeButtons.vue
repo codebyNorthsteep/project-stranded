@@ -41,7 +41,7 @@ p {
 
   .button {
     font-size: 1.15rem;
-    width: 125px;
+    min-width: 125px;
     padding: 7px 24px;
   }
 }
@@ -53,7 +53,7 @@ p {
 
     .button {
     font-size: 1.3rem;
-    width: 140px;
+    min-width: 200px;
     padding: 9px 28px;
   }
 }

@@ -80,7 +80,7 @@ function closeOnBackdrop(event) {
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: linear-gradient(rgb(18 29 17 / 25%), rgb(18 29 17 / 55%));
+  background: linear-gradient(rgb(18, 29, 17, 0.65), rgb(18 29 17 / 55%));
   content: "";
   pointer-events: none;
 }
@@ -109,8 +109,9 @@ function closeOnBackdrop(event) {
   width: auto;
   align-self: center;
   min-height: 44px;
-  font-weight: 700;
+  font-weight: 800;
   touch-action: manipulation;
+  color: var(--accent-gold);
 }
 .close-button {
   width: 100%;

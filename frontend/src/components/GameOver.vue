@@ -12,7 +12,7 @@ defineProps({
 const emit = defineEmits(['restart'])
 const router = useRouter()
 
-function goToMenu() {
+function GoToMyDashboard() {
   router.push({ name: 'MyDashboard' })
 }
 </script>
@@ -23,7 +23,7 @@ function goToMenu() {
     <p class="status-message">Du skulle dö!</p>
     <p v-if="explanation" class="explanation">{{ explanation }}</p>
     <button @click="emit('restart')">Spela igen</button>
-    <button @click="goToMenu">Till startmenyn</button>
+    <button @click="GoToMyDashboard">Till startmenyn</button>
   </section>
 </template>
 
