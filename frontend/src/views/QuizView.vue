@@ -1,11 +1,11 @@
 <script setup>
 import "@/Assets/quiz.css";
 import { useRoute, useRouter } from "vue-router";
-
 import { ref, onMounted, computed, watch } from "vue";
+import LevelCompleted from "@/components/LevelCompleted.vue";
+
 const route = useRoute();
 const router = useRouter(); //Hämta router-instansen för att kunna navigera till nästa level efter att man har klarat alla frågor i en nivå
-import LevelCompleted from '@/components/LevelCompleted.vue'
 
 const loading = ref(false);
 const error = ref(null);
@@ -38,30 +38,24 @@ const isLast = computed(
 const nextQuestion = () => {
   if (!isLast.value) {
     currentIndex.value++;
-      validatedAnswer.value = null;
-  selectedAnswerId.value = null;
+    validatedAnswer.value = null;
+    selectedAnswerId.value = null;
   } else {
-    //todo: visa en popup-ruta som säger att man har klarat alla frågor i en nivå och navigera till nästa level eller dashboard
-    nextLevel(); // Navigera till nästa level efter att man har klarat alla frågor i en nivå
+    isLevelCompleted.value = true; // Navigera till nästa level efter att man har klarat alla frågor i en nivå
   }
-
 };
 
 const handleNextLevel = () => {
   isLevelCompleted.value = false;
-  currentIndex.value = 0;
-  validatedAnswer.value = null;
-  selectedAnswerId.value = null;
-  
-  fetchQuestions();
+  nextLevel();
 };
 
 const fetchQuestions = async (requestedLevelId = route.params.levelId) => {
   loading.value = true;
-error.value = null;
-// Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
-const isCurrentRequestedLevel = () =>
-String(route.params.levelId) === String(requestedLevelId);
+  error.value = null;
+  // Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
+  const isCurrentRequestedLevel = () =>
+    String(route.params.levelId) === String(requestedLevelId);
   try {
     const response = await fetch(
       `http://localhost:3000/api/levels/${requestedLevelId}/questions`,
@@ -136,9 +130,10 @@ watch(
       selectedAnswerId.value = null;
       currentIndex.value = 0;
       questions.value = [];
+      isLevelCompleted.value = false;
       fetchQuestions(newLevelId); // Hämta nya frågor för den nya nivån
     }
-  }
+  },
 );
 
 onMounted(() => {
@@ -181,7 +176,7 @@ onMounted(() => {
             v-for="(answer, i) in currentQuestion.answers"
             :key="answer.answer_id"
           >
-          <!-- Eftersom att vi vid fel svar kommer visa att det är fel via en popup-ruta, 
+            <!-- Eftersom att vi vid fel svar kommer visa att det är fel via en popup-ruta, 
            så finns det just nu endast logik för svar som är korrekta -->
             <button
               class="button"
@@ -222,16 +217,18 @@ onMounted(() => {
         </ul>
       </div>
 
-      <div class="next-question" v-if="validatedAnswer && validatedAnswer.is_correct">
+      <div
+        class="next-question"
+        v-if="validatedAnswer && validatedAnswer.is_correct"
+      >
         <div class="correct-msg">Korrekt svar!</div>
-        <button v-if="!isLast" @click="nextQuestion" class="button">Nästa fråga</button>
+        <button v-if="!isLast" @click="nextQuestion" class="button">
+          Nästa fråga
+        </button>
         <button v-else @click="nextLevel" class="button">Nästa nivå</button>
       </div>
     </div>
 
-    <LevelCompleted
-      v-if="isLevelCompleted"
-      @next-level="handleNextLevel"
-    />
+    <LevelCompleted v-if="isLevelCompleted" @next-level="handleNextLevel" />
   </div>
 </template>
