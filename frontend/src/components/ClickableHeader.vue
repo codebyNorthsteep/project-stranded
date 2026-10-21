@@ -26,7 +26,7 @@ function goHome() {
     <header>
     <a
     v-if="!isQuizpage"
-    href="/"
+    <router-link to="/"
     class="clickable-header"
     @click.prevent="goHome"
     >
