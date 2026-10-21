@@ -1,19 +1,14 @@
 <script setup>
 import QuizLevels from "@/components/dashboard/QuizLevels.vue";
+import DashboardWelcome from "@/components/dashboard/DashboardWelcome.vue";
 import "@/Assets/dashboard.css";
-import { ref} from "vue";
-
-const username = ref("Alice"); // ersätt med det faktiska användarnamnet från backend
+import { ref } from "vue";
 
 </script>
 
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-welcome">
-      <h1>Välkommen, {{ username }}!</h1>
-      <p>Här är din dashboard där du kan se din statistik och framsteg.</p>
-    </div>
-
+    <DashboardWelcome />
     <QuizLevels />
   </div>
 </template>
