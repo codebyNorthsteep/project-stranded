@@ -137,6 +137,12 @@ font-family: Syne Mono, monospace;
 }
 
 @media (min-width: 768px) {
+
+  .dashboard-welcome {
+    padding: 32px 48px;
+    max-width: 700px;
+  }
+
   .dashboard-quiz-card {
     flex-direction: row;
     max-width: 700px;
