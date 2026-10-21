@@ -1,10 +1,11 @@
 <script setup>
 import { onMounted, ref} from "vue";
 
+const loggedInUserId = ref(null);
 const username = ref(); // ersätt med det faktiska användarnamnet från backend
 
-const getLoggedInUsername = async () =>{
-fetch(`http://localhost:3000/api/users/${JSON.parse(localStorage.getItem("user"))?.id}`, {
+const getLoggedInUsername = async (userId) =>{
+fetch(`http://localhost:3000/api/users/${userId}`, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem("user_token")}`,
     },
@@ -19,6 +20,12 @@ fetch(`http://localhost:3000/api/users/${JSON.parse(localStorage.getItem("user")
 }
 
 onMounted(() => {
+    loggedInUserId.value = JSON.parse(localStorage.getItem("user"))?.id;
+    if (loggedInUserId.value) {
+        getLoggedInUsername(loggedInUserId.value);
+    } else {
+        username.value = "Användare"; // Default value if user is not logged in
+    }
     getLoggedInUsername();
 });
 </script>
