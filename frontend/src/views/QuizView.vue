@@ -342,6 +342,5 @@ onMounted(() => {
     <LevelCompleted v-if="isLevelCompleted" @next-level="nextLevel" />
     <QuizCompleted v-if="isQuizCompleted" @first-level="firstLevel" />
     <GameOver v-if="isGameOver" :explanation="gameOverExplanation" @restart="handleRestartCurrentLevel" />
-    />
   </div>
 </template>
