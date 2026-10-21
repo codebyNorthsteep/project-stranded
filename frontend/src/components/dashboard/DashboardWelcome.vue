@@ -26,7 +26,6 @@ onMounted(() => {
     } else {
         username.value = "Användare"; // Default value if user is not logged in
     }
-    getLoggedInUsername();
 });
 </script>
 
