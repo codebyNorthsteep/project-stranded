@@ -9,7 +9,7 @@ const route = useRoute();
 const isQuizpage = computed(() => route.name === "Quiz");
 
 function goHome() {
-  if (route.name === "Login" || route.name === "Register") {
+  if (route.name === "Login" || route.name === "Welcome" || route.name === "Register") {
     router.push({ name: "Welcome" });
     return;
   }

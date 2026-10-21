@@ -3,9 +3,7 @@ import ClickableHeader from "./components/ClickableHeader.vue";
 </script>
 
 <template>
-  <header>
-    <ClickableHeader />
-  </header>
+  <ClickableHeader />
   
   <main class="main-content">
     <RouterView />
