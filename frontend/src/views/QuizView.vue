@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { ref, onMounted, computed, watch } from "vue";
 import LevelCompleted from "@/components/LevelCompleted.vue";
 import QuizCompleted from "@/components/QuizCompleted.vue";
+import GameOver from "@/components/GameOver.vue";
 
 const route = useRoute();
 const router = useRouter(); //Hämta router-instansen för att kunna navigera till nästa level efter att man har klarat alla frågor i en nivå
@@ -18,6 +19,8 @@ const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
 const isLevelCompleted = ref(false);
 const isQuizCompleted = ref(false);
+const isGameOver = ref(false);
+const gameOverExplanation = ref("");
 
 const letters = ["A", "B", "C"];
 
@@ -82,11 +85,22 @@ const firstLevel = () => {
     questions.value = [];
     isLevelCompleted.value = false;
     isQuizCompleted.value = false;
+    isGameOver.value = false;
     fetchQuestions(firstLevelId);
   } else {
     isQuizCompleted.value = false;
     router.push(`/quiz/${firstLevelId}/questions`);
   }
+};
+
+//If the user loses, we have to restart the level there the user was answering
+const handleRestartCurrentLevel = () => {
+  isGameOver.value = false;
+  validatedAnswer.value = null;
+  selectedAnswerId.value = null;
+  currentIndex.value = 0;
+  questions.value = [];
+  fetchQuestions(route.params.levelId);
 };
 
 //Determinate if the current level is the last level
@@ -187,6 +201,11 @@ const fetchAnswerValidation = async (answerId) => {
           isLevelCompleted.value = true;
         }
       }
+
+      if (!result.is_correct) {
+        gameOverExplanation.value = result.explanation || "";
+        isGameOver.value = true;
+      }
     }
   } catch (err) {
     // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
@@ -210,6 +229,7 @@ watch(
       questions.value = [];
       isLevelCompleted.value = false;
       isQuizCompleted.value = false;
+      isGameOver.value = false;
       fetchQuestions(newLevelId); // Hämta nya frågor för den nya nivån
     }
   },
@@ -321,5 +341,7 @@ onMounted(() => {
 
     <LevelCompleted v-if="isLevelCompleted" @next-level="nextLevel" />
     <QuizCompleted v-if="isQuizCompleted" @first-level="firstLevel" />
+    <GameOver v-if="isGameOver" :explanation="gameOverExplanation" @restart="handleRestartCurrentLevel" />
+    />
   </div>
 </template>
