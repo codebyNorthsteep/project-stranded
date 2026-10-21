@@ -15,6 +15,10 @@ const questions = ref([]);
 const currentIndex = ref(0);
 const levels = ref([]);
 
+//håll koll på sekvensnumret för att hantera race conditions vid flera fetch-anrop
+//todo: kolla på att refaktorera detta till en bättre lösning
+let requestSequence = 0;
+
 const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
 const isLevelCompleted = ref(false);
@@ -149,6 +153,10 @@ const fetchQuestions = async (
   requestedLevelId = route.params.levelId,
   { resume = true } = {},
 ) => {
+
+  // Öka sekvensnumret för varje nytt anrop så att gamla, pågående anrop blir ogiltiga
+  const currentSequence = ++requestSequence;
+
   loading.value = true;
   error.value = null;
   //Hämta ut frågans id från query-parametern om den finns, annars sätt till null
@@ -168,7 +176,9 @@ const fetchQuestions = async (
     const data = await response.json();
 
     // Blanda svarsalternativen en gång per fråga när de laddas in
-    if (isCurrentRequestedLevel()) {
+    // Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
+    if (currentSequence === requestSequence &&
+      isCurrentRequestedLevel()) {
       questions.value = data.map((q) => ({
         ...q,
         answers: [...q.answers].sort(() => Math.random() - 0.5),
@@ -182,7 +192,8 @@ const fetchQuestions = async (
       currentIndex.value = targetIndex >= 0 ? targetIndex : 0;
     }
   } catch (err) {
-    if (isCurrentRequestedLevel()) error.value = err.message;
+    if (
+      currentSequence === requestSequence &&isCurrentRequestedLevel()) error.value = err.message;
   } finally {
     if (isCurrentRequestedLevel()) loading.value = false;
   }
@@ -359,5 +370,6 @@ onMounted(() => {
       :explanation="gameOverExplanation"
       @restart="handleRestartCurrentLevel"
     />
+
   </div>
 </template>
