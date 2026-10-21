@@ -61,8 +61,8 @@ async function handleSubmit() {
       }
     }
 
-    // Redirect to the quiz after successful login
-    router.push("/quiz");
+    // Redirect to dashboard after successful login
+    router.push("/dashboard");
   } catch (error) {
     errorMessage.value = error.message;
   } finally {
