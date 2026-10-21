@@ -1,24 +1,45 @@
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 const router = useRouter();
 const route = useRoute();
+
+const logoutError = ref("");
 
 const isDashboard = computed(
   () => route.name === "MyDashboard" || route.path === "/dashboard",
 );
 
 const logout = () => {
-  localStorage.removeItem("user_token");
-  localStorage.removeItem("user");
+  logoutError.value = "";
+  let tokenRemoved = false;
 
-  router.push("/");
+  try {
+    localStorage.removeItem("user_token");
+    tokenRemoved = true;
+  } catch (error) {
+    console.error("Failed to remove user_token:", error);
+    logoutError.value = "Logout did not complete. Please try again.";
+  }
+
+  try {
+    localStorage.removeItem("user");
+  } catch (error) {
+    console.error("Failed to remove stored user data:", error);
+  }
+
+  if (tokenRemoved) {
+    return router.push("/");
+  }
 };
 </script>
 
 <template>
   <button v-if="isDashboard" @click="logout" class="button">Logga ut</button>
+  <p v-if="logoutError" role="alert" class="error-message">
+    {{ logoutError }}
+  </p>
 </template>
 
 <style scoped>
@@ -27,7 +48,12 @@ const logout = () => {
   padding: 0 10px;
   margin-top: 20px;
   margin-right: -10px;
-  font-family: 'Syne Mono', monospace;
+  font-family: "Syne Mono", monospace;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.8rem;
 }
 
 @media (min-width: 768px) {
