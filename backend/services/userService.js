@@ -44,7 +44,29 @@ function createUser (username, email, hashedPassword){
   });
 }
 
+function getUserInfoById(userId) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      SELECT user_id, username, email
+      FROM users
+      WHERE user_id = ?
+      LIMIT 1;
+    `;
+    connectionMySQL.query(
+      sql,
+      [userId],
+      (err, rows) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(rows.length > 0 ? rows[0] : null);
+      },
+    );
+  });
+}
+
 module.exports = {
   getUserByUsernameOrEmail,
-  createUser
+  createUser,
+  getUserInfoById
 };
