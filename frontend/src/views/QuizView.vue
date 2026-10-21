@@ -3,6 +3,7 @@ import "@/Assets/quiz.css";
 import { useRoute, useRouter } from "vue-router";
 import { ref, onMounted, computed, watch } from "vue";
 import LevelCompleted from "@/components/LevelCompleted.vue";
+import QuizCompleted from "@/components/QuizCompleted.vue";
 
 const route = useRoute();
 const router = useRouter(); //Hämta router-instansen för att kunna navigera till nästa level efter att man har klarat alla frågor i en nivå
@@ -11,10 +12,12 @@ const loading = ref(false);
 const error = ref(null);
 const questions = ref([]);
 const currentIndex = ref(0);
+const levels = ref([]);
 
 const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
 const isLevelCompleted = ref(false);
+const isQuizCompleted = ref(false);
 
 const letters = ["A", "B", "C"];
 
@@ -41,13 +44,60 @@ const nextQuestion = () => {
     validatedAnswer.value = null;
     selectedAnswerId.value = null;
   } else {
-    isLevelCompleted.value = true; // Navigera till nästa level efter att man har klarat alla frågor i en nivå
+    //If it's last question,
+    //We have to check if it's the last question of the last level, in that case, we show the component quiz completed
+    if (isLastLevelOfQuiz.value) {
+      isQuizCompleted.value = true;
+    //Otherwise, it's the last question of another level so we show the component level completed instead
+    } else { 
+      isLevelCompleted.value = true;
+    }
   }
 };
 
-const handleNextLevel = () => {
+const nextLevel = () => {
   isLevelCompleted.value = false;
-  nextLevel();
+  const currentLevelId = Number(route.params.levelId);
+  const currentIndex = levels.value.findIndex(
+    (l) => l.level_id === currentLevelId,
+  );
+
+  if (currentIndex !== -1 && currentIndex < levels.value.length - 1) {
+    const nextLevelId = levels.value[currentIndex + 1].level_id;
+    router.push(`/quiz/${nextLevelId}/questions`);
+  }
+};
+
+//We need to handle first level in case the user press on the button "start quiz from first level" on quiz completed
+const firstLevel = () => {
+  isQuizCompleted.value = false;
+  if (levels.value.length > 0) {
+    const firstLevelId = levels.value[0].level_id;
+    router.push(`/quiz/${firstLevelId}/questions`);
+  }
+};
+
+//Determinate if the current level is the last level
+const isLastLevelOfQuiz = computed(() => {
+  if (levels.value.length === 0) {
+    return false;
+  }
+  const currentLevelId = Number(route.params.levelId);
+  const lastLevel = levels.value[levels.value.length - 1];
+  return currentLevelId === lastLevel.level_id;
+});
+
+const fetchLevels = async () => {
+  try {
+    const response = await fetch(`http://localhost:3000/api/levels`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    levels.value = data;
+  } catch (err) {
+    console.error("Error fetching levels:", err);
+  }
 };
 
 const fetchQuestions = async (requestedLevelId = route.params.levelId) => {
@@ -79,13 +129,6 @@ const fetchQuestions = async (requestedLevelId = route.params.levelId) => {
   }
 };
 
-const nextLevel = () => {
-  // Navigera till nästa level efter att man har klarat alla frågor i en nivå
-  const currentLevelId = parseInt(route.params.levelId);
-  const nextLevelId = currentLevelId + 1;
-  router.push(`/quiz/${nextLevelId}/questions`);
-};
-
 const fetchAnswerValidation = async (answerId) => {
   selectedAnswerId.value = answerId;
   const validationLevelId = route.params.levelId; // Spara nuvarande nivå när anropet startar för att säkerställa att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
@@ -107,7 +150,11 @@ const fetchAnswerValidation = async (answerId) => {
       validatedAnswer.value = result;
 
       if (result.is_correct && isLast.value) {
-        isLevelCompleted.value = true;
+        if (isLastLevelOfQuiz.value) {
+          isQuizCompleted.value = true;
+        } else {
+          isLevelCompleted.value = true;
+        }
       }
     }
   } catch (err) {
@@ -131,12 +178,14 @@ watch(
       currentIndex.value = 0;
       questions.value = [];
       isLevelCompleted.value = false;
+      isQuizCompleted.value = false;
       fetchQuestions(newLevelId); // Hämta nya frågor för den nya nivån
     }
   },
 );
 
 onMounted(() => {
+  fetchLevels();
   fetchQuestions();
 });
 </script>
@@ -225,10 +274,13 @@ onMounted(() => {
         <button v-if="!isLast" @click="nextQuestion" class="button">
           Nästa fråga
         </button>
-        <button v-else @click="nextLevel" class="button">Nästa nivå</button>
+        <button v-else @click="nextQuestion" class="button">
+          {{ isLastLevelOfQuiz ? "Se resultat" : "Nästa nivå" }}
+        </button>
       </div>
     </div>
 
-    <LevelCompleted v-if="isLevelCompleted" @next-level="handleNextLevel" />
+    <LevelCompleted v-if="isLevelCompleted" @next-level="nextLevel" />
+    <QuizCompleted v-if="isQuizCompleted" @first-level="firstLevel" />
   </div>
 </template>
