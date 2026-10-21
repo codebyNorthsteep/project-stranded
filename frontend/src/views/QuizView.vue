@@ -99,16 +99,35 @@ const isLastLevelOfQuiz = computed(() => {
   return currentLevelId === lastLevel.level_id;
 });
 
+const levelsLoading = ref(true);
+const levelsError = ref(null);
+
+const levelsReady = computed(
+  () => !levelsLoading.value && !levelsError.value && levels.value.length > 0,
+);
+
 const fetchLevels = async () => {
+  levelsLoading.value = true;
+  levelsError.value = null;
+
   try {
-    const response = await fetch(`http://localhost:3000/api/levels`);
+    const response = await fetch("http://localhost:3000/api/levels");
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     const data = await response.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error("Inga nivåer kunde laddas.");
+    }
+
     levels.value = data;
   } catch (err) {
-    console.error("Error fetching levels:", err);
+    levelsError.value = err.message;
+  } finally {
+    levelsLoading.value = false;
   }
 };
 
@@ -204,10 +223,18 @@ onMounted(() => {
 
 <template>
   <div class="quiz-container" :id="getBackgroundId">
-    <p v-if="loading" class="status-msg">Laddar...</p>
+    <p v-if="loading || levelsLoading" class="status-msg">Laddar...</p>
+
     <p v-if="error" class="status-msg error">Fel: {{ error }}</p>
 
-    <div v-if="currentQuestion" class="quiz-content">
+    <div v-if="levelsError" role="alert">
+      <p class="status-msg error">
+        Kunde inte ladda nivåerna: {{ levelsError }}
+      </p>
+      <button class="button" @click="fetchLevels">Försök igen</button>
+    </div>
+
+    <div v-if="currentQuestion && levelsReady" class="quiz-content">
       <div class="quiz-header">
         <div class="level-info">
           <p class="level-badge">Nivå: {{ currentQuestion.level_name }}</p>
