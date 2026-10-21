@@ -24,8 +24,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="dashboard-welcome">
-      <h1>Välkommen, {{ username }}!</h1>
-      <p>Här är din dashboard där du kan se din statistik och framsteg.</p>
+<div class="dashboard-welcome">
+      <h2>Välkommen tillbaka, <span class="username-highlight">{{ username || 'Användare' }}</span>! 👋</h2>
+      <p>Här är din översikt där du kan följa din statistik, se dina framsteg och hoppa direkt in i nästa quiz.</p>
     </div>
 </template>
