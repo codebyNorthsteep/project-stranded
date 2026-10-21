@@ -153,7 +153,6 @@ const fetchQuestions = async (
   requestedLevelId = route.params.levelId,
   { resume = true } = {},
 ) => {
-
   // Öka sekvensnumret för varje nytt anrop så att gamla, pågående anrop blir ogiltiga
   const currentSequence = ++requestSequence;
 
@@ -177,8 +176,7 @@ const fetchQuestions = async (
 
     // Blanda svarsalternativen en gång per fråga när de laddas in
     // Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
-    if (currentSequence === requestSequence &&
-      isCurrentRequestedLevel()) {
+    if (currentSequence === requestSequence && isCurrentRequestedLevel()) {
       questions.value = data.map((q) => ({
         ...q,
         answers: [...q.answers].sort(() => Math.random() - 0.5),
@@ -192,10 +190,11 @@ const fetchQuestions = async (
       currentIndex.value = targetIndex >= 0 ? targetIndex : 0;
     }
   } catch (err) {
-    if (
-      currentSequence === requestSequence &&isCurrentRequestedLevel()) error.value = err.message;
+    if (currentSequence === requestSequence && isCurrentRequestedLevel())
+      error.value = err.message;
   } finally {
-    if (isCurrentRequestedLevel()) loading.value = false;
+    if (currentSequence === requestSequence && isCurrentRequestedLevel())
+      loading.value = false;
   }
 };
 
@@ -370,6 +369,5 @@ onMounted(() => {
       :explanation="gameOverExplanation"
       @restart="handleRestartCurrentLevel"
     />
-
   </div>
 </template>
