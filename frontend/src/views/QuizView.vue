@@ -48,8 +48,8 @@ const nextQuestion = () => {
     //We have to check if it's the last question of the last level, in that case, we show the component quiz completed
     if (isLastLevelOfQuiz.value) {
       isQuizCompleted.value = true;
-    //Otherwise, it's the last question of another level so we show the component level completed instead
-    } else { 
+      //Otherwise, it's the last question of another level so we show the component level completed instead
+    } else {
       isLevelCompleted.value = true;
     }
   }
@@ -70,9 +70,21 @@ const nextLevel = () => {
 
 //We need to handle first level in case the user press on the button "start quiz from first level" on quiz completed
 const firstLevel = () => {
-  isQuizCompleted.value = false;
-  if (levels.value.length > 0) {
-    const firstLevelId = levels.value[0].level_id;
+  if (levels.value.length === 0) return;
+
+  const firstLevelId = levels.value[0].level_id;
+
+  //If the first level is, ath the same time, the last level, we need to restart all the variables
+  if (Number(route.params.levelId) === Number(firstLevelId)) {
+    validatedAnswer.value = null;
+    selectedAnswerId.value = null;
+    currentIndex.value = 0;
+    questions.value = [];
+    isLevelCompleted.value = false;
+    isQuizCompleted.value = false;
+    fetchQuestions(firstLevelId);
+  } else {
+    isQuizCompleted.value = false;
     router.push(`/quiz/${firstLevelId}/questions`);
   }
 };
