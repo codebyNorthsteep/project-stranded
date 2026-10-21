@@ -119,7 +119,10 @@ onMounted(() => {
       <!-- Om användaren är på denna nivå (Fortsätt quiz) -->
       <router-link
         v-else-if="getLevelStatus(level, index) === 'in-progress'"
-        :to="`/quiz/${level.level_id}/questions`"
+        :to="
+        currentQuestionId
+        ?`/quiz/${level.level_id}/questions?questionId=${currentQuestionId}`
+        : `/quiz/${level.level_id}/questions`"
         class="button"
       >
         <!-- Byt text beroende på om man är på början eller mitt i -->

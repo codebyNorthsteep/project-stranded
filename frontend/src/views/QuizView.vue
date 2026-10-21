@@ -148,6 +148,9 @@ const fetchLevels = async () => {
 const fetchQuestions = async (requestedLevelId = route.params.levelId) => {
   loading.value = true;
   error.value = null;
+  //Hämta ut frågans id från query-parametern om den finns, annars sätt till null
+  const targetQuestionId = route.query.questionId ? Number(route.query.questionId) : null;
+
   // Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
   const isCurrentRequestedLevel = () =>
     String(route.params.levelId) === String(requestedLevelId);
@@ -166,6 +169,15 @@ const fetchQuestions = async (requestedLevelId = route.params.levelId) => {
         ...q,
         answers: [...q.answers].sort(() => Math.random() - 0.5),
       }));
+
+      if(targetQuestionId) {
+        const targetIndex = questions.value.findIndex(q => q.question_id === targetQuestionId);
+        if(targetIndex !== -1) {
+          currentIndex.value = targetIndex;
+        } else {
+          currentIndex.value = 0; // Om frågan inte hittas, starta från början
+        }
+      }
     }
   } catch (err) {
     if (isCurrentRequestedLevel()) error.value = err.message;
@@ -220,8 +232,8 @@ const fetchAnswerValidation = async (answerId) => {
 
 // Lyssna på om URL:en ändras (i detta fallnär man byter nivå)
 watch(
-  () => route.params.levelId,
-  (newLevelId) => {
+  () => [route.params.levelId, route.query.questionId],
+  ([newLevelId]) => { //plocka ut den nya levelId:n från route.params.levelId
     if (newLevelId) {
       validatedAnswer.value = null;
       selectedAnswerId.value = null;
