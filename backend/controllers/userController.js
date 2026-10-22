@@ -120,3 +120,29 @@ exports.registerUser = async (req, res) => {
     });
   }
 };
+
+exports.getUserInfo = async (req, res) => {
+  try {
+    const authenticatedUserId = req.userData?.id;
+
+    if (authenticatedUserId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    if (String(req.params.userId) !== String(authenticatedUserId)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const userId = authenticatedUserId;
+    const userInfo = await userService.getUserInfoById(userId);
+    if (!userInfo) {
+      return res.status(404).json({ error: "Användare hittades inte" });
+    }
+    return res.status(200).json(userInfo);
+  } catch (err) {
+    console.error("Get user info controller error:", err);
+    return res.status(500).json({
+      error: "Ett fel uppstod när användarinformationen hämtades",
+    });
+  }
+};

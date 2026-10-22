@@ -10,14 +10,34 @@
 }
 
 .dashboard-welcome {
-  margin-bottom: 20px;
+  background-color: var(--card-bg, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-radius: 16px;
+  padding: 24px 32px;
+  margin-bottom: 24px;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: center; /* Snyggt centrerat, ta bort denna rad om du hellre vill ha vänsterställt */
 }
 
-.dashboard-welcome h1 {
-  margin-bottom: 10px;
+.dashboard-welcome h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.username-highlight {
+  color: #2ecc71; /* Eller någon accentfärg som passar din profil, t.ex. en grön ton */
+}
+
+.dashboard-welcome p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text-muted, #a0a0a0);
+  line-height: 1.5;
 }
 
 .dashboard-quiz-card {
@@ -61,13 +81,29 @@ content: '';
 
 /* Se till att text och knapp hamnar ovanför det mörka lagret */
 .dashboard-level p,
-.dashboard-level .button {
+.dashboard-level .button,
+.dashboard-level .badge-completed {
   position: relative;
   z-index: 2;
 }
 
 .dashboard-level p {
   font-weight: bold;
+}
+
+.badge-completed {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  background-color: rgba(46, 204, 113, 0.15); 
+  border: 1px solid rgba(46, 204, 113, 0.4); 
+  border-radius: 20px;
+  padding: 6px 16px;
+  color: var(--text-light);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+font-family: Syne Mono, monospace;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .locked-content {
@@ -101,6 +137,12 @@ content: '';
 }
 
 @media (min-width: 768px) {
+
+  .dashboard-welcome {
+    padding: 32px 48px;
+    max-width: 700px;
+  }
+
   .dashboard-quiz-card {
     flex-direction: row;
     max-width: 700px;
