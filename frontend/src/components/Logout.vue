@@ -38,7 +38,7 @@ const logout = () => {
 <template>
   <div v-if="isDashboard || logoutError" class="logout-controls">
     <button v-if="isDashboard" @click="logout" class="button">Logga ut</button>
-    <p v-if="logoutError" role="alert" class="error-message">
+    <p v-if="logoutError" && "isDashboard" role="alert" class="error-message">
       {{ logoutError }}
     </p>
   </div>
