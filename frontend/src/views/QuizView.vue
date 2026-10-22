@@ -15,6 +15,10 @@ const questions = ref([]);
 const currentIndex = ref(0);
 const levels = ref([]);
 
+//håll koll på sekvensnumret för att hantera race conditions vid flera fetch-anrop
+//todo: kolla på att refaktorera detta till en bättre lösning
+let requestSequence = 0;
+
 const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
 const isLevelCompleted = ref(false);
@@ -86,7 +90,7 @@ const firstLevel = () => {
     isLevelCompleted.value = false;
     isQuizCompleted.value = false;
     isGameOver.value = false;
-    fetchQuestions(firstLevelId);
+    fetchQuestions(firstLevelId, { resume: false });
   } else {
     isQuizCompleted.value = false;
     router.push(`/quiz/${firstLevelId}/questions`);
@@ -100,7 +104,7 @@ const handleRestartCurrentLevel = () => {
   selectedAnswerId.value = null;
   currentIndex.value = 0;
   questions.value = [];
-  fetchQuestions(route.params.levelId);
+  fetchQuestions(route.params.levelId, { resume: false });
 };
 
 //Determinate if the current level is the last level
@@ -145,9 +149,19 @@ const fetchLevels = async () => {
   }
 };
 
-const fetchQuestions = async (requestedLevelId = route.params.levelId) => {
+const fetchQuestions = async (
+  requestedLevelId = route.params.levelId,
+  { resume = true } = {},
+) => {
+  // Öka sekvensnumret för varje nytt anrop så att gamla, pågående anrop blir ogiltiga
+  const currentSequence = ++requestSequence;
+
   loading.value = true;
   error.value = null;
+  //Hämta ut frågans id från query-parametern om den finns, annars sätt till null
+  const targetQuestionId =
+    resume && route.query.questionId ? Number(route.query.questionId) : null;
+
   // Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
   const isCurrentRequestedLevel = () =>
     String(route.params.levelId) === String(requestedLevelId);
@@ -161,16 +175,26 @@ const fetchQuestions = async (requestedLevelId = route.params.levelId) => {
     const data = await response.json();
 
     // Blanda svarsalternativen en gång per fråga när de laddas in
-    if (isCurrentRequestedLevel()) {
+    // Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
+    if (currentSequence === requestSequence && isCurrentRequestedLevel()) {
       questions.value = data.map((q) => ({
         ...q,
         answers: [...q.answers].sort(() => Math.random() - 0.5),
       }));
+
+      const targetIndex =
+        targetQuestionId !== null
+          ? questions.value.findIndex((q) => q.question_id === targetQuestionId)
+          : -1;
+
+      currentIndex.value = targetIndex >= 0 ? targetIndex : 0;
     }
   } catch (err) {
-    if (isCurrentRequestedLevel()) error.value = err.message;
+    if (currentSequence === requestSequence && isCurrentRequestedLevel())
+      error.value = err.message;
   } finally {
-    if (isCurrentRequestedLevel()) loading.value = false;
+    if (currentSequence === requestSequence && isCurrentRequestedLevel())
+      loading.value = false;
   }
 };
 
@@ -220,8 +244,9 @@ const fetchAnswerValidation = async (answerId) => {
 
 // Lyssna på om URL:en ändras (i detta fallnär man byter nivå)
 watch(
-  () => route.params.levelId,
-  (newLevelId) => {
+  () => [route.params.levelId, route.query.questionId],
+  ([newLevelId]) => {
+    //plocka ut den nya levelId:n från route.params.levelId
     if (newLevelId) {
       validatedAnswer.value = null;
       selectedAnswerId.value = null;
@@ -284,8 +309,6 @@ onMounted(() => {
             v-for="(answer, i) in currentQuestion.answers"
             :key="answer.answer_id"
           >
-            <!-- Eftersom att vi vid fel svar kommer visa att det är fel via en popup-ruta, 
-           så finns det just nu endast logik för svar som är korrekta -->
             <button
               class="button"
               :class="{
@@ -341,6 +364,10 @@ onMounted(() => {
 
     <LevelCompleted v-if="isLevelCompleted" @next-level="nextLevel" />
     <QuizCompleted v-if="isQuizCompleted" @first-level="firstLevel" />
-    <GameOver v-if="isGameOver" :explanation="gameOverExplanation" @restart="handleRestartCurrentLevel" />
+    <GameOver
+      v-if="isGameOver"
+      :explanation="gameOverExplanation"
+      @restart="handleRestartCurrentLevel"
+    />
   </div>
 </template>

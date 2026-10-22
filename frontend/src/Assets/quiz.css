@@ -179,19 +179,19 @@ ul {
 .correct-answer {
   border-color: #1ad920;
   color: #1ad920;
-  transform: scale(1.10);
+  transform: scale(1.1);
 }
 
 .button.dimmed-answer {
-  filter: blur(2px);     /* Gör knappen suddig */
-  opacity: 0.8;          /* Drar ner genomskinligheten lite */
-  pointer-events: none;  /* Gör att man inte kan klicka på de andra knapparna mer */
-  transition: filter 0.3s ease, opacity 0.3s ease;
+  filter: blur(2px); /* Gör knappen suddig */
+  opacity: 0.8; /* Drar ner genomskinligheten lite */
+  pointer-events: none; /* Gör att man inte kan klicka på de andra knapparna mer */
+  transition:
+    filter 0.3s ease,
+    opacity 0.3s ease;
 }
 
-
 .button.correct-answer .letter {
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -207,7 +207,6 @@ ul {
   border-color: #1ad920;
   padding: 5px 20px;
   color: var(--text-light);
-
 }
 
 .next-question {
@@ -218,23 +217,21 @@ ul {
 }
 
 .next-question .button {
-width: 40%;
+  width: 40%;
 }
 
 /* ==========================================================================
    MEDIA QUERIES FOR TABLET & DESKTOP :)
    ========================================================================== */
 
-
 @media (min-width: 768px) {
   .quiz-container {
-    max-width: 950px;
+    max-width: 90%;
     padding: 60px 40px;
     display: flex;
     justify-content: center;
     align-items: center;
   }
-
 
   .quiz-content {
     display: grid;
@@ -256,10 +253,9 @@ width: 40%;
 
   .quiz-header {
     grid-column: 2;
-    grid-row: 1 / span 2; 
+    grid-row: 1;
 
-  
-    background-color: var(--card-bg);
+    background-color: rgb(18, 29, 17, 0.88);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 24px 20px;
@@ -269,6 +265,8 @@ width: 40%;
     align-items: center;
     gap: 16px;
   }
+
+
 
   .level-info {
     flex-direction: column;
