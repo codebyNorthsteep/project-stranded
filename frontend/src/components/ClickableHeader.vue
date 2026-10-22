@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "vue";
 import { useRouter,useRoute } from "vue-router";
+import Logout from '../components/Logout.vue';
 
 
 const router = useRouter();
@@ -23,7 +24,7 @@ function goHome() {
 </script>
 
 <template>
-    <header>
+    <header class="main-header">
     <a
     v-if="!isQuizpage"
     <router-link to="/"
@@ -34,6 +35,9 @@ function goHome() {
     </a>
 
     <h1 v-else class="clickable-header">Stranded</h1>
+
+    <Logout />
+
     </header>
 </template>
 
@@ -47,6 +51,12 @@ function goHome() {
 .clickable-header:focus-visible {
   outline: 2px solid var(--accent-gold);
   outline-offset: 4px;
+}
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 h1 {
   margin-top: 20px;
