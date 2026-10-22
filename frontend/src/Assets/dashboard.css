@@ -1,12 +1,21 @@
 .dashboard-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  grid-template-areas: "main stats";
+  align-items: start;
+  gap: 24px;
   min-height: 100vh;
   padding: 20px;
-  text-align: center;
   background-color: var(--bg-dark);
+}
+
+.dashboard-main {
+  grid-area: main;
+  min-width: 0;
+}
+
+.stats-panel {
+  grid-area: stats;
 }
 
 .dashboard-welcome {
@@ -160,5 +169,14 @@ font-family: Syne Mono, monospace;
 
   .dashboard-level p {
   font-size: 20px;
+}
+}
+
+@media (max-width: 900px) {
+.dashboard-container {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "main"
+    "stats";
 }
 }

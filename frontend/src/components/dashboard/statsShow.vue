@@ -4,7 +4,7 @@ import { ref, onMounted } from "vue";
 const stats = ref([
   { level_id: 1, correct_answers: 0 },
   { level_id: 2, correct_answers: 0 },
-  { level_id: 4, correct_answers: 0 }
+  { level_id: 3, correct_answers: 0 }
 ]);
 
 const userId = ref(null);
@@ -40,23 +40,21 @@ onMounted(() => {
 
 <template>
   <div class="stats-panel">
-    <h2>Din statistik</h2>
+    <h2 class="stats-title">Din statistik</h2>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <span class="label">Nivå 1</span>
-        <strong>{{ getLevelCount(1) }}</strong>
-      </div>
+    <div class="stat-card stat-level-1">
+      <span class="label">Svenska skog</span>
+      <strong>{{ getLevelCount(1) }}</strong>
+    </div>
 
-      <div class="stat-card">
-        <span class="label">Nivå 2</span>
-        <strong>{{ getLevelCount(2) }}</strong>
-      </div>
+    <div class="stat-card stat-level-2">
+      <span class="label">Amazonas</span>
+      <strong>{{ getLevelCount(2) }}</strong>
+    </div>
 
-      <div class="stat-card">
-        <span class="label">Nivå 3</span>
-        <strong>{{ getLevelCount(3) }}</strong>
-      </div>
+    <div class="stat-card stat-level-4">
+      <span class="label">Sahara</span>
+      <strong>{{ getLevelCount(3) }}</strong>
     </div>
   </div>
 </template>
@@ -64,37 +62,59 @@ onMounted(() => {
 <style scoped>
 .stats-panel {
   display: grid;
-  gap: 16px;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "title"
+    "level1"
+    "level2"
+    "level3";
+  align-content: start;
+  gap: 12px;
   width: 100%;
-  max-width: 300px;
-  background: #111;
-  color: white;
+  box-sizing: border-box;
   padding: 20px;
+  color: var(--text-light);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
-  border: 2px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+.stats-title {
+  grid-area: title;
+  margin: 0;
+  color: var(--text-light);
+  text-align: center;
+}
+
+.stat-level-1 {
+  grid-area: level1;
+}
+
+.stat-level-2 {
+  grid-area: level2;
 }
 
 .stat-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #1a1a1a;
-  border: 1px solid #333;
-  border-radius: 12px;
   padding: 14px 16px;
+  color: var(--text-light);
+  background: rgba(18, 29, 17, 0.55);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.stat-level-3 {
+  grid-area: level4;
 }
 
 .label {
-  font-size: 0.95rem;
+  color: var(--text-muted);
 }
 
-strong {
-  font-size: 1.4rem;
+.stat-card strong {
+  color: var(--accent-gold);
 }
 </style>
