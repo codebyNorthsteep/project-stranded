@@ -26,6 +26,8 @@ app.use(quizRoute);
 const userRoute = require('./routes/userRoutes');
 app.use(userRoute);
 
+const rightAnswerRoute = require("./routes/RightAnswerRoutes");
+app.use(rightAnswerRoute);
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);   
 });
