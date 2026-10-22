@@ -35,6 +35,7 @@ const getProgress = (level, index) => {
   if (status === "locked") return 0;
 
   const totalQuestions = levelQuestions.value.length;
+  if (totalQuestions === 0) return 0;
   const indexOfCurrentQuestion = levelQuestions.value.findIndex(
     (q) => q.question_id === currentQuestionId.value,
   );
@@ -94,6 +95,7 @@ const fetchCurrentQuestionForUser = async (userId) => {
     currentQuestionReady.value = true;
 
     // hämta frågorna för den aktuella nivån
+    if (data?.current_level_id == null) return;
     const resQ = await fetch(
       `http://localhost:3000/api/levels/${data.current_level_id}/questions`,
     );
