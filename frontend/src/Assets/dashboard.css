@@ -61,7 +61,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 60px;
+  height: 65px;
   padding: 20px;
   border-radius: 12px;
   border: 1px solid var(--border-color);
@@ -82,7 +82,8 @@ content: '';
 /* Se till att text och knapp hamnar ovanför det mörka lagret */
 .dashboard-level p,
 .dashboard-level .button,
-.dashboard-level .badge-completed {
+.dashboard-level .badge-completed,
+progress {
   position: relative;
   z-index: 2;
 }

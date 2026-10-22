@@ -4,6 +4,7 @@ import { ref, onMounted, computed } from "vue";
 const loading = ref(false);
 const error = ref(null);
 const levels = ref([]);
+const levelQuestions = ref([]);
 const currentQuestion = ref(null);
 const currentQuestionReady = ref(false);
 const loggedInUserId = ref(null);
@@ -27,6 +28,19 @@ const currentLevelId = computed(() => {
 const currentQuestionId = computed(() => {
   return currentQuestion.value?.current_question_id;
 });
+
+const getProgress = (level, index) => {
+  const status = getLevelStatus(level, index);
+  if (status === "completed") return 100;
+  if (status === "locked") return 0;
+
+  const totalQuestions = levelQuestions.value.length;
+  if (totalQuestions === 0) return 0;
+  const indexOfCurrentQuestion = levelQuestions.value.findIndex(
+    (q) => q.question_id === currentQuestionId.value,
+  );
+  return (Math.max(indexOfCurrentQuestion, 0) / totalQuestions) * 100;
+};
 
 const getLevelStatus = (level, index) => {
   // hämta värdet på den aktuella nivån för användaren
@@ -62,7 +76,6 @@ const fetchLevels = async () => {
 };
 
 const fetchCurrentQuestionForUser = async (userId) => {
-
   try {
     const response = await fetch(
       `http://localhost:3000/api/users/${userId}/statistics/current-question`,
@@ -80,6 +93,13 @@ const fetchCurrentQuestionForUser = async (userId) => {
 
     currentQuestion.value = data;
     currentQuestionReady.value = true;
+
+    // hämta frågorna för den aktuella nivån
+    if (data?.current_level_id == null) return;
+    const resQ = await fetch(
+      `http://localhost:3000/api/levels/${data.current_level_id}/questions`,
+    );
+    if (resQ.ok) levelQuestions.value = await resQ.json();
   } catch (err) {
     error.value = err.message;
   }
@@ -102,7 +122,10 @@ onMounted(() => {
 <template>
   <p v-if="loading">Laddar nivåer...</p>
   <p v-if="error" class="error-text">{{ error }}</p>
-  <div class="dashboard-quiz-card" v-if="!loading && currentQuestionReady && !error">
+  <div
+    class="dashboard-quiz-card"
+    v-if="!loading && currentQuestionReady && !error"
+  >
     <div
       v-for="(level, index) in levels"
       :key="level.id"
@@ -110,33 +133,64 @@ onMounted(() => {
       :id="getBackgroundId(level.env_name)"
     >
       <p>{{ level.env_name }}</p>
+      <div class="progress-content">
+        <!-- Om nivån är avklarad -->
+        <div v-if="getLevelStatus(level, index) === 'completed'">
+          <span class="badge-completed">Avklarad</span>
+        </div>
 
-      <!-- Om nivån är avklarad -->
-      <div v-if="getLevelStatus(level, index) === 'completed'">
-        <span class="badge-completed">Avklarad</span>
-      </div>
+        <!-- Om användaren är på denna nivå (Fortsätt quiz) -->
+        <router-link
+          v-else-if="getLevelStatus(level, index) === 'in-progress'"
+          :to="
+            currentQuestionId
+              ? `/quiz/${level.level_id}/questions?questionId=${currentQuestionId}`
+              : `/quiz/${level.level_id}/questions`
+          "
+          class="button"
+        >
+          <!-- Byt text beroende på om man är på början eller mitt i -->
+          {{
+            currentLevelId > 1 || (currentQuestionId && currentQuestionId > 1)
+              ? "Fortsätt quiz"
+              : "Starta quiz"
+          }}
+        </router-link>
 
-      <!-- Om användaren är på denna nivå (Fortsätt quiz) -->
-      <router-link
-        v-else-if="getLevelStatus(level, index) === 'in-progress'"
-        :to="
-        currentQuestionId
-        ?`/quiz/${level.level_id}/questions?questionId=${currentQuestionId}`
-        : `/quiz/${level.level_id}/questions`"
-        class="button"
-      >
-        <!-- Byt text beroende på om man är på början eller mitt i -->
-        {{
-          currentLevelId > 1 || (currentQuestionId && currentQuestionId > 1)
-            ? "Fortsätt quiz"
-            : "Starta quiz"
-        }}
-      </router-link>
-
-      <!-- Om den är låst -->
-      <div v-else class="locked-content">
-        <span class="lock-icon">🔒</span>
+        <!-- Om den är låst -->
+        <div v-else class="locked-content">
+          <span class="lock-icon">🔒</span>
+        </div>
+        <!-- Progressbar -->
+        <progress
+          v-if="getLevelStatus(level, index) === 'in-progress'"
+          :value="getProgress(level, index)"
+          max="100"
+        ></progress>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Progress bar styling */
+progress {
+  width: 80%;
+  height: 6px;
+  appearance: none;
+  border: none;
+}
+progress::-webkit-progress-bar {
+  background: var(--card-bg);
+  border: 1px solid var(--accent-gold);
+  border-radius: 4px;
+}
+progress::-webkit-progress-value {
+  background: var(--accent-gold);
+  border-radius: 4px;
+}
+progress::-moz-progress-bar {
+  background: var(--accent-gold);
+  border-radius: 4px;
+}
+</style>
