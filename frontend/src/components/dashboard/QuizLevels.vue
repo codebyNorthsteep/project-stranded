@@ -180,6 +180,7 @@ progress {
 }
 progress::-webkit-progress-bar {
   background: var(--card-bg);
+  border: 1px solid var(--accent-gold);
   border-radius: 4px;
 }
 progress::-webkit-progress-value {
