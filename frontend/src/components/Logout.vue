@@ -36,13 +36,21 @@ const logout = () => {
 </script>
 
 <template>
-  <button v-if="isDashboard" @click="logout" class="button">Logga ut</button>
-  <p v-if="logoutError" role="alert" class="error-message">
-    {{ logoutError }}
-  </p>
+  <div v-if="isDashboard || logoutError" class="logout-controls">
+    <button v-if="isDashboard" @click="logout" class="button">Logga ut</button>
+    <p v-if="logoutError" role="alert" class="error-message">
+      {{ logoutError }}
+    </p>
+  </div>
 </template>
 
 <style scoped>
+.logout-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
 .button {
   height: 30px;
   padding: 0 10px;
