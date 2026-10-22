@@ -8,7 +8,6 @@ const levelQuestions = ref([]);
 const currentQuestion = ref(null);
 const currentQuestionReady = ref(false);
 const loggedInUserId = ref(null);
-const currentIndex = ref(0);
 
 // Hjälpfunktion för att få rätt CSS-klass baserat på miljöns namn
 const getBackgroundId = (envName) => {
@@ -31,15 +30,15 @@ const currentQuestionId = computed(() => {
 });
 
 const getProgress = (level, index) => {
-const status = getLevelStatus(level, index);
-if(status === "completed") return 100;
-if(status === "locked") return 0;
+  const status = getLevelStatus(level, index);
+  if (status === "completed") return 100;
+  if (status === "locked") return 0;
 
-const totalQuestions = levelQuestions.value.length;
-const indexOfCurrentQuestion = levelQuestions.value.findIndex(
-  (q) => q.question_id === currentQuestionId.value
-);
-return (Math.max(indexOfCurrentQuestion, 0) / totalQuestions) * 100;
+  const totalQuestions = levelQuestions.value.length;
+  const indexOfCurrentQuestion = levelQuestions.value.findIndex(
+    (q) => q.question_id === currentQuestionId.value,
+  );
+  return (Math.max(indexOfCurrentQuestion, 0) / totalQuestions) * 100;
 };
 
 const getLevelStatus = (level, index) => {
@@ -59,7 +58,6 @@ const getLevelStatus = (level, index) => {
     return "locked"; // Nivån är låst
   }
 };
-
 
 const fetchLevels = async () => {
   loading.value = true;
@@ -133,37 +131,41 @@ onMounted(() => {
       :id="getBackgroundId(level.env_name)"
     >
       <p>{{ level.env_name }}</p>
+      <div class="progress-content">
+        <!-- Om nivån är avklarad -->
+        <div v-if="getLevelStatus(level, index) === 'completed'">
+          <span class="badge-completed">Avklarad</span>
+        </div>
 
-      <!-- Om nivån är avklarad -->
-      <div v-if="getLevelStatus(level, index) === 'completed'">
-        <span class="badge-completed">Avklarad</span>
+        <!-- Om användaren är på denna nivå (Fortsätt quiz) -->
+        <router-link
+          v-else-if="getLevelStatus(level, index) === 'in-progress'"
+          :to="
+            currentQuestionId
+              ? `/quiz/${level.level_id}/questions?questionId=${currentQuestionId}`
+              : `/quiz/${level.level_id}/questions`
+          "
+          class="button"
+        >
+          <!-- Byt text beroende på om man är på början eller mitt i -->
+          {{
+            currentLevelId > 1 || (currentQuestionId && currentQuestionId > 1)
+              ? "Fortsätt quiz"
+              : "Starta quiz"
+          }}
+        </router-link>
+
+        <!-- Om den är låst -->
+        <div v-else class="locked-content">
+          <span class="lock-icon">🔒</span>
+        </div>
+        <!-- Progressbar -->
+        <progress
+          v-if="getLevelStatus(level, index) === 'in-progress'"
+          :value="getProgress(level, index)"
+          max="100"
+        ></progress>
       </div>
-
-      <!-- Om användaren är på denna nivå (Fortsätt quiz) -->
-      <router-link
-        v-else-if="getLevelStatus(level, index) === 'in-progress'"
-        :to="
-          currentQuestionId
-            ? `/quiz/${level.level_id}/questions?questionId=${currentQuestionId}`
-            : `/quiz/${level.level_id}/questions`
-        "
-        class="button"
-      >
-        <!-- Byt text beroende på om man är på början eller mitt i -->
-        {{
-          currentLevelId > 1 || (currentQuestionId && currentQuestionId > 1)
-            ? "Fortsätt quiz"
-            : "Starta quiz"
-        }}
-      </router-link>
-
-      <!-- Om den är låst -->
-      <div v-else class="locked-content">
-        <span class="lock-icon">🔒</span>
-      </div>
-      <!-- Progressbar -->
-       <progress v-if="getLevelStatus(level, index) === 'in-progress' || getLevelStatus(level, index) === 'completed'" 
-       :value="getProgress(level, index)" max="100"></progress>
     </div>
   </div>
 </template>
@@ -171,7 +173,7 @@ onMounted(() => {
 <style scoped>
 /* Progress bar styling */
 progress {
-  width: 100%;
+  width: 80%;
   height: 6px;
   appearance: none;
   border: none;

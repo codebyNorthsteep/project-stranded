@@ -69,6 +69,7 @@
   position: relative;
   overflow: hidden;
   margin-bottom: 0px;
+  gap: 10px;
 }
 
 .dashboard-level::before {
@@ -82,7 +83,8 @@ content: '';
 /* Se till att text och knapp hamnar ovanför det mörka lagret */
 .dashboard-level p,
 .dashboard-level .button,
-.dashboard-level .badge-completed {
+.dashboard-level .badge-completed,
+progress {
   position: relative;
   z-index: 2;
 }
