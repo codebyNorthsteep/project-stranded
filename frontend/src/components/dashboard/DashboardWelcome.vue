@@ -3,6 +3,13 @@ import { onMounted, ref, computed } from "vue";
 
 const loggedInUserId = ref(null);
 const username = ref(); // ersätt med det faktiska användarnamnet från backend
+const firstTimeGreetings = [
+  "Välkommen till vildmarken, {name}! Din expedition börjar nu.",
+  "Första dagen i skogen, {name}! Vi hoppas att du har packat rätt.",
+  "Ny överlevare på lägret, {name}! Låt oss se vad du går för.",
+  "Du har tagit dina första steg, {name}! Nu börjar äventyret.",
+];
+
 const randomGreetings = [
   "Du överlevde till idag, grattis, {name}!",
   "Välkommen tillbaka till vildmarken, {name}!",
@@ -19,13 +26,11 @@ const randomGreetings = [
   "Hur länge klarar du dig i vildmarken, {name}?",
 ];
 
-const greetingTemplate =
-  randomGreetings[Math.floor(Math.random() * randomGreetings.length)];
+// Hjälpfunktion för att slumpa fram ett meddelande
+const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
-const greetingParts = computed(() => {
-  const [before, after] = greetingTemplate.split("{name}");
-  return { before, after };
-});
+// Välj ett slumpmässigt meddelande från listan med hälsningar
+const greetingTemplate = ref(pick(randomGreetings));
 
 const getLoggedInUsername = async (userId) => {
   fetch(`http://localhost:3000/api/users/${userId}`, {
@@ -44,12 +49,26 @@ const getLoggedInUsername = async (userId) => {
 
 onMounted(() => {
   loggedInUserId.value = JSON.parse(localStorage.getItem("user"))?.id;
+
+  //kolla om det är första gången användaren besöker dashboarden, om så är fallet, 
+  //visa ett av de slumpmässiga meddelandena från firstTimeGreetings istället för randomGreetings
   if (loggedInUserId.value) {
+    const key = `dashboardVisited_${loggedInUserId.value}`; // unik nyckel för varje användare
+    if (!localStorage.getItem(key)) {
+      greetingTemplate.value = pick(firstTimeGreetings);
+      localStorage.setItem(key, "true");
+    }
     getLoggedInUsername(loggedInUserId.value);
   } else {
-    username.value = "Användare"; // Default value if user is not logged in
+    username.value = "Användare";
   }
 });
+
+const greetingParts = computed(() => {
+  const [before, after] = greetingTemplate.value.split("{name}");
+  return { before, after };
+});
+
 </script>
 
 <template>
