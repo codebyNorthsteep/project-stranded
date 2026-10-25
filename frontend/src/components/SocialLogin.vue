@@ -12,27 +12,15 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 // his Google account from the popup
 const callback = async (googleResponse) => {
   try {
-    //1. First we use DecodeCredential which will retrive the JWT payload from the credential
-    const googleData = decodeCredential(googleResponse.credential);
 
-    //2. We map the google fields to the structure we use in our database
-    const user = {
-      username:
-        googleData.given_name ||
-        googleData.name ||
-        googleData.email.split("@")[0],
-      email: googleData.email,
-    }; //add later picture: googleData.picture for my profile
-
-    //3. Send the request to our endpoint
+    //Send the original credential to our endpoint
     const apiResponse = await fetch(`${apiBaseUrl}/api/login/google`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: user.username,
-        email: user.email,
+        credential: googleResponse.credential,
       }),
     });
 
@@ -44,11 +32,11 @@ const callback = async (googleResponse) => {
       );
     }
 
-    //4. We store the JWT received from Google as the primary session token
+    //We store the JWT received from our backend as the primary session token
     localStorage.setItem("user_token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
 
-    //5. Redirect to dashboard
+    //Redirect to dashboard
     router.push("/dashboard");
   } catch (error) {
     console.error("Google login error:", error);

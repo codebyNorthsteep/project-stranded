@@ -2,6 +2,8 @@ const userService = require("../services/userService");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const { OAuth2Client } = require("google-auth-library");
+const googleClient = new OAuth2Client();
 
 exports.loginUser = async (req, res) => {
   try {
@@ -124,23 +126,58 @@ exports.registerUser = async (req, res) => {
 
 exports.loginViaSocialLogin = async (req, res) => {
   try {
-    const input = req.body ?? {};
+
+    const { credential } = req.body ?? {};
 
     //1. Validation
-    if (typeof input.username !== "string" || typeof input.email !== "string") {
+
+    //Validate that the credential exists
+    if (typeof credential !== "string" || !credential.trim()) {
       return res.status(400).json({
-        error: "Användarnamn och e-post måste vara text.",
+        error: "Google credential is required.",
       });
     }
 
-    const username = input.username.trim();
-    const email = input.email.trim();
+    const clientId = process.env.GOOGLE_CLIENT_ID;
 
-    if (!username || !email) {
-      return res.status(400).json({
-        error: "Ange ett giltigt användarnamn och e-postadress",
+    if (!clientId) {
+      return res.status(500).json({
+        error: "Google login is not configured.",
       });
     }
+
+    let payload;
+
+    try {
+      //Verify the token's signature and expiration with Google
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credential,
+        audience: clientId,
+      });
+
+      payload = ticket.getPayload();
+    } catch {
+      return res.status(401).json({
+        error: "Invalid or expired Google credential.",
+      });
+    }
+    //Verify that the email is verified by Google
+    if (!payload?.sub || !payload.email || payload.email_verified !== true) {
+      return res.status(401).json({
+        error: "A verified Google email is required.",
+      });
+    }
+
+    // Keep email-based login limited to addresses for which Google
+    // is authoritative. Other addresses need explicit account linking.
+    if (!payload.email.endsWith("@gmail.com") && !payload.hd) {
+      return res.status(401).json({
+        error: "Use password login to link this Google account.",
+      });
+    }
+
+    const email = payload.email;
+    const username = payload.given_name?.trim() || payload.name?.trim() || email.split("@")[0];
 
     const secretKey = process.env.JWT_SECRET;
 
