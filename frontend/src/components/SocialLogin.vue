@@ -61,7 +61,7 @@ const callback = async (googleResponse) => {
   <div class="social-button-container">
     <p>eller</p>
     <div class="google-button-wrapper">
-      <GoogleLogin :callback="callback" prompt auto-login />
+      <GoogleLogin :callback="callback" prompt />
     </div>
     <p v-if="errorMessage" class="error-message">
       {{ errorMessage }}
