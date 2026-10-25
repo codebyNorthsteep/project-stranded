@@ -50,7 +50,7 @@ const getLoggedInUsername = async (userId) => {
 onMounted(() => {
   loggedInUserId.value = JSON.parse(localStorage.getItem("user"))?.id;
 
-  //kolla om det är första gången användaren besöker dashboarden, om så är fallet, 
+  //kolla om det är första gången användaren besöker dashboarden, om så är fallet,
   //visa ett av de slumpmässiga meddelandena från firstTimeGreetings istället för randomGreetings
   if (loggedInUserId.value) {
     const key = `dashboardVisited_${loggedInUserId.value}`; // unik nyckel för varje användare
@@ -68,23 +68,28 @@ const greetingParts = computed(() => {
   const [before, after] = greetingTemplate.value.split("{name}");
   return { before, after };
 });
-
 </script>
 
 <template>
   <div class="dashboard-welcome">
+    <div class="welcome">
     <h2>
       {{ greetingParts.before
       }}<span class="username-highlight">{{ username || "Användare" }}</span
       >{{ greetingParts.after }}
     </h2>
-    <p>
-      Här är din översikt där du kan följa din statistik, se dina framsteg och
-      hoppa direkt in i nästa quiz.
-    </p>
-    <p>
-      Behöver du en paus kan du när som helst
-      lämna ett pågående quiz och fortsätta där du slutade. 
-  </p>
+    </div>
+    <div class="info-text-box">
+      <p>
+        Här är din översikt där du kan följa din statistik, se dina framsteg och
+        hoppa direkt in i nästa quiz.
+      </p>
+    </div>
+    <div class="info-text-box">
+      <p>
+        Behöver du en paus kan du när som helst lämna ett pågående quiz och
+        fortsätta där du slutade.
+      </p>
+    </div>
   </div>
 </template>
