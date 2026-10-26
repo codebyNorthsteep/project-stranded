@@ -90,6 +90,7 @@ const firstLevel = () => {
     isLevelCompleted.value = false;
     isQuizCompleted.value = false;
     isGameOver.value = false;
+    gameOverExplanation.value = "";
     fetchQuestions(firstLevelId, { resume: false });
   } else {
     isQuizCompleted.value = false;
@@ -100,6 +101,7 @@ const firstLevel = () => {
 //If the user loses, we have to restart the level there the user was answering
 const handleRestartCurrentLevel = () => {
   isGameOver.value = false;
+  gameOverExplanation.value = "";
   validatedAnswer.value = null;
   selectedAnswerId.value = null;
   currentIndex.value = 0;
@@ -227,7 +229,7 @@ const fetchAnswerValidation = async (answerId) => {
       }
 
       if (!result.is_correct) {
-        gameOverExplanation.value = result.explanation || "";
+        gameOverExplanation.value = result.answer_explanation || "";
         isGameOver.value = true;
       }
     }
@@ -255,6 +257,7 @@ watch(
       isLevelCompleted.value = false;
       isQuizCompleted.value = false;
       isGameOver.value = false;
+      gameOverExplanation.value = "";
       fetchQuestions(newLevelId); // Hämta nya frågor för den nya nivån
     }
   },
