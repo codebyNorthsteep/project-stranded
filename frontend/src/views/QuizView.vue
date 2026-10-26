@@ -380,9 +380,13 @@ onMounted(() => {
     </div>
 
     <LevelCompleted v-if="isLevelCompleted" 
+    :level="currentQuestion?.level_name"
     :summary="levelSummaries[currentQuestion?.level_name]"
     @next-level="nextLevel" />
-    <QuizCompleted v-if="isQuizCompleted" @first-level="firstLevel" />
+    <QuizCompleted v-if="isQuizCompleted"
+     :level="currentQuestion?.level_name"
+     :summary="levelSummaries[currentQuestion?.level_name]"
+    @first-level="firstLevel" />
     <GameOver
       v-if="isGameOver"
       :explanation="gameOverExplanation"

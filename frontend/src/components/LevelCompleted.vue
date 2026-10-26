@@ -8,6 +8,10 @@ defineProps({
     type: String,
     default: "",
   },
+  level: {
+    type: String,
+    default: "",
+  },
   summary: {
     type: String,
     default: "",
@@ -34,7 +38,7 @@ onMounted(() => {
     <div class="level-completed-content">
       <p class="level-completed-title">Nivå avklarad!</p>
       <div class="level-completed-summary">
-        <h3>Vad du har lärt dig:</h3>
+        <h3>Vad du har lärt dig om {{ level }}:</h3>
         <p>{{ summary }}</p>
       </div>
 

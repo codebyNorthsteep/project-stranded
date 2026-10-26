@@ -8,6 +8,14 @@ defineProps({
     type: String,
     default: "",
   },
+  level: {
+    type: String,
+    default: "",
+  },
+  summary: {
+    type: String,
+    default: "",
+  },
 });
 
 const emit = defineEmits(["first-level"]);
@@ -29,8 +37,11 @@ onMounted(() => {
 
     <div class="quiz-completed-content">
       <p class="quiz-completed-title">Quiz avklarat!</p>
-      <p class="quiz-completed-subtitle">Grattis 🎉 du har klarat alla nivåer</p>
-
+      <div class="quiz-completed-summary">
+        <h3>Vad du har lärt dig om {{ level }}:</h3>
+      <p>{{ summary }}</p>
+      </div>
+       <p class="quiz-completed-subtitle">Grattis 🎉 du har klarat alla nivåer</p>
       <div class="button-group">
         <button type="button" class="button" @click="emit('first-level')">
           Börja om från första nivån
@@ -57,7 +68,7 @@ onMounted(() => {
   border-radius: 8px;
   background-color: var(--bg-dark);
   padding: 24px;
-  max-width: 240px;
+  max-width: 400px;
   width: 90%;
   margin: auto;
   color: var(--accent-gold);
@@ -77,15 +88,26 @@ onMounted(() => {
   margin-bottom: 15px;
 }
 
+.quiz-completed-summary {
+  margin-top: 15px;
+  text-align: left;
+  margin: 20px 0;
+  border: 3px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+  letter-spacing: 0.08em;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
+}
+
 .quiz-completed-subtitle {
-  font-size: 0.9rem;
-  margin-bottom: 20px;
+  font-size: 17px;
+  margin-top: 20px;
 }
 
 .button-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   width: 100%;
   margin-top: 15px;
 }
@@ -106,7 +128,7 @@ onMounted(() => {
 @media (min-width: 768px) {
   .quiz-completed-dialog {
     max-width: 600px;
-    padding: 32px
+    padding: 32px;
   }
 
   .quiz-completed-title {
