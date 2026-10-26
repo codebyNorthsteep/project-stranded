@@ -59,7 +59,7 @@ function getQuestionsByLevel(levelId) {
 function getAnswerValidation(anwerId) {
     return new Promise((resolve, reject) => {
         const sql = `
-            SELECT is_correct
+            SELECT is_correct, answer_explanation
             FROM answers
             WHERE answer_id = ?;
         `;

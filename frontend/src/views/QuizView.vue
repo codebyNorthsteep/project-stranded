@@ -335,11 +335,11 @@ onMounted(() => {
               </span>
 
               <div class="answer-content">
-                <span class="answer-text">{{ answer.answer_text }}</span>
+                <span v-if="!answer.answer_img" class="answer-text">{{ answer.answer_text }}</span>
                 <img
                   v-if="answer.answer_img"
                   :src="answer.answer_img"
-                  alt="Svarsalternativ"
+                  :alt="answer.answer_text"
                   class="answer-img"
                 />
               </div>
@@ -352,7 +352,10 @@ onMounted(() => {
         class="next-question"
         v-if="validatedAnswer && validatedAnswer.is_correct"
       >
-        <div class="correct-msg">Korrekt svar!</div>
+        <div class="correct-msg">
+        <h3>Rätt svar!</h3>
+        <p>{{ validatedAnswer.answer_explanation }}</p>
+        </div>
         <button v-if="!isLast" @click="nextQuestion" class="button">
           Nästa fråga
         </button>
