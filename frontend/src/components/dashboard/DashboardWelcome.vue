@@ -33,35 +33,55 @@ const pick = (list) => list[Math.floor(Math.random() * list.length)];
 const greetingTemplate = ref(pick(randomGreetings));
 
 const getLoggedInUsername = async (userId) => {
-  fetch(`http://localhost:3000/api/users/${userId}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("user_token")}`,
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      username.value = data.username;
-    })
-    .catch((error) => {
-      console.error("Error fetching user info:", error);
-    });
+  try {
+    const token = localStorage.getItem("user_token");
+    if (!token) return;
+
+    const response = await fetch(
+      `http://localhost:3000/api/users/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`User request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    username.value = data.username || "Användare";
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+  }
 };
 
 onMounted(() => {
-  loggedInUserId.value = JSON.parse(localStorage.getItem("user"))?.id;
+  username.value = "Användare";
 
-  //kolla om det är första gången användaren besöker dashboarden, om så är fallet,
-  //visa ett av de slumpmässiga meddelandena från firstTimeGreetings istället för randomGreetings
-  if (loggedInUserId.value) {
-    const key = `dashboardVisited_${loggedInUserId.value}`; // unik nyckel för varje användare
+  try {
+    const storedUser = localStorage.getItem("user");
+    loggedInUserId.value = JSON.parse(storedUser)?.id ?? null;
+  } catch (error) {
+    console.warn("Could not read stored user:", error);
+  }
+
+  if (!loggedInUserId.value) return;
+
+  try {
+    const key = `dashboardVisited_${loggedInUserId.value}`;
+
     if (!localStorage.getItem(key)) {
       greetingTemplate.value = pick(firstTimeGreetings);
       localStorage.setItem(key, "true");
     }
-    getLoggedInUsername(loggedInUserId.value);
-  } else {
-    username.value = "Användare";
+  } catch (error) {
+    console.warn("Could not read or save dashboard visit:", error);
   }
+
+  // Visit tracking must not prevent the username request.
+  getLoggedInUsername(loggedInUserId.value);
 });
 
 const greetingParts = computed(() => {

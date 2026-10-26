@@ -28,7 +28,7 @@
 
 .dashboard-welcome h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 24px;
   font-weight: 700;
   line-height: 1.3;
   color: var(--text-light);
@@ -48,7 +48,7 @@
 
 .dashboard-welcome p {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 17px;
   line-height: 1.5;
   color: var(--text-muted, #a0a0a0);
 }
