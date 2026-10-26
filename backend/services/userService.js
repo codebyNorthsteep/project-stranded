@@ -109,10 +109,74 @@ function getUserByEmail(email) {
   });
 }
 
+function updateUsername(userId, username) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+        UPDATE users
+        SET username = ?
+        WHERE user_id = ?
+        `;
+    connectionMySQL.query(sql, [username, userId], (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result.affectedRows > 0);
+    });
+  });
+}
+
+function updatePassword(userId, hashedPassword) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+        UPDATE users
+        SET password_hash = ?
+        WHERE user_id = ?
+        `;
+    connectionMySQL.query(sql, [hashedPassword, userId], (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result.affectedRows > 0);
+    });
+  });
+}
+
+function updatePicture(userId, picture) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+        UPDATE users
+        SET user_img = ?
+        WHERE user_id = ?
+        `;
+    connectionMySQL.query(sql, [picture, userId], (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result.affectedRows > 0);
+    });
+  });
+}
+
+function deleteUser(userId) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+        DELETE FROM users WHERE user_id = ?
+        `;
+    connectionMySQL.query(sql, [userId], (err, result) => {
+      if (err) reject(err);
+      resolve(result.affectedRows > 0);
+    });
+  });
+}
+
 module.exports = {
   getUserByUsernameOrEmail,
   createUser,
   createUserViaSocialLogin,
   getUserInfoById,
-  getUserByEmail
+  getUserByEmail,
+  updateUsername,
+  updatePassword, 
+  updatePicture,
+  deleteUser
 };

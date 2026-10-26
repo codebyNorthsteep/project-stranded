@@ -288,3 +288,68 @@ exports.getUserInfo = async (req, res) => {
     });
   }
 };
+
+exports.updateUser = async (req, res) => {
+
+  try {
+    const authenticatedUserId = req.userData?.id;
+
+    if (authenticatedUserId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    if (String(req.params.userId) !== String(authenticatedUserId)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const userId = authenticatedUserId;
+    const { username, password, picture } = req.body;
+
+    if (username) {
+      await userService.updateUsername(userId, username);
+    }
+
+    if (password) {
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      await userService.updatePassword(userId, hashedPassword);
+    }
+    if (picture) {
+      await userService.updatePicture(userId, picture);
+    }
+    
+    return res.status(200).json("User updated successfully");
+
+  } catch (err) {
+    console.error("Update user info controller error:", err);
+    return res.status(500).json({
+      error: "Ett fel uppstod när användarinformationen hämtades",
+    });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+
+   try {
+    const authenticatedUserId = req.userData?.id;
+
+    if (authenticatedUserId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    if (String(req.params.userId) !== String(authenticatedUserId)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const userId = authenticatedUserId;
+
+    await userService.deleteUser(userId);
+
+    return res.status(200).json("User deleted successfully");
+  } catch (err) {
+    console.error("Delete user controller error:", err);
+    return res.status(500).json({
+      error: "Ett fel uppstod när användaren skulle tas bort",
+    });
+  }
+};
