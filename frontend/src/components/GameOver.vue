@@ -50,7 +50,7 @@ onMounted(() => {
   border-radius: 8px;
   background-color: var(--bg-dark);
   padding: 24px;
-  max-width: 240px;
+  max-width: 400px;
   width: 90%;
   margin: auto;
   color: var(--accent-gold);
@@ -69,19 +69,26 @@ onMounted(() => {
   text-align: center;
 }
 
+h3 {
+  margin: 0 0 10px;
+  color: var(--accent-gold);
+}
+
 .game-over-content {
   margin-top: 15px;
-  text-align: center;
-  margin:20px 0;
+  text-align: left;
+  margin: 20px 0;
   border: 3px solid var(--border-color);
   border-radius: 10px;
-  padding: 10px;
+  padding: 20px;
+  letter-spacing: 0.08em;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
 }
 
 .button-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   width: 100%;
   margin-top: 15px;
 }
