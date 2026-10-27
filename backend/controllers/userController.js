@@ -353,7 +353,7 @@ exports.updateUser = async (req, res) => {
     await userService.updateUser(userId, updates);
 
     return res.status(200).json("User updated successfully");
-    
+
   } catch (err) {
     console.error("Update user info controller error:", err);
     return res.status(500).json({
@@ -376,7 +376,11 @@ exports.deleteUser = async (req, res) => {
 
     const userId = authenticatedUserId;
 
-    await userService.deleteUser(userId);
+    const deleted = await userService.deleteUser(userId);
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Användare hittades inte" });
+    }
 
     return res.status(200).json("User deleted successfully");
   } catch (err) {
