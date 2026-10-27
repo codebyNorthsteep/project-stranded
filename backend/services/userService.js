@@ -150,7 +150,7 @@ function deleteUser(userId) {
         DELETE FROM users WHERE user_id = ?
         `;
     connectionMySQL.query(sql, [userId], (err, result) => {
-      if (err) reject(err);
+      if (err) return reject(err);
       resolve(result.affectedRows > 0);
     });
   });
