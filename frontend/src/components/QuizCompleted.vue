@@ -32,16 +32,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <dialog ref="quizCompletedDialog" class="quiz-completed-dialog">
+  <dialog
+    ref="quizCompletedDialog"
+    class="quiz-completed-dialog"
+    closedby="none"
+    @keydown.esc.prevent.stop
+    @cancel.prevent
+  >
     <Confetti :duration="10000" />
 
     <div class="quiz-completed-content">
       <p class="quiz-completed-title">Quiz avklarat!</p>
       <div class="quiz-completed-summary">
         <h3>Vad du har lärt dig om {{ level }}:</h3>
-      <p>{{ summary }}</p>
+        <p>{{ summary }}</p>
       </div>
-       <p class="quiz-completed-subtitle">Grattis 🎉 du har klarat alla nivåer</p>
+      <p class="quiz-completed-subtitle">
+        Grattis 🎉 du har klarat alla nivåer
+      </p>
       <div class="button-group">
         <button type="button" class="button" @click="emit('first-level')">
           Börja om från första nivån

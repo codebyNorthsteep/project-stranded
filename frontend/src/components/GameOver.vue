@@ -23,15 +23,25 @@ onMounted(() => {
 </script>
 
 <template>
-  <dialog ref="gameOverDialog" class="game-over-dialog">
+  <dialog
+    ref="gameOverDialog"
+    class="game-over-dialog"
+    closedby="none"
+    @keydown.esc.prevent.stop
+    @cancel.prevent
+  >
     <h2 class="game-over-title">Spelet är slut</h2>
     <div class="game-over-content">
-          <h3 class="status-message">Fel svar!</h3>
-    <p v-if="explanation" class="explanation">{{ explanation }}</p>
+      <h3 class="status-message">Fel svar!</h3>
+      <p v-if="explanation" class="explanation">{{ explanation }}</p>
     </div>
     <div class="button-group">
-      <button type="button" class="button" @click="emit('restart')">Spela igen</button>
-      <button type="button" class="button" @click="GoToMyDashboard">Gå till dashboard</button>
+      <button type="button" class="button" @click="emit('restart')">
+        Spela igen
+      </button>
+      <button type="button" class="button" @click="GoToMyDashboard">
+        Gå till dashboard
+      </button>
     </div>
   </dialog>
 </template>

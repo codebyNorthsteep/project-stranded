@@ -32,7 +32,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <dialog ref="levelCompletedDialog" class="level-completed-dialog">
+  <dialog
+    ref="levelCompletedDialog"
+    class="level-completed-dialog"
+    closedby="none"
+    @keydown.esc.prevent.stop
+    @cancel.prevent
+  >
     <Confetti :duration="3000" />
 
     <div class="level-completed-content">
