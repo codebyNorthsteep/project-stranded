@@ -109,51 +109,38 @@ function getUserByEmail(email) {
   });
 }
 
-function updateUsername(userId, username) {
-  return new Promise((resolve, reject) => {
-    const sql = `
-        UPDATE users
-        SET username = ?
-        WHERE user_id = ?
-        `;
-    connectionMySQL.query(sql, [username, userId], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(result.affectedRows > 0);
-    });
-  });
-}
+function updateUser(userId, updates) {
+  //1. Map incoming fields to database column names, filtrering out undefined values
+  const fields = [
+    ["username", updates.username],
+    ["password_hash", updates.password],
+    ["user_img", updates.picture],
+  ].filter(([, value]) => value !== undefined);
 
-function updatePassword(userId, hashedPassword) {
-  return new Promise((resolve, reject) => {
-    const sql = `
-        UPDATE users
-        SET password_hash = ?
-        WHERE user_id = ?
-        `;
-    connectionMySQL.query(sql, [hashedPassword, userId], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(result.affectedRows > 0);
-    });
-  });
-}
+  //2. Double-check that there is at least one column to update
+  if (fields.length === 0) {
+    return Promise.reject(new Error("No fields to update"));
+  }
 
-function updatePicture(userId, picture) {
+  //3. Dynamically construct SQL assignments (e.g., "username = ?, user_img = ?")
+  const assignments = fields.map(([column]) => `${column} = ?`).join(", ");
+
+  //4. Extract values in the same order as columns for parameterized query safety
+  const values = fields.map(([, value]) => value);
+
+  //5. Execute the single UPDATE query
   return new Promise((resolve, reject) => {
-    const sql = `
-        UPDATE users
-        SET user_img = ?
-        WHERE user_id = ?
-        `;
-    connectionMySQL.query(sql, [picture, userId], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(result.affectedRows > 0);
-    });
+    connectionMySQL.query(
+      `UPDATE users SET ${assignments} WHERE user_id = ?`,
+      [...values, userId],
+      (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve(result);
+      },
+    );
   });
 }
 
@@ -175,8 +162,6 @@ module.exports = {
   createUserViaSocialLogin,
   getUserInfoById,
   getUserByEmail,
-  updateUsername,
-  updatePassword, 
-  updatePicture,
-  deleteUser
+  updateUser,
+  deleteUser,
 };
