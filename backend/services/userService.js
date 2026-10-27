@@ -70,7 +70,7 @@ function createUserViaSocialLogin(username, email, hashedPassword){
 function getUserInfoById(userId) {
   return new Promise((resolve, reject) => {
     const sql = `
-      SELECT user_id, username, email
+      SELECT user_id, username, email, user_img
       FROM users
       WHERE user_id = ?
       LIMIT 1;
