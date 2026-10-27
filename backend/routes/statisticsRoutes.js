@@ -7,4 +7,10 @@ router.get('/api/users/:userId/statistics/current-question',
     userMiddleware.isLoggedIn, // Middleware för att kontrollera om användaren är inloggad
     statisticsController.getCurrentQuestionForUser);
 
+router.get(
+    '/api/users/:userId/statistics/levels',
+    userMiddleware.isLoggedIn,
+    statisticsController.getLevelsStatistics
+);
+
 module.exports = router;

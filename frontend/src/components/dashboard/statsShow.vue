@@ -2,16 +2,29 @@
 import { ref, onMounted } from "vue";
 
 const stats = ref([
-  { level_id: 1, correct_answers: 0 },
-  { level_id: 2, correct_answers: 0 },
-  { level_id: 3, correct_answers: 0 }
+  { level_id: 1, correct_answers: 0, wrong_answers: 0, unlocked: true },
+  { level_id: 2, correct_answers: 0, wrong_answers: 0, unlocked: false },
+  { level_id: 3, correct_answers: 0, wrong_answers: 0, unlocked: false },
 ]);
 
 const userId = ref(null);
 
 const getLevelCount = (levelId) => {
-  const match = stats.value.find(item => Number(item.level_id) === Number(levelId));
+  const match = stats.value.find(
+    (item) => Number(item.level_id) === Number(levelId),
+  );
   return match ? match.correct_answers : 0;
+};
+
+const isLevelUnlocked = (levelId) =>
+  stats.value.find((item) => Number(item.level_id) === Number(levelId))
+    ?.unlocked ?? false;
+
+const getWrongCount = (levelId) => {
+  const match = stats.value.find(
+    (item) => Number(item.level_id) === Number(levelId),
+  );
+  return match ? match.wrong_answers : 0;
 };
 
 const fetchStats = async () => {
@@ -21,11 +34,14 @@ const fetchStats = async () => {
 
   if (!userId.value) return;
 
-  const response = await fetch(`http://localhost:3000/api/statistics/${userId.value}/levels`, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+  const response = await fetch(
+    `http://localhost:3000/api/users/${userId.value}/statistics/levels`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
 
   if (!response.ok) throw new Error("Kunde inte hämta statistik");
 
@@ -42,19 +58,35 @@ onMounted(() => {
   <div class="stats-panel">
     <h2 class="stats-title">Din statistik</h2>
 
-    <div class="stat-card stat-level-1">
-      <span class="label">Svenska skog</span>
-      <strong>{{ getLevelCount(1) }}</strong>
-    </div>
+    <div class="stats-level-list">
+        <div class="stats-column-heading">
+          <span></span>
+          <h3>Rätt</h3>
+          <h3>Fel</h3>
+        </div>
+        <div class="stat-card">
+          <span class="label">Svenska skog</span>
+          <strong v-if="isLevelUnlocked(1)">{{ getLevelCount(1) }}</strong>
+          <strong v-else class="not-available">🔒</strong>
+          <strong v-if="isLevelUnlocked(1)">{{ getWrongCount(1) }}</strong>
+          <strong v-else class="not-available">🔒</strong>
+        </div>
 
-    <div class="stat-card stat-level-2">
-      <span class="label">Amazonas</span>
-      <strong>{{ getLevelCount(2) }}</strong>
-    </div>
+        <div class="stat-card">
+          <span class="label">Amazonas</span>
+          <strong v-if="isLevelUnlocked(2)">{{ getLevelCount(2) }}</strong>
+          <strong v-else class="not-available">🔒</strong>
+          <strong v-if="isLevelUnlocked(2)">{{ getWrongCount(2) }}</strong>
+        <strong v-else class="not-available">🔒</strong>
+      </div>
 
-    <div class="stat-card stat-level-4">
-      <span class="label">Sahara</span>
-      <strong>{{ getLevelCount(3) }}</strong>
+        <div class="stat-card">
+          <span class="label">Sahara</span>
+          <strong v-if="isLevelUnlocked(3)">{{ getLevelCount(3) }}</strong>
+          <strong v-else class="not-available">🔒</strong>
+          <strong v-if="isLevelUnlocked(3)">{{ getWrongCount(3) }}</strong>
+          <strong v-else class="not-available">🔒</strong>
+        </div>
     </div>
   </div>
 </template>
@@ -65,9 +97,7 @@ onMounted(() => {
   grid-template-columns: 1fr;
   grid-template-areas:
     "title"
-    "level1"
-    "level2"
-    "level3";
+    "levels";
   align-content: start;
   gap: 12px;
   width: 100%;
@@ -76,6 +106,7 @@ onMounted(() => {
   color: var(--text-light);
   background: var(--card-bg);
   border: 1px solid var(--border-color);
+  border-top: 2px solid var(--accent-gold);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
@@ -87,27 +118,44 @@ onMounted(() => {
   text-align: center;
 }
 
-.stat-level-1 {
-  grid-area: level1;
+.stats-column-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px 48px;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-gold);
+  padding: 0 16px;
 }
 
-.stat-level-2 {
-  grid-area: level2;
+.stats-column-heading h3 {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+
+.stats-level-list {
+  grid-area: levels;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(18, 29, 17, 0.35);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
 }
 
 .stat-card {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 48px 48px;
   align-items: center;
+  gap: 8px;
   padding: 14px 16px;
   color: var(--text-light);
   background: rgba(18, 29, 17, 0.55);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-}
-
-.stat-level-3 {
-  grid-area: level4;
 }
 
 .label {
@@ -116,5 +164,10 @@ onMounted(() => {
 
 .stat-card strong {
   color: var(--accent-gold);
+  text-align: right;
+}
+
+.stat-card strong.not-available {
+  color: var(--text-muted);
 }
 </style>

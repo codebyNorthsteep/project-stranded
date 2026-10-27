@@ -60,7 +60,7 @@
   padding: 10px;
   width: 100%;
   max-width: 400px;
-  margin-top: 20px;
+  margin: 20px auto 0;
   gap: 10px;
 }
 
@@ -156,6 +156,8 @@ font-family: Syne Mono, monospace;
   .dashboard-quiz-card {
     flex-direction: row;
     max-width: 700px;
+    margin-right: auto;
+    margin-left: auto;
     gap: 20px;
     justify-content: center;
   }
