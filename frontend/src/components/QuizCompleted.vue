@@ -35,6 +35,8 @@ onMounted(() => {
   <dialog
     ref="quizCompletedDialog"
     class="quiz-completed-dialog"
+    aria-labelledby="quiz-completed-title"
+    aria-describedby="quiz-completed-summary"
     closedby="none"
     @keydown.esc.prevent.stop
     @cancel.prevent
@@ -42,8 +44,8 @@ onMounted(() => {
     <Confetti :duration="10000" />
 
     <div class="quiz-completed-content">
-      <p class="quiz-completed-title">Quiz avklarat!</p>
-      <div class="quiz-completed-summary">
+      <p id="quiz-completed-title" class="quiz-completed-title">Quiz avklarat!</p>
+      <div id="quiz-completed-summary" class="quiz-completed-summary">
         <h3>Vad du har lärt dig om {{ level }}:</h3>
         <p>{{ summary }}</p>
       </div>

@@ -26,14 +26,16 @@ onMounted(() => {
   <dialog
     ref="gameOverDialog"
     class="game-over-dialog"
+    aria-labelledby="game-over-title"
+    aria-describedby="game-over-content"
     closedby="none"
     @keydown.esc.prevent.stop
     @cancel.prevent
   >
-    <h2 class="game-over-title">Spelet är slut</h2>
-    <div class="game-over-content">
+    <h2 id="game-over-title" class="game-over-title">Spelet är slut</h2>
+    <div id="game-over-content" class="game-over-content">
       <h3 class="status-message">Fel svar!</h3>
-      <p v-if="explanation" class="explanation">{{ explanation }}</p>
+      <p v-if="explanation"  class="explanation">{{ explanation }}</p>
     </div>
     <div class="button-group">
       <button type="button" class="button" @click="emit('restart')">

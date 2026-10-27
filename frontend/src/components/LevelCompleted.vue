@@ -34,6 +34,8 @@ onMounted(() => {
 <template>
   <dialog
     ref="levelCompletedDialog"
+    aria-labelledby="level-completed-title"
+    aria-describedby="level-completed-summary"
     class="level-completed-dialog"
     closedby="none"
     @keydown.esc.prevent.stop
@@ -42,8 +44,8 @@ onMounted(() => {
     <Confetti :duration="3000" />
 
     <div class="level-completed-content">
-      <p class="level-completed-title">Nivå avklarad!</p>
-      <div class="level-completed-summary">
+      <p id="level-completed-title" class="level-completed-title">Nivå avklarad!</p>
+      <div id="level-completed-summary" class="level-completed-summary">
         <h3>Vad du har lärt dig om {{ level }}:</h3>
         <p>{{ summary }}</p>
       </div>
