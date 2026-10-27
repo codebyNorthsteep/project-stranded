@@ -346,6 +346,11 @@ exports.updateUser = async (req, res) => {
 
     //6. Hash password BEFORE touching the database to avoid partial updates on error
     if (updates.password !== undefined) {
+      if (Buffer.byteLength(updates.password, "utf8") > 72) {
+        return res.status(400).json({
+          error: "Password must not exceed 72 UTF-8 bytes",
+        });
+      }
       updates.password = await bcrypt.hash(updates.password, 10);
     }
 
