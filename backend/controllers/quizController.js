@@ -38,8 +38,16 @@ exports.getAnswerValidation = async (req, res) => {
 
 exports.updateCurrentQuestion = async (req, res) => {
   try {
-    const { userId } = req.body;
+    const userId = req.userData?.id;
+    if (userId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
     const { questionId } = req.body;
+    if (!Number.isInteger(questionId)) {
+      return res.status(400).json({ error: "questionId must be an integer" });
+    }
+
     const result = await userService.updateCurrentQuestion(userId, questionId);
     res.json(result);
   } catch (err) {
