@@ -13,4 +13,10 @@ router.get(
     statisticsController.getLevelsStatistics
 );
 
+router.post(
+    '/api/answers/:answerId/submit',
+    userMiddleware.isLoggedIn,
+    statisticsController.submitAnswer
+);
+
 module.exports = router;

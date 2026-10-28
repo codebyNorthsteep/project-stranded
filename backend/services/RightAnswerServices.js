@@ -4,11 +4,11 @@ function getCorrectAnswersByLevel(userId) {
   const query = `
     SELECT
       l.level_id AS level_id,
-      COUNT(DISTINCT CASE
-        WHEN s.stat_id IS NOT NULL AND a.is_correct = TRUE THEN q.question_id
+      COUNT(CASE
+        WHEN s.stat_id IS NOT NULL AND a.is_correct = TRUE THEN s.stat_id
       END) AS correct_answers,
-      COUNT(DISTINCT CASE
-        WHEN s.stat_id IS NOT NULL AND a.is_correct = FALSE THEN q.question_id
+      COUNT(CASE
+        WHEN s.stat_id IS NOT NULL AND a.is_correct = FALSE THEN s.stat_id
       END) AS wrong_answers
     FROM level l
     LEFT JOIN questions q ON q.level_id = l.level_id

@@ -65,3 +65,43 @@ exports.getLevelsStatistics = async (req, res) => {
     });
   }
 };
+
+exports.submitAnswer = async (req, res) => {
+  const userId = Number(req.userData?.id);
+  const questionId = Number(req.body.questionId);
+  const answerId = Number(req.params.answerId);
+
+  if (!Number.isInteger(userId) || userId < 1) {
+    return res.status(401).json({ error: "Du måste vara inloggad." });
+  }
+
+  if (
+    !Number.isInteger(questionId) ||
+    questionId < 1 ||
+    !Number.isInteger(answerId) ||
+    answerId < 1
+  ) {
+    return res.status(400).json({ error: "Frågan eller svaret är ogiltigt." });
+  }
+
+  try {
+    const result = await statisticsService.saveAnswerAttempt(
+      userId,
+      questionId,
+      answerId,
+    );
+
+    if (result === null) {
+      return res.status(400).json({
+        error: "Svaret hör inte till den valda frågan.",
+      });
+    }
+
+    return res.json(result);
+  } catch (err) {
+    console.error("Error saving quiz answer:", err);
+    return res.status(500).json({
+      error: "Ett fel uppstod när svaret skulle sparas.",
+    });
+  }
+};
