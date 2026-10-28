@@ -70,8 +70,23 @@ function getAnswerValidation(anwerId) {
     });
 }
 
+function updateCurrentQuestion(userId, questionId) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      UPDATE users_questions
+      SET current_question_id = ?
+      WHERE user_id = ?;
+    `;
+    connectionMySQL.query(sql, [questionId, userId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 module.exports = {
   getAllLevels,
   getQuestionsByLevel,
   getAnswerValidation,
+  updateCurrentQuestion,
 };

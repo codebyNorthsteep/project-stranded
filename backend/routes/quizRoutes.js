@@ -11,5 +11,6 @@ router.get('/api/levels/:levelId/questions', quizController.getQuestionsByLevel)
 // Define the route for validating an answer
 router.get('/api/answers/:answerId/validate', quizController.getAnswerValidation);
 
+router.put('/api/users/statistics/current-question', quizController.updateCurrentQuestion);
 
 module.exports = router;

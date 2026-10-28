@@ -35,3 +35,17 @@ exports.getAnswerValidation = async (req, res) => {
     });
   }
 };
+
+exports.updateCurrentQuestion = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const { questionId } = req.body;
+    const result = await userService.updateCurrentQuestion(userId, questionId);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "An error occurred while updating the current question",
+    });
+  }
+};

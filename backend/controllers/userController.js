@@ -109,6 +109,9 @@ exports.registerUser = async (req, res) => {
       hashedPassword,
     );
 
+    // insert into users_questions table with user_id
+    const newQuestionEntry = await userService.createCurrentQuestionEntryForUser(newUser.user_id);
+
     //5. Return user info
     return res.status(201).json({
       message: "Register successful",
@@ -236,6 +239,9 @@ exports.loginViaSocialLogin = async (req, res) => {
         email,
         password,
       );
+
+      //insert into users_questions table with user_id
+      const newQuestionEntry = await userService.createCurrentQuestionEntryForUser(newUser.user_id);
 
       //B.5 Generate JWT token
       const token = jwt.sign(
