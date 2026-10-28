@@ -32,6 +32,7 @@ const toggleMenu = () => {
     <div v-if="isOpen" class="overlay" @click="toggleMenu"></div>
 
     <div class="burger-menu" :class="{ 'is-open': isOpen }">
+    
       <header class="menu-header">
         <div class="profile-title">
           <h1>Min Profil</h1>
@@ -115,7 +116,7 @@ h1 {
   margin-top: -25px;
 }
 
-@media (min-width: 350px) {
+@media (min-width: 450px) {
   .burger-menu {
     width: 300px;
     right: -300px;
@@ -141,6 +142,7 @@ h1 {
 
   .close-button {
     padding: 6px 10px;
+    margin-top: 0;
   }
 }
 
@@ -153,6 +155,10 @@ h1 {
   .icon {
     width: 33px;
     height: 30px;
+  }
+
+  .close-button {
+    margin-top: 0;
   }
 }
 </style>

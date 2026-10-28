@@ -1,64 +1,23 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import Logout from "../components/Logout.vue";
 
 const props = defineProps({
   username: { type: String, required: false },
-  picture: { type: String, required: false },
+  user_img: { type: String, required: false },
 });
 
 const user = ref({
   username: "",
-  picture: "",
+  user_img: "",
 });
-
+const router = useRouter();
 const errorMessage = ref("");
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 const token = localStorage.getItem("user_token");
-const userId = localStorage.getItem("userId");
-
-async function myProfile() {
-  try {
-    const response = await fetch(`${apiBaseUrl}/api/users/${userId}`, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      user.value = data;
-    } else {
-      errorMessage.value = "Error getting user information";
-    }
-  } catch (error) {
-    errorMessage.value = error.message;
-  }
-}
-
-async function updateProfile(updateData) {
-  try {
-    const response = await fetch(`${apiBaseUrl}/api/users/${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(updatedData),
-    });
-
-    if (response.ok) {
-      console.log("Profile updated successfully");
-      myProfile();
-    } else {
-      const err = await response.json();
-      alert(`Error: ${err.error || "It could not update"}`);
-    }
-  } catch (error) {
-    errorMessage.value = error.message;
-  }
-}
+const userStorage = JSON.parse(localStorage.getItem("user") || "{}");
+const userId = userStorage.id;
 
 const promptUpdateUsername = () => {
   const newUsername = prompt("Enter new username:", user.value.username);
@@ -75,6 +34,81 @@ const promptUpdatePicture = () => {
   if (newPicture) updateProfile({ picture: newPicture });
 };
 
+const handleDeleteAccount = () => {
+  const confirmation = confirm("Är du säker på att du vill ta bort ditt konto? Det går inte att ångra");
+  if(!confirmation) return;
+  deleteAccount();
+}
+
+async function myProfile() {
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/users/${userId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      user.value = { 
+      ...data, 
+      user_img: data.user_img || data.picture,
+      };
+    } else {
+      errorMessage.value = "Error getting user information";
+    }
+  } catch (error) {
+    errorMessage.value = error.message;
+  }
+}
+
+async function updateProfile(updateData) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/users/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (response.ok) {
+      console.log("Profile updated successfully");
+      myProfile();
+    } else {
+      const err = await response.json();
+      alert(`Error: ${err.error || "It could not update"}`);
+    }
+  } catch (error) {
+    errorMessage.value = error.message;
+  }
+}
+
+async function deleteAccount(){
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user");
+      console.log("Profile deleted successfully");
+      router.push("/");
+    } else {
+      const err = await response.json();
+      alert(`Error: ${err.error || "It could not delete account"}`);
+    }
+  } catch (error) {
+    errorMessage.value = error.message;
+  }
+}
+
 onMounted(() => {
   if (userId && token) {
     myProfile();
@@ -84,15 +118,19 @@ onMounted(() => {
 
 <template>
   <div class="my-profile-container">
-
     <div class="my-profile-picture">
       <div class="picture-wrapper">
         <img
-          :src="user?.user_img || props.user_img"
+          :src="user?.user_img || props.user_img || '/src/assets/images/Default-profile-picture.png'"
           alt="userPicture"
-          class="avatar-img"
+          class="user-picture"
         />
-        <button class="button" @click="promptUpdatePicture">📷</button>
+        <button
+          class="button button-update-picture"
+          @click="promptUpdatePicture"
+        >
+          📷
+        </button>
       </div>
     </div>
 
@@ -100,32 +138,35 @@ onMounted(() => {
       <h3>{{ user?.username || props.username }}</h3>
     </div>
 
-    <div class="options-list">
-      <div class="option-card" @click="promptUpdateUsername">
-        <span class="icon">👤</span>
-        <span>Change username</span>
-        <span class="arrow">›</span>
+    <div ref="profileDialog" class="options-list">
+
+      <div class="button option-card" @click="promptUpdateUsername">
+        <div class="icon">👤</div>
+        <div>Ändra användarnamn</div>
+        <div class="arrow">›</div>
       </div>
 
-      <div class="option-card" @click="promptUpdatePassword">
-        <span class="icon">🔒</span>
-        <span>Change password</span>
-        <span class="arrow">›</span>
+      <div class="button option-card" @click="promptUpdatePassword">
+        <div class="icon">🔒</div>
+        <div>Ändra lösenord</div>
+        <div class="arrow">›</div>
       </div>
 
-      <div class="option-card" @click="handleDeleteAccount">
-        <span class="icon">🗑️</span>
-        <span>Delete account</span>
-        <span class="arrow">›</span>
+      <div class="button option-card" @click="handleDeleteAccount">
+        <div class="icon">🗑️</div>
+        <div>Ta bort konto</div>
+        <div class="arrow">›</div>
       </div>
+
     </div>
   </div>
 </template>
 
 <style scoped>
-
 .profile-container {
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   background-color: var(--bg-dark);
   color: var(--accent-gold);
@@ -139,6 +180,7 @@ onMounted(() => {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .picture-wrapper {
@@ -147,7 +189,14 @@ onMounted(() => {
   height: 90px;
 }
 
-.avatar-img {
+.button-update-picture {
+  position: absolute;
+  bottom: -9px;
+  right: -7px;
+  padding: 5px 7px;
+}
+
+.user-picture {
   width: 100%;
   height: 100%;
   border-radius: 50%;
@@ -155,15 +204,12 @@ onMounted(() => {
   border: 2px solid var(--accent-gold);
 }
 
-.button {
-    border-radius: 100px;
-}
-
 .my-profile-username {
   text-align: center;
-  font-size: 18px;
+  font-size: 0.8rem;
   font-weight: bold;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  color: var(--accent-gold);
 }
 
 .options-list {
@@ -171,18 +217,20 @@ onMounted(() => {
   flex-direction: column;
   gap: 12px;
   margin-bottom: 30px;
+  align-items: center;
 }
 
 .option-card {
-  background-color: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  padding: 14px 16px;
+  padding: 8px 12px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
   transition: border-color 0.2s;
+  font-size: 0.8rem;
+  width: 85%;
+  max-width: 250px;
 }
 
 .option-card:hover {
@@ -192,5 +240,4 @@ onMounted(() => {
 .icon {
   margin-right: 10px;
 }
-
 </style>
