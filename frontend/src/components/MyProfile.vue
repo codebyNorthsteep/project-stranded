@@ -71,7 +71,7 @@ const promptUpdatePassword = () => {
 };
 
 const promptUpdatePicture = () => {
-  const newPicture = prompt("Enter new picture URL:", user.value.picture);
+  const newPicture = prompt("Enter new picture URL:", user.value.user_img);
   if (newPicture) updateProfile({ picture: newPicture });
 };
 
@@ -88,7 +88,7 @@ onMounted(() => {
     <div class="my-profile-picture">
       <div class="picture-wrapper">
         <img
-          :src="user?.picture || props.picture"
+          :src="user?.user_img || props.user_img"
           alt="userPicture"
           class="avatar-img"
         />

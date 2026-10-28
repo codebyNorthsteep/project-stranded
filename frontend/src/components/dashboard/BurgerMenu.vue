@@ -138,6 +138,10 @@ h1 {
     width: 31px;
     height: 28px;
   }
+
+  .close-button {
+    padding: 6px 10px;
+  }
 }
 
 @media (min-width: 1024px) {
