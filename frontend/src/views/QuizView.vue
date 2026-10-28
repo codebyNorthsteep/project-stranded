@@ -233,7 +233,16 @@ const fetchAnswerValidation = async (answerId) => {
         gameOverExplanation.value = result.answer_explanation || "";
         isGameOver.value = true;
       }
+
+      // Uppdatera current_question_id i databasen baserat på om svaret var korrekt eller inte
+      //om svaret var korrekt öka currenQuestion värdet med 1, annars återställ till första frågan i nivån
+      const quiestionIdToSave = result.is_correct
+        ? currentQuestion.value.question_id + 1
+        : questions.value[0].question_id;
+
+        await updateCurrentQuestion(quiestionIdToSave); // Uppdatera current_question_id i databasen
     }
+
   } catch (err) {
     // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
     if (
@@ -242,6 +251,30 @@ const fetchAnswerValidation = async (answerId) => {
     ) {
       error.value = err.message;
     }
+  }
+};
+
+const updateCurrentQuestion = async (questionId) => {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/api/users/statistics/current-question",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: JSON.parse(localStorage.getItem("user")).id,
+          questionId: questionId,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (err) {
+    console.error("Error updating current question:", err);
   }
 };
 

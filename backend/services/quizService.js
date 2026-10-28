@@ -79,6 +79,7 @@ function updateCurrentQuestion(userId, questionId) {
     `;
     connectionMySQL.query(sql, [questionId, userId], (err, result) => {
       if (err) return reject(err);
+      console.log("affectedRows:", result.affectedRows, "userId:", userId, "questionId:", questionId);
       resolve(result);
     });
   });
