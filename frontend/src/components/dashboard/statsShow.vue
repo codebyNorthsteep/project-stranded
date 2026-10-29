@@ -1,3 +1,4 @@
+
 <script setup>
 import { ref, onMounted } from "vue";
 
@@ -7,167 +8,124 @@ const stats = ref([
   { level_id: 3, correct_answers: 0, wrong_answers: 0, unlocked: false },
 ]);
 
-const userId = ref(null);
-
-const getLevelCount = (levelId) => {
-  const match = stats.value.find(
-    (item) => Number(item.level_id) === Number(levelId),
-  );
-  return match ? match.correct_answers : 0;
+const levelNames = {
+  1: "Svenska skog",
+  2: "Amazonas",
+  3: "Sahara",
 };
 
-const isLevelUnlocked = (levelId) =>
-  stats.value.find((item) => Number(item.level_id) === Number(levelId))
-    ?.unlocked ?? false;
+function getLevel(id) {
+  return stats.value.find((level) => Number(level.level_id) === id);
+}
 
-const getWrongCount = (levelId) => {
-  const match = stats.value.find(
-    (item) => Number(item.level_id) === Number(levelId),
-  );
-  return match ? match.wrong_answers : 0;
-};
+async function fetchStats() {
+  try {
+    const token = localStorage.getItem("user_token");
+    const user = JSON.parse(localStorage.getItem("user"));
 
-const fetchStats = async () => {
-  const token = localStorage.getItem("user_token");
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  userId.value = user.id;
+    if (!token || !user) return;
 
-  if (!userId.value) return;
+    const url = `http://localhost:3000/api/users/${user.id}/statistics`;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
 
-  const response = await fetch(
-    `http://localhost:3000/api/users/${userId.value}/statistics/levels`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+    const [statsResponse, questionResponse] = await Promise.all([
+      fetch(`${url}/levels`, { headers }),
+      fetch(`${url}/current-question`, { headers }),
+    ]);
 
-  if (!response.ok) throw new Error("Kunde inte hämta statistik");
+    if (!statsResponse.ok || !questionResponse.ok) {
+      throw new Error("Kunde inte hämta statistiken.");
+    }
 
-  const data = await response.json();
-  stats.value = data.levels;
-};
+    const { levels } = await statsResponse.json();
+    const question = await questionResponse.json();
 
-onMounted(() => {
-  fetchStats();
-});
+    const currentLevelId =
+      Number(question?.current_level_id) || 1;
+
+    stats.value = levels.map((level) => ({
+      ...level,
+      unlocked: Number(level.level_id) <= currentLevelId,
+    }));
+  } catch (error) {
+    console.error("Fel vid hämtning av statistik:", error);
+  }
+}
+
+onMounted(fetchStats);
 </script>
 
 <template>
   <div class="stats-panel">
-    <h2 class="stats-title">Din statistik</h2>
+    <h2>Min statistik</h2>
 
-    <div class="stats-level-list">
-        <div class="stats-column-heading">
-          <span></span>
-          <h3>Rätt</h3>
-          <h3>Fel</h3>
-        </div>
-        <div class="stat-card">
-          <span class="label">Svenska skog</span>
-          <strong v-if="isLevelUnlocked(1)">{{ getLevelCount(1) }}</strong>
-          <strong v-else class="not-available">🔒</strong>
-          <strong v-if="isLevelUnlocked(1)">{{ getWrongCount(1) }}</strong>
-          <strong v-else class="not-available">🔒</strong>
-        </div>
+    <div
+      v-for="id in [1, 2, 3]"
+      :key="id"
+      class="level-card"
+    >
+      <h3>{{ levelNames[id] }}</h3>
 
-        <div class="stat-card">
-          <span class="label">Amazonas</span>
-          <strong v-if="isLevelUnlocked(2)">{{ getLevelCount(2) }}</strong>
-          <strong v-else class="not-available">🔒</strong>
-          <strong v-if="isLevelUnlocked(2)">{{ getWrongCount(2) }}</strong>
-        <strong v-else class="not-available">🔒</strong>
-      </div>
+      <template v-if="getLevel(id)?.unlocked">
+        <p>
+          Rätt svar:
+          {{ getLevel(id)?.correct_answers ?? 0 }}
+        </p>
 
-        <div class="stat-card">
-          <span class="label">Sahara</span>
-          <strong v-if="isLevelUnlocked(3)">{{ getLevelCount(3) }}</strong>
-          <strong v-else class="not-available">🔒</strong>
-          <strong v-if="isLevelUnlocked(3)">{{ getWrongCount(3) }}</strong>
-          <strong v-else class="not-available">🔒</strong>
-        </div>
+        <p>
+          Fel svar:
+          {{ getLevel(id)?.wrong_answers ?? 0 }}
+        </p>
+      </template>
+
+      <p v-else>
+        🔒 Låst nivå
+      </p>
     </div>
   </div>
 </template>
 
 <style scoped>
 .stats-panel {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "title"
-    "levels";
-  align-content: start;
-  gap: 12px;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 20px;
-  color: var(--text-light);
+  padding: 22px;
+  border: 1px solid var(--border-color);
+  border-top: 3px solid var(--accent-gold);
+  border-radius: 18px;
   background: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-top: 2px solid var(--accent-gold);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.stats-title {
-  grid-area: title;
-  margin: 0;
-  color: var(--text-light);
-  text-align: center;
-}
-
-.stats-column-heading {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 48px 48px;
-  align-items: center;
-  gap: 8px;
   color: var(--accent-gold);
-  padding: 0 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
 }
 
-.stats-column-heading h3 {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: right;
+h2 {
+  margin-bottom: 20px;
+  color: var(--accent-gold);
 }
 
-
-.stats-level-list {
-  grid-area: levels;
-  display: grid;
-  gap: 10px;
-  padding: 12px;
+.level-card {
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
   background: rgba(18, 29, 17, 0.35);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.10);
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.stat-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 48px 48px;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 16px;
-  color: var(--text-light);
-  background: rgba(18, 29, 17, 0.55);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+.level-card:hover {
+  border-color: var(--accent-gold);
+  background: rgba(18, 29, 17, 0.5);
 }
 
-.label {
-  color: var(--text-muted);
-}
-
-.stat-card strong {
+.level-card h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
   color: var(--accent-gold);
-  text-align: right;
 }
 
-.stat-card strong.not-available {
-  color: var(--text-muted);
+.level-card p {
+  margin: 6px 0;
+  color: var(--accent-gold);
 }
 </style>

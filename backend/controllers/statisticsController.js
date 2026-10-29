@@ -13,24 +13,6 @@ exports.getCurrentQuestionForUser = async (req, res) => {
       return res.status(403).json({ error: "Access denied" });
     }
 
-    const [answerCounts, currentQuestion] = await Promise.all([
-      rightAnswerService.getCorrectAnswersByLevel(authenticatedUserId),
-      statisticsService.getCurrentQuestionForUser(authenticatedUserId),
-    ]);
-    const currentLevelId = Number(currentQuestion?.current_level_id) || 1;
-    const levels = [1, 2, 3].map((levelId) => {
-      const savedCount = answerCounts.find(
-        (item) => Number(item.level_id) === levelId,
-      );
-
-      return {
-        level_id: levelId,
-        correct_answers: Number(savedCount?.correct_answers ?? 0),
-        wrong_answers: Number(savedCount?.wrong_answers ?? 0),
-        unlocked: levelId <= currentLevelId,
-      };
-    });
-
     const userId = authenticatedUserId;
 
     const currentQuestion =
@@ -41,6 +23,77 @@ exports.getCurrentQuestionForUser = async (req, res) => {
     return res.status(500).json({
       error:
         "An error occurred while fetching the current question for the user",
+    });
+  }
+};
+
+
+exports.submitAnswer = async (req, res) => {
+  const userId = Number(req.userData?.id);
+  const questionId = Number(req.body?.questionId);
+  const answerId = Number(req.params.answerId);
+
+  if (!Number.isInteger(userId) || userId < 1) {
+    return res.status(401).json({ error: "You must be logged in." });
+  }
+
+  if (
+    !Number.isInteger(questionId) ||
+    questionId < 1 ||
+    !Number.isInteger(answerId) ||
+    answerId < 1
+  ) {
+    return res.status(400).json({
+      error: "The question or answer ID is invalid.",
+    });
+  }
+
+  try {
+    const result = await statisticsService.saveAnswerAttempt(
+      userId,
+      questionId,
+      answerId
+    );
+
+    if (result === null) {
+      return res.status(400).json({
+        error: "This answer does not belong to this question.",
+      });
+    }
+
+    return res.json(result);
+  } catch (error) {
+    console.error("Could not save answer:", error);
+    return res.status(500).json({
+      error: "Could not save the answer.",
+    });
+  }
+};
+exports.getLevelsStatistics = async (req, res) => {
+  const userId = Number(req.userData?.id);
+
+  if (!Number.isInteger(userId) || userId < 1) {
+    return res.status(401).json({
+      error: "You must be logged in.",
+    });
+  }
+
+  if (String(req.params.userId) !== String(userId)) {
+    return res.status(403).json({
+      error: "Access denied.",
+    });
+  }
+
+  try {
+    const levels =
+      await rightAnswerService.getCorrectAnswersByLevel(userId);
+
+    return res.json({ levels });
+  } catch (error) {
+    console.error("Could not fetch level statistics:", error);
+
+    return res.status(500).json({
+      error: "Could not fetch statistics.",
     });
   }
 };

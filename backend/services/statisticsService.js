@@ -1,4 +1,7 @@
 const connectionMySQL = require("./../connectionMySQL");
+const {promisify}  = require ("util");
+
+const query = promisify(connectionMySQL.query).bind(connectionMySQL);
 
 function getCurrentQuestionForUser(userId) {
   return new Promise((resolve, reject) => {
@@ -14,47 +17,27 @@ function getCurrentQuestionForUser(userId) {
   });
 }
 
-function saveAnswerAttempt(userId, questionId, answerId) {
-  return new Promise((resolve, reject) => {
-    const findAnswerSql = `
-      SELECT is_correct
-      FROM answers
-      WHERE answer_id = ? AND question_id = ?;
-    `;
+async function saveAnswerAttempt(userId, questionId, answerId) {  const answerRows = await query(
+     `SELECT is_correct
+     FROM answers
+     WHERE answer_id = ? AND question_id = ?`,
+    [answerId, questionId],
+  );
 
-    connectionMySQL.query(
-      findAnswerSql,
-      [answerId, questionId],
-      (findError, answerRows) => {
-        if (findError) {
-          return reject(findError);
-        }
+  if(answerRows.length ===0){
+    return null;
+  }
 
-        if (answerRows.length === 0) {
-          return resolve(null);
-        }
+  await query(
+    `INSERT INTO statistics (user_id, answer_id, answer_timestamp)
+     VALUES (?, ?, CURRENT_TIMESTAMP)`,
+     [userId,answerId],
+  );
 
-        const saveAttemptSql = `
-          INSERT INTO statistics (user_id, answer_id, answer_timestamp)
-          VALUES (?, ?, CURRENT_TIMESTAMP);
-        `;
-
-        connectionMySQL.query(
-          saveAttemptSql,
-          [userId, answerId],
-          (saveError) => {
-            if (saveError) {
-              return reject(saveError);
-            }
-
-            resolve({
-              is_correct: Boolean(answerRows[0].is_correct),
-            });
-          },
-        );
-      },
-    );
-  });
+  return{
+    is_correct: Boolean(answerRows[0].is_correct),
+  };
+  
 }
 
 module.exports = {
