@@ -126,7 +126,7 @@ onMounted(() => {
           :src="
             user?.user_img ||
             props.user_img ||
-            '/src/assets/images/Default-profile-picture.png'
+            '/src/Assets/images/Default-profile-picture.png'
           "
           alt="userPicture"
           class="user-picture"
