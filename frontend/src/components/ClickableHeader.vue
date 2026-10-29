@@ -1,13 +1,14 @@
 <script setup>
 import { computed } from "vue";
 import { useRouter,useRoute } from "vue-router";
-import Logout from '../components/Logout.vue';
+import BurgerMenu from '../components/dashboard/BurgerMenu.vue';
 
 
 const router = useRouter();
 const route = useRoute();
 
 const isQuizpage = computed(() => route.name === "Quiz");
+const isDashboardPage = computed(() => route.name === "MyDashboard");
 
 function goHome() {
   if (route.name === "Login" || route.name === "Welcome" || route.name === "Register") {
@@ -36,7 +37,7 @@ function goHome() {
 
     <h1 v-else class="clickable-header">Stranded</h1>
 
-    <Logout />
+    <BurgerMenu v-if="isDashboardPage" />
 
     </header>
 </template>

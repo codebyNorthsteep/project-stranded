@@ -288,3 +288,123 @@ exports.getUserInfo = async (req, res) => {
     });
   }
 };
+
+exports.updateUser = async (req, res) => {
+
+  try {
+    const authenticatedUserId = req.userData?.id;
+
+    //1. Authentication check
+    if (authenticatedUserId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    //2. Authorization check (prevent other users from modifying other accounts)
+    if (String(req.params.userId) !== String(authenticatedUserId)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const userId = authenticatedUserId;
+    const input = req.body ?? {};
+
+    //3. Ensure the request body is a valid JSON object
+    if (typeof input !== "object" || Array.isArray(input)) {
+      return res.status(400).json({ error: "Invalid request body" });
+    }
+
+    const updates = {};
+
+    //4. Validate only the fields present in the request body
+    for (const field of ["username", "password", "picture"]) {
+      //Skip fields that were not provided in the request
+      if (!Object.prototype.hasOwnProperty.call(input, field)) {
+        continue;
+      }
+
+      const value = input[field];
+
+      // Ensure provided values are non-empty strings
+      if (
+        typeof value !== "string" ||
+        (field === "password" ? value.length === 0 : !value.trim())
+      ) {
+        return res.status(400).json({
+          error: `${field} must be a non-empty string`,
+        });
+      }
+
+      if (field === "password" && value.length < 6) {
+        return res.status(400).json({
+          error: "Ange ett lösenord med minst sex tecken",
+        });
+      }
+
+      // Trim leading/trailing whitespace for username and picture, but preserve raw password characters
+      updates[field] = field === "username" ? value.trim() : value;
+    }
+
+    //5. Ensure at least one valid field was sent for update
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        error: "Provide username, password, or picture",
+      });
+    }
+
+    //6. Hash password BEFORE touching the database to avoid partial updates on error
+    if (updates.password !== undefined) {
+      if (Buffer.byteLength(updates.password, "utf8") > 72) {
+        return res.status(400).json({
+          error: "Lösenordet får inte överstiga 72 UTF-8-byte",
+        });
+      }
+      updates.password = await bcrypt.hash(updates.password, 10);
+    }
+
+    //7. Perform a single atomic UPDATE query in the database
+    await userService.updateUser(userId, updates);
+
+    return res.status(200).json("Användaren har uppdaterats");
+
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({
+        code: "USERNAME_TAKEN",
+        error: "Användarnamnet används redan. Välj ett annat.",
+      });
+    }
+
+    console.error("Update user info controller error:", err);
+    return res.status(500).json({
+      error: "Kunde inte uppdatera användarinformationen. Försök igen.",
+    });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const authenticatedUserId = req.userData?.id;
+
+    if (authenticatedUserId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    if (String(req.params.userId) !== String(authenticatedUserId)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const userId = authenticatedUserId;
+
+    const deleted = await userService.deleteUser(userId);
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Användare hittades inte" });
+    }
+
+    return res.status(200).json("Användaren har tagits bort");
+  } catch (err) {
+    console.error("Delete user controller error:", err);
+    return res.status(500).json({
+      error: "Ett fel uppstod när användaren skulle tas bort",
+    });
+  }
+};
