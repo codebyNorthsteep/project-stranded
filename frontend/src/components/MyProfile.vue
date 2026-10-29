@@ -324,17 +324,26 @@ onMounted(() => {
         </div>
 
         <div class="modal-button-container">
-          <button type="button" class="button modal-button" @click="closeModal" v-if="!successMessage">
+          <button
+            type="button"
+            class="button modal-button"
+            @click="closeModal"
+            v-if="!successMessage"
+          >
             Avbryt
           </button>
-          <button type="submit" class="button modal-butto" :disabled="successMessage !== ''"
-            v-if="!successMessage">
+          <button
+            type="submit"
+            class="button modal-butto"
+            :disabled="successMessage !== ''"
+            v-if="!successMessage"
+          >
             {{ activeAction === "delete" ? "Radera konto" : "Spara" }}
           </button>
-          <button 
-            type="button" 
-            class="button modal-button" 
-            @click="closeModal" 
+          <button
+            type="button"
+            class="button modal-button"
+            @click="closeModal"
             v-if="successMessage !== ''"
           >
             Gå tillbaka
