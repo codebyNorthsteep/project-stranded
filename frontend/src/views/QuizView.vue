@@ -20,6 +20,8 @@ const levels = ref([]);
 let requestSequence = 0;
 
 const savingProgress = ref(false);
+const progressError = ref(null);
+const pendingQuestionId = ref(null);
 
 const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
@@ -57,6 +59,10 @@ const isLast = computed(
 );
 
 const nextQuestion = () => {
+  if(progressError.value) {
+    // If there was an error saving progress, we don't proceed to the next question
+    return;
+  }
   if (!isLast.value) {
     currentIndex.value++;
     validatedAnswer.value = null;
@@ -243,13 +249,8 @@ const fetchAnswerValidation = async (answerId) => {
         : questions.value[0].question_id;
 
       savingProgress.value = true; // Sätt savingProgress till true innan anropet för att undvika att användaren klickar på nästa fråga innan uppdateringen är klar
-      try {
-        await updateCurrentQuestion(questionIdToSave); // Uppdatera current_question_id i databasen
-      } catch (err) {
-        console.error("Error updating current question:", err);
-      } finally {
-        savingProgress.value = false; // Sätt savingProgress till false efter anropet är klart
-      }
+
+      await saveProgress(questionIdToSave);
 
       validatedAnswer.value = result;
     }
@@ -265,28 +266,43 @@ const fetchAnswerValidation = async (answerId) => {
 };
 
 const updateCurrentQuestion = async (questionId) => {
-  try {
-    const response = await fetch(
-      "http://localhost:3000/api/users/statistics/current-question",
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("user_token")}`,
-        },
-        body: JSON.stringify({
-          questionId: questionId,
-        }),
+  const response = await fetch(
+    "http://localhost:3000/api/users/statistics/current-question",
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("user_token")}`,
       },
-    );
+      body: JSON.stringify({
+        questionId: questionId,
+      }),
+    },
+  );
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-  } catch (err) {
-    console.error("Error updating current question:", err);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
   }
 };
+
+const saveProgress = async (questionId) => {
+  savingProgress.value = true;
+  progressError.value = null;
+  pendingQuestionId.value = questionId;
+  try {
+    await updateCurrentQuestion(questionId);
+    pendingQuestionId.value = null; // Rensa pendingQuestionId om uppdateringen lyckas
+    return true; // Returnera true för att indikera att uppdateringen lyckades
+  } catch (err) {
+    console.error("Error saving progress:", err);
+    progressError.value = `Kunde inte spara framsteg: ${err.message}`;
+    return false; // Returnera false för att indikera att uppdateringen misslyckades
+  } finally {
+    savingProgress.value = false;
+  }
+};
+// Funktion för att försöka spara framsteg igen
+const retrySaveProgress = () => saveProgress(pendingQuestionId.value);
 
 // Lyssna på om URL:en ändras (i detta fallnär man byter nivå)
 watch(
@@ -302,6 +318,8 @@ watch(
       isQuizCompleted.value = false;
       isGameOver.value = false;
       gameOverExplanation.value = "";
+      progressError.value = null; // Rensa eventuella tidigare felmeddelanden
+      pendingQuestionId.value = null; // Rensa pendingQuestionId när vi byter nivå
       fetchQuestions(newLevelId); // Hämta nya frågor för den nya nivån
     }
   },
@@ -405,10 +423,18 @@ onMounted(() => {
           <h3>Rätt svar!</h3>
           <p>{{ validatedAnswer.answer_explanation }}</p>
         </div>
-        <button v-if="!isLast" @click="nextQuestion" class="button" :disabled="savingProgress">
+        <button
+          v-if="!isLast"
+          @click="nextQuestion"
+          class="button"
+          :disabled="savingProgress || progressError"
+        >
           Nästa fråga
         </button>
-        <button v-else @click="nextQuestion" class="button">
+        <button v-else @click="nextQuestion" 
+        class="button"
+        :disabled="savingProgress || progressError"
+        >
           Slutför nivå
         </button>
       </div>
