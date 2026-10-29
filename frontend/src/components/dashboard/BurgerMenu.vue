@@ -1,18 +1,37 @@
 <script setup>
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import MyProfile from "../MyProfile.vue";
 import Logout from "../Logout.vue";
 
 const isOpen = ref(false);
+const menuButton = ref(null);
+const closeButton = ref(null);
 
-const toggleMenu = () => {
-  isOpen.value = !isOpen.value;
+const toggleMenu = async () => {
+  if (isOpen.value) {
+    // Move focus out before making the menu inert.
+    menuButton.value?.focus({ preventScroll: true });
+    isOpen.value = false;
+  } else {
+    isOpen.value = true;
+    // Wait for Vue to remove inert before moving focus inside.
+    await nextTick();
+    closeButton.value?.focus({ preventScroll: true });
+  }
 };
 </script>
 
 <template>
   <div class="burger-container">
-    <button class="button" @click="toggleMenu">
+    <button
+      ref="menuButton"
+      type="button"
+      class="button"
+      aria-label="Open profile menu"
+      aria-controls="profile-menu"
+      :aria-expanded="isOpen"
+      @click="toggleMenu"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="icon"
@@ -31,13 +50,26 @@ const toggleMenu = () => {
 
     <div v-if="isOpen" class="overlay" @click="toggleMenu"></div>
 
-    <div class="burger-menu" :class="{ 'is-open': isOpen }">
-    
+    <div
+      id="profile-menu"
+      class="burger-menu"
+      :class="{ 'is-open': isOpen }"
+      :inert="isOpen ? null : ''"
+      @keydown.esc.stop.prevent="toggleMenu"
+    >
       <header class="menu-header">
         <div class="profile-title">
           <h1>Min Profil</h1>
         </div>
-        <button class="button close-button" @click="toggleMenu">✕</button>
+        <button
+          ref="closeButton"
+          type="button"
+          class="button close-button"
+          aria-label="Close profile menu"
+          @click="toggleMenu"
+        >
+          ✕
+        </button>
       </header>
 
       <main class="menu-main">
