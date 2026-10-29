@@ -22,19 +22,20 @@ async function fetchStats() {
   try {
     const token = localStorage.getItem("user_token");
     const user = JSON.parse(localStorage.getItem("user"));
-
+    
     if (!token || !user) return;
 
-    const url = `http://localhost:3000/api/users/${user.id}/statistics`;
+    const levelsUrl = `http://localhost:3000/api/users/${user.id}/statistics/levels`;
+    const questionUrl = `http://localhost:3000/api/users/${user.id}/statistics/current-question`;
+
     const headers = {
       Authorization: `Bearer ${token}`,
     };
 
     const [statsResponse, questionResponse] = await Promise.all([
-      fetch(`${url}/levels`, { headers }),
-      fetch(`${url}/current-question`, { headers }),
-    ]);
-
+      fetch(levelsUrl, { headers }),
+      fetch(questionUrl, { headers }),
+]);
     if (!statsResponse.ok || !questionResponse.ok) {
       throw new Error("Kunde inte hämta statistiken.");
     }
