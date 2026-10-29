@@ -67,6 +67,21 @@ function createUserViaSocialLogin(username, email, hashedPassword){
   });
 }
 
+//Create entry in users_questions table for a new user with default current_question_id = 1
+function createCurrentQuestionEntryForUser(userId) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      INSERT INTO users_questions (user_id, current_question_id)
+      VALUES (?, 1);
+    `;
+    connectionMySQL.query(sql, [userId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
+
 function getUserInfoById(userId) {
   return new Promise((resolve, reject) => {
     const sql = `
@@ -160,6 +175,7 @@ module.exports = {
   getUserByUsernameOrEmail,
   createUser,
   createUserViaSocialLogin,
+  createCurrentQuestionEntryForUser,
   getUserInfoById,
   getUserByEmail,
   updateUser,
