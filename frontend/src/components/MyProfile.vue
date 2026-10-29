@@ -316,7 +316,7 @@ onMounted(() => {
             Är du säker på att du vill ta bort ditt konto? Det går inte att
             ångra.
           </p>
-          
+
           <div v-if="errorMessage" class="error-message">
             {{ errorMessage }}
           </div>
@@ -326,7 +326,9 @@ onMounted(() => {
           <button type="button" class="button modal-button" @click="closeModal">
             Avbryt
           </button>
-          <button type="submit" class="button modal-button">Spara</button>
+          <button type="submit" class="button modal-button">
+            {{ activeAction === "delete" ? "Radera konto" : "Spara" }}
+          </button>
         </div>
       </form>
     </dialog>
