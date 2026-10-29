@@ -35,10 +35,12 @@ const promptUpdatePicture = () => {
 };
 
 const handleDeleteAccount = () => {
-  const confirmation = confirm("Är du säker på att du vill ta bort ditt konto? Det går inte att ångra");
-  if(!confirmation) return;
+  const confirmation = confirm(
+    "Är du säker på att du vill ta bort ditt konto? Det går inte att ångra",
+  );
+  if (!confirmation) return;
   deleteAccount();
-}
+};
 
 async function myProfile() {
   try {
@@ -51,9 +53,9 @@ async function myProfile() {
 
     if (response.ok) {
       const data = await response.json();
-      user.value = { 
-      ...data, 
-      user_img: data.user_img || data.picture,
+      user.value = {
+        ...data,
+        user_img: data.user_img || data.picture,
       };
     } else {
       errorMessage.value = "Error getting user information";
@@ -86,7 +88,7 @@ async function updateProfile(updateData) {
   }
 }
 
-async function deleteAccount(){
+async function deleteAccount() {
   try {
     const response = await fetch(`${apiBaseUrl}/api/users/${userId}`, {
       method: "DELETE",
@@ -102,7 +104,7 @@ async function deleteAccount(){
       router.push("/");
     } else {
       const err = await response.json();
-      alert(`Error: ${err.error || "It could not delete account"}`);
+      errorMessage.value = err.error || "It could not delete account";
     }
   } catch (error) {
     errorMessage.value = error.message;
@@ -121,7 +123,11 @@ onMounted(() => {
     <div class="my-profile-picture">
       <div class="picture-wrapper">
         <img
-          :src="user?.user_img || props.user_img || '/src/assets/images/Default-profile-picture.png'"
+          :src="
+            user?.user_img ||
+            props.user_img ||
+            '/src/assets/images/Default-profile-picture.png'
+          "
           alt="userPicture"
           class="user-picture"
         />
@@ -138,8 +144,11 @@ onMounted(() => {
       <h3>{{ user?.username || props.username }}</h3>
     </div>
 
-    <div ref="profileDialog" class="options-list">
+    <p v-if="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </p>
 
+    <div ref="profileDialog" class="options-list">
       <div class="button option-card" @click="promptUpdateUsername">
         <div class="icon">👤</div>
         <div>Ändra användarnamn</div>
@@ -157,7 +166,6 @@ onMounted(() => {
         <div>Ta bort konto</div>
         <div class="arrow">›</div>
       </div>
-
     </div>
   </div>
 </template>
@@ -239,5 +247,10 @@ onMounted(() => {
 
 .icon {
   margin-right: 10px;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.8rem;
 }
 </style>
