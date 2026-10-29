@@ -222,7 +222,6 @@ const fetchAnswerValidation = async (answerId) => {
     }
     const result = await response.json();
 
-    // Kontrollera att vi är kvar på samma nivå och att samma svar fortfarande är aktivt
     if (
       String(route.params.levelId) === String(validationLevelId) &&
       selectedAnswerId.value === answerId
@@ -234,6 +233,15 @@ const fetchAnswerValidation = async (answerId) => {
         isGameOver.value = true;
       }
     }
+
+    // Spara nästa fråga som ska visas beroende på om svaret var korrekt eller inte, och uppdatera användarens nuvarande fråga i databasen
+    const nextQuestionId = questions.value[currentIndex.value + 1]?.question_id;
+    const questionIdToSave = result.is_correct
+      ? (nextQuestionId ?? currentQuestion.value.question_id)
+      : questions.value[0].question_id;
+
+    await fetchUpdateCurrentQuestion(questionIdToSave);
+    
   } catch (err) {
     // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
     if (
@@ -242,6 +250,27 @@ const fetchAnswerValidation = async (answerId) => {
     ) {
       error.value = err.message;
     }
+  }
+};
+
+const fetchUpdateCurrentQuestion = async (questionId) => {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/api/users/statistics/current-question",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+        },
+        body: JSON.stringify({ questionId }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (err) {
+    error.value = err.message;
   }
 };
 
