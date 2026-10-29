@@ -109,12 +109,23 @@ exports.registerUser = async (req, res) => {
       hashedPassword,
     );
 
+    if (!newUser) {
+      return res.status(500).json({
+        error: "Kunde inte skapa konto. Försök igen.",
+      });
+    }
+
+    // Create an entry in users_questions for the new user
+    const newQuestionEntry =
+      await userService.createCurrentQuestionEntryForUser(newUser.user_id);
+
     //5. Return user info
     return res.status(201).json({
       message: "Register successful",
       user_id: newUser.user_id,
       username: newUser.username,
       email: newUser.email,
+      current_question_id: newQuestionEntry.current_question_id, // Include the current_question_id in the response
     });
   } catch (err) {
     console.error("Register controller error:", err);
@@ -126,7 +137,6 @@ exports.registerUser = async (req, res) => {
 
 exports.loginViaSocialLogin = async (req, res) => {
   try {
-
     const { credential } = req.body ?? {};
 
     //1. Validation
@@ -177,7 +187,8 @@ exports.loginViaSocialLogin = async (req, res) => {
     }
 
     const email = payload.email;
-    const username = payload.given_name?.trim() || payload.name?.trim() || email.split("@")[0];
+    const username =
+      payload.given_name?.trim() || payload.name?.trim() || email.split("@")[0];
 
     const secretKey = process.env.JWT_SECRET;
 
@@ -237,6 +248,16 @@ exports.loginViaSocialLogin = async (req, res) => {
         password,
       );
 
+      if (!newUser) {
+        return res.status(500).json({
+          error: "Kunde inte skapa konto. Försök igen.",
+        });
+      }
+
+      // Create an entry in users_questions for the new user
+      const newQuestionEntry =
+        await userService.createCurrentQuestionEntryForUser(newUser.user_id);
+
       //B.5 Generate JWT token
       const token = jwt.sign(
         { id: newUser.user_id, username: newUser.username },
@@ -252,6 +273,7 @@ exports.loginViaSocialLogin = async (req, res) => {
           id: newUser.user_id,
           username: newUser.username,
           email: newUser.email,
+          current_question_id: newQuestionEntry.current_question_id, // Include the current_question_id in the response
         },
       });
     }
@@ -290,7 +312,6 @@ exports.getUserInfo = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-
   try {
     const authenticatedUserId = req.userData?.id;
 
