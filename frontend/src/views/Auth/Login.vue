@@ -1,12 +1,14 @@
 <script setup>
 import LoginForm from "../../components/LoginForm.vue";
+import SocialLogin from "../../components/SocialLogin.vue";
 </script>
 
 <template>
   <p class="slogan">your knowledge is your survival tool</p>
 
   <LoginForm />
-
+  <SocialLogin />
+  
   <div class="register-link">
     <p>
       Har du inget konto?

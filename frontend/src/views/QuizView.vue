@@ -29,6 +29,15 @@ const gameOverExplanation = ref("");
 
 const letters = ["A", "B", "C"];
 
+const levelSummaries = {
+  "Svensk skog":
+    "Du har lärt dig att skaffa överblick från högsta punkten, välja rinnande vatten långt från föroreningar och tända eld med torr näver. Blöta kläder och kyla är en större fara än man tror, så håll dig varm och torka kläderna vid en eld. Om du går vilse ska du stanna, vara lugn och göra dig synlig. Ät aldrig svamp, växter eller bär som du inte är helt säker på.",
+  Amazonas:
+    "I regnskogen kan uttorkning börja redan efter en timme. Du har lärt dig att djurstigar kan leda till vatten, att kåda från kamfer eller eukalyptus skyddar mot insekter och att du ska testa marken med en käpp. Sov upphöjt från marken, och om du är vilse ska du följa rinnande vatten nedströms. Vatten från bambu och blad är en säker källa, men okända frukter kan vara giftiga.",
+  Sahara:
+    "I öknen gäller det att spara kroppens vatten: täck huden, drick regelbundet och rör dig när det är svalt. Vatten hittar du i låga punkter som uttorkade flodbäddar, och okänt vatten ska renas eller kokas. Natten är kall, så isolera mot marken och skaka ur skor och kläder innan du tar dem på dig. Vid sandstorm söker du lä bakom klippor, Polstjärnan visar norr, och räddningen ser dig bäst med ett stort SOS-tecken och ett blankt föremål som reflekterar solljus.",
+};
+
 //Ändra bakgrundsbild beroende på level_name
 const getBackgroundId = computed(() => {
   if (!currentQuestion.value) return "";
@@ -91,6 +100,7 @@ const firstLevel = () => {
     isLevelCompleted.value = false;
     isQuizCompleted.value = false;
     isGameOver.value = false;
+    gameOverExplanation.value = "";
     fetchQuestions(firstLevelId, { resume: false });
   } else {
     isQuizCompleted.value = false;
@@ -101,6 +111,7 @@ const firstLevel = () => {
 //If the user loses, we have to restart the level there the user was answering
 const handleRestartCurrentLevel = () => {
   isGameOver.value = false;
+  gameOverExplanation.value = "";
   validatedAnswer.value = null;
   selectedAnswerId.value = null;
   currentIndex.value = 0;
@@ -238,16 +249,8 @@ const fetchAnswerValidation = async (answerId) => {
     ) {
       validatedAnswer.value = result;
 
-      if (result.is_correct && isLast.value) {
-        if (isLastLevelOfQuiz.value) {
-          isQuizCompleted.value = true;
-        } else {
-          isLevelCompleted.value = true;
-        }
-      }
-
       if (!result.is_correct) {
-        gameOverExplanation.value = result.explanation || "";
+        gameOverExplanation.value = result.answer_explanation || "";
         isGameOver.value = true;
       }
     }
@@ -277,6 +280,7 @@ watch(
       isLevelCompleted.value = false;
       isQuizCompleted.value = false;
       isGameOver.value = false;
+      gameOverExplanation.value = "";
       fetchQuestions(newLevelId); // Hämta nya frågor för den nya nivån
     }
   },
@@ -357,11 +361,13 @@ onMounted(() => {
               </span>
 
               <div class="answer-content">
-                <span class="answer-text">{{ answer.answer_text }}</span>
+                <span v-if="!answer.answer_img" class="answer-text">{{
+                  answer.answer_text
+                }}</span>
                 <img
                   v-if="answer.answer_img"
                   :src="answer.answer_img"
-                  alt="Svarsalternativ"
+                  :alt="answer.answer_text"
                   class="answer-img"
                 />
               </div>
@@ -374,18 +380,31 @@ onMounted(() => {
         class="next-question"
         v-if="validatedAnswer && validatedAnswer.is_correct"
       >
-        <div class="correct-msg">Korrekt svar!</div>
+        <div class="correct-msg">
+          <h3>Rätt svar!</h3>
+          <p>{{ validatedAnswer.answer_explanation }}</p>
+        </div>
         <button v-if="!isLast" @click="nextQuestion" class="button">
           Nästa fråga
         </button>
         <button v-else @click="nextQuestion" class="button">
-          {{ isLastLevelOfQuiz ? "Se resultat" : "Nästa nivå" }}
+          Slutför nivå
         </button>
       </div>
     </div>
 
-    <LevelCompleted v-if="isLevelCompleted" @next-level="nextLevel" />
-    <QuizCompleted v-if="isQuizCompleted" @first-level="firstLevel" />
+    <LevelCompleted
+      v-if="isLevelCompleted"
+      :level="currentQuestion?.level_name"
+      :summary="levelSummaries[currentQuestion?.level_name]"
+      @next-level="nextLevel"
+    />
+    <QuizCompleted
+      v-if="isQuizCompleted"
+      :level="currentQuestion?.level_name"
+      :summary="levelSummaries[currentQuestion?.level_name]"
+      @first-level="firstLevel"
+    />
     <GameOver
       v-if="isGameOver"
       :explanation="gameOverExplanation"
