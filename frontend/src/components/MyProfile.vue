@@ -81,7 +81,7 @@ async function updateProfile(updateData) {
       myProfile();
     } else {
       const err = await response.json();
-      alert(`Error: ${err.error || "It could not update"}`);
+      errorMessage.value = "It could not update";
     }
   } catch (error) {
     errorMessage.value = error.message;
@@ -104,7 +104,7 @@ async function deleteAccount() {
       router.push("/");
     } else {
       const err = await response.json();
-      errorMessage.value = err.error || "It could not delete account";
+      errorMessage.value = "It could not delete account";
     }
   } catch (error) {
     errorMessage.value = error.message;
@@ -252,5 +252,8 @@ onMounted(() => {
 .error-message {
   color: red;
   font-size: 0.8rem;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 20px;
 }
 </style>
