@@ -109,11 +109,14 @@ const firstLevel = () => {
 
 //If the user loses, we have to restart the level there the user was answering
 const handleRestartCurrentLevel = () => {
+  const firstQuestionId = questions.value[0]?.question_id;
   isGameOver.value = false;
   gameOverExplanation.value = "";
   validatedAnswer.value = null;
   selectedAnswerId.value = null;
   currentIndex.value = 0;
+
+  if (firstQuestionId) fetchUpdateCurrentQuestion(firstQuestionId);
   questions.value = [];
   fetchQuestions(route.params.levelId, { resume: false });
 };
@@ -227,21 +230,20 @@ const fetchAnswerValidation = async (answerId) => {
       selectedAnswerId.value === answerId
     ) {
       validatedAnswer.value = result;
+      // Spara nästa fråga som ska visas beroende på om svaret var korrekt eller inte, och uppdatera användarens nuvarande fråga i databasen
+      const nextQuestionId =
+        questions.value[currentIndex.value + 1]?.question_id;
+      const questionIdToSave = result.is_correct
+        ? (nextQuestionId ?? currentQuestion.value.question_id)
+        : questions.value[0].question_id;
 
       if (!result.is_correct) {
         gameOverExplanation.value = result.answer_explanation || "";
         isGameOver.value = true;
       }
+
+      fetchUpdateCurrentQuestion(questionIdToSave);
     }
-
-    // Spara nästa fråga som ska visas beroende på om svaret var korrekt eller inte, och uppdatera användarens nuvarande fråga i databasen
-    const nextQuestionId = questions.value[currentIndex.value + 1]?.question_id;
-    const questionIdToSave = result.is_correct
-      ? (nextQuestionId ?? currentQuestion.value.question_id)
-      : questions.value[0].question_id;
-
-    await fetchUpdateCurrentQuestion(questionIdToSave);
-    
   } catch (err) {
     // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
     if (
