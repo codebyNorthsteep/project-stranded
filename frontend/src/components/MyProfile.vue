@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import Logout from "../components/Logout.vue";
 
@@ -12,6 +12,7 @@ const user = ref({
   username: "",
   user_img: "",
 });
+
 const router = useRouter();
 const errorMessage = ref("");
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
@@ -20,20 +21,15 @@ const userStorage = JSON.parse(localStorage.getItem("user") || "{}");
 const userId = userStorage.id;
 const successMessage = ref("");
 
-const updateUsername = () => {
-  const newUsername = prompt("Enter new username:", user.value.username);
-  if (newUsername) updateProfile({ username: newUsername });
-};
+const optionListDialog = ref(null);
+const activeAction = ref(null);
 
-const promptUpdatePassword = () => {
-  const newPassword = prompt("Enter new password:");
-  if (newPassword) updateProfile({ password: newPassword });
-};
-
-const promptUpdatePicture = () => {
-  const newPicture = prompt("Enter new picture URL:", user.value.user_img);
-  if (newPicture) updateProfile({ picture: newPicture });
-};
+const form = ref({
+  username: "",
+  password: "",
+  confirmPassword: "",
+  picture: "",
+});
 
 const handleDeleteAccount = () => {
   const confirmation = confirm(
@@ -45,8 +41,42 @@ const handleDeleteAccount = () => {
 
 async function openModal(action) {
   activeAction.value = action;
+  errorMessage.value = "";
+  successMessage.value = "";
+
+  if (action === "username") {
+    form.value.username = user.value.username || "";
+  } else if (action === "picture") {
+    form.value.picture = user.value.user_img || "";
+  } else {
+    form.value.password = "";
+    form.value.confirmPassword = "";
+  }
+
   await nextTick();
-  dialogRef.value?.showModal(); 
+  optionListDialog.value?.showModal();
+}
+
+function closeModal() {
+  optionListDialog.value?.close();
+  activeAction.value = null;
+}
+
+function updateSubmit() {
+  if (activeAction.value === "username") {
+    updateProfile({ username: form.value.username });
+  } else if (activeAction.value === "password") {
+    // Ensure that new password and confirm password are the same
+    if (form.value.password !== form.value.confirmPassword) {
+      errorMessage.value = "Lösenorden matchar inte";
+      return;
+    }
+    updateProfile({ password: form.value.password });
+  } else if (activeAction.value === "picture") {
+    updateProfile({ picture: form.value.picture });
+  } else if (activeAction.value === "delete") {
+    deleteAccount();
+  }
 }
 
 async function myProfile() {
@@ -155,8 +185,10 @@ onMounted(() => {
           class="user-picture"
         />
         <button
+          type="button"
           class="button button-update-picture"
-          @click="promptUpdatePicture"
+          @click="openModal('picture')"
+          aria-label="Ändra profilbild"
         >
           📷
         </button>
@@ -168,9 +200,33 @@ onMounted(() => {
     </div>
 
     <div class="options-list">
-      <button type="button" class="button option-card" @click="openModal('username')">👤 Ändra användarnamn ›</button>
-      <button type="button" class="button option-card" @click="openModal('password')">🔒 Ändra lösenord ›</button>
-      <button type="button" class="button option-card" @click="openModal('username')">🗑️ Ta bort konto ›</button>
+      <button
+        type="button"
+        class="button option-card"
+        @click="openModal('username')"
+      >
+        <div class="icon">👤</div>
+        <div class="text">Ändra användarnamn</div>
+        <div class="arrow">›</div>
+      </button>
+      <button
+        type="button"
+        class="button option-card"
+        @click="openModal('password')"
+      >
+        <div class="icon">🔒</div>
+        <div class="text">Ändra lösenord</div>
+        <div class="arrow">›</div>
+      </button>
+      <button
+        type="button"
+        class="button option-card"
+        @click="openModal('delete')"
+      >
+        <div class="icon">🗑️</div>
+        <div class="text">Ta bort konto</div>
+        <div class="arrow">›</div>
+      </button>
     </div>
 
     <dialog
@@ -181,8 +237,10 @@ onMounted(() => {
       @cancel.prevent
     >
       <form @submit.prevent="updateSubmit" novalidate>
-        <div v-if="activeAction === username" class="field">
-          <label for="username" class="form-label">Användarnamn</label>
+        <div v-if="activeAction === 'username'" class="field">
+          <label for="username" class="form-label"
+            >Ange det nya användarnamnet</label
+          >
           <input
             id="username"
             v-model="form.username"
@@ -191,16 +249,18 @@ onMounted(() => {
             class="form-control"
             required
           />
-          <p v-if="formErrors.username" class="error-message">
-            {{ formErrors.username }}
-          </p>
-          <p v-if="successMessage" class="success-message" role="status">
+          <div v-if="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
+          <div v-if="successMessage" class="success-message" role="status">
             {{ successMessage }}
-          </p>
+          </div>
         </div>
 
-        <div v-if="activeAction === password" class="field">
-          <label for="password" class="form-label">Lösenord</label>
+        <div v-if="activeAction === 'password'" class="field">
+          <label for="password" class="form-label"
+            >Ange det nya lösenordet</label
+          >
           <input
             id="password"
             v-model="form.password"
@@ -208,18 +268,60 @@ onMounted(() => {
             name="password"
             class="form-control"
             required
+          /><br />
+
+          <label for="confirmPassword" class="form-label"
+            >Bekräfta lösenord</label
+          >
+          <input
+            id="confirmPassword"
+            v-model="form.confirmPassword"
+            type="password"
+            name="confirmPassword"
+            class="form-control"
+            required
           />
-          <p v-if="formErrors.password" class="error-message">
-            {{ formErrors.password }}
-          </p>
-          <p v-if="successMessage" class="success-message" role="status">
+
+          <div v-if="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
+          <div v-if="successMessage" class="success-message" role="status">
             {{ successMessage }}
-          </p>
+          </div>
         </div>
 
-        <div class="button dialog-button">
-          <button type="button" @click="closeModal">Avbryt</button>
-          <button type="submit">Spara</button>
+        <div v-if="activeAction === 'picture'" class="field">
+          <label for="picture" class="form-label">Bild URL</label>
+          <input
+            id="picture"
+            v-model="form.picture"
+            type="url"
+            name="picture"
+            class="form-control"
+            required
+          />
+
+          <div v-if="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
+          <div v-if="successMessage" class="success-message" role="status">
+            {{ successMessage }}
+          </div>
+        </div>
+
+        <div v-if="activeAction === 'delete'" class="field">
+          <h3>Radera konto ⚠️</h3>
+          <br />
+          <p class="warning-text">
+            Är du säker på att du vill ta bort ditt konto? Det går inte att
+            ångra.
+          </p>
+        </div>
+        <div class="modal-button-container">
+          <button type="button" class="button" @click="closeModal">
+            Avbryt
+          </button>
+          <button type="submit" class="button">Spara</button>
         </div>
       </form>
     </dialog>
@@ -227,6 +329,31 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.option-list-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.option-list-dialog {
+  border: 1px solid var(--accent-gold);
+  border-radius: 8px;
+  background-color: var(--bg-dark);
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  margin: auto;
+  color: var(--accent-gold);
+  overflow: visible;
+}
+
+.option-list-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(2px);
+}
+
 .profile-container {
   display: flex;
   flex-direction: column;
@@ -301,8 +428,43 @@ onMounted(() => {
   border-color: var(--accent-gold);
 }
 
-.icon {
-  margin-right: 10px;
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 220px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.form-label {
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.modal-button-container {
+  display: flex;
+  justify-content: space-evenly;
+  background: none;
+}
+
+.form-control {
+  width: 100%;
+  padding: 4px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: 1px solid var(--accent-gold);
+  border-color: var(--accent-gold);
 }
 
 .error-message {
@@ -310,13 +472,13 @@ onMounted(() => {
   font-size: 0.8rem;
   justify-content: center;
   text-align: center;
-  margin-bottom: 20px;
+  margin-top: 15px;
 }
 
 .success-message {
   font-size: 0.8rem;
   justify-content: center;
   text-align: center;
-  margin-bottom: 20px;
+  margin-top: 15px;
 }
 </style>
