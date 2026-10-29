@@ -348,7 +348,7 @@ exports.updateUser = async (req, res) => {
     if (updates.password !== undefined) {
       if (Buffer.byteLength(updates.password, "utf8") > 72) {
         return res.status(400).json({
-          error: "Password must not exceed 72 UTF-8 bytes",
+          error: "Lösenordet får inte överstiga 72 UTF-8-byte",
         });
       }
       updates.password = await bcrypt.hash(updates.password, 10);
@@ -357,7 +357,7 @@ exports.updateUser = async (req, res) => {
     //7. Perform a single atomic UPDATE query in the database
     await userService.updateUser(userId, updates);
 
-    return res.status(200).json("User updated successfully");
+    return res.status(200).json("Användaren har uppdaterats");
 
   } catch (err) {
     if (err.code === "ER_DUP_ENTRY") {
@@ -394,7 +394,7 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ error: "Användare hittades inte" });
     }
 
-    return res.status(200).json("User deleted successfully");
+    return res.status(200).json("Användaren har tagits bort");
   } catch (err) {
     console.error("Delete user controller error:", err);
     return res.status(500).json({

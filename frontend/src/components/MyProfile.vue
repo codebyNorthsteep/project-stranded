@@ -81,7 +81,7 @@ async function updateProfile(updateData) {
       myProfile();
     } else {
       const err = await response.json();
-      errorMessage.value = "It could not update";
+      errorMessage.value = err.error || "It could not update";
     }
   } catch (error) {
     errorMessage.value = error.message;
