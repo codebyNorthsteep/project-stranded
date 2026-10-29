@@ -69,14 +69,17 @@ function createUserViaSocialLogin(username, email, hashedPassword){
 
 //Create entry in users_questions table for a new user with default current_question_id = 1
 function createCurrentQuestionEntryForUser(userId) {
+  const defaultQuestionId = 1; // default id 1 för varje ny användare
   return new Promise((resolve, reject) => {
     const sql = `
       INSERT INTO users_questions (user_id, current_question_id)
-      VALUES (?, 1);
+      VALUES (?, ?);
     `;
-    connectionMySQL.query(sql, [userId], (err, result) => {
+    connectionMySQL.query(sql, [userId, defaultQuestionId], (err) => {
       if (err) return reject(err);
-      resolve(result);
+      resolve({
+        current_question_id: defaultQuestionId,
+      });
     });
   });
 }
