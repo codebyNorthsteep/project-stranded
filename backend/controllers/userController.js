@@ -333,10 +333,26 @@ exports.updateUser = async (req, res) => {
         });
       }
 
+      // Ensure provided password is no shorter than 6 digits
       if (field === "password" && value.length < 6) {
         return res.status(400).json({
           error: "Ange ett lösenord med minst sex tecken",
         });
+      }
+
+      // Ensure provided url's picture is valid
+      if (field === "picture") {
+        const trimmedPicture = value.trim();
+        try {
+          const parsedUrl = new URL(trimmedPicture);
+          if ( parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:" ){
+            throw new Error();
+          }
+        } catch {
+          return res.status(400).json({
+            error: "Ange en giltig bild-URL",
+          });
+        }
       }
 
       // Trim leading/trailing whitespace for username and picture, but preserve raw password characters
@@ -364,7 +380,6 @@ exports.updateUser = async (req, res) => {
     await userService.updateUser(userId, updates);
 
     return res.status(200).json("Användaren har uppdaterats");
-
   } catch (err) {
     if (err.code === "ER_DUP_ENTRY") {
       return res.status(409).json({

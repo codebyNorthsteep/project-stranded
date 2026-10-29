@@ -67,6 +67,8 @@ async function myProfile() {
 }
 
 async function updateProfile(updateData) {
+
+  errorMessage.value = "";
   successMessage.value = "";
 
   try {
