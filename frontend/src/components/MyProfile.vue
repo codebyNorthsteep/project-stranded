@@ -20,7 +20,7 @@ const userStorage = JSON.parse(localStorage.getItem("user") || "{}");
 const userId = userStorage.id;
 const successMessage = ref("");
 
-const promptUpdateUsername = () => {
+const updateUsername = () => {
   const newUsername = prompt("Enter new username:", user.value.username);
   if (newUsername) updateProfile({ username: newUsername });
 };
@@ -42,6 +42,12 @@ const handleDeleteAccount = () => {
   if (!confirmation) return;
   deleteAccount();
 };
+
+async function openModal(action) {
+  activeAction.value = action;
+  await nextTick();
+  dialogRef.value?.showModal(); 
+}
 
 async function myProfile() {
   try {
@@ -67,7 +73,6 @@ async function myProfile() {
 }
 
 async function updateProfile(updateData) {
-
   errorMessage.value = "";
   successMessage.value = "";
 
@@ -98,7 +103,6 @@ async function updateProfile(updateData) {
       }
 
       myProfile();
-
     } else {
       errorMessage.value = data.error || "Det gick inte att uppdatera profilen";
     }
@@ -163,33 +167,62 @@ onMounted(() => {
       <h3>{{ user?.username || props.username }}</h3>
     </div>
 
-    <p v-if="successMessage" class="success-message" role="status">
-      {{ successMessage }}
-    </p>
-
-    <p v-if="errorMessage" class="error-message" role="alert">
-      {{ errorMessage }}
-    </p>
-
-    <div ref="profileDialog" class="options-list">
-      <div class="button option-card" @click="promptUpdateUsername">
-        <div class="icon">👤</div>
-        <div>Ändra användarnamn</div>
-        <div class="arrow">›</div>
-      </div>
-
-      <div class="button option-card" @click="promptUpdatePassword">
-        <div class="icon">🔒</div>
-        <div>Ändra lösenord</div>
-        <div class="arrow">›</div>
-      </div>
-
-      <div class="button option-card" @click="handleDeleteAccount">
-        <div class="icon">🗑️</div>
-        <div>Ta bort konto</div>
-        <div class="arrow">›</div>
-      </div>
+    <div class="options-list">
+      <button type="button" class="button option-card" @click="openModal('username')">👤 Ändra användarnamn ›</button>
+      <button type="button" class="button option-card" @click="openModal('password')">🔒 Ändra lösenord ›</button>
+      <button type="button" class="button option-card" @click="openModal('username')">🗑️ Ta bort konto ›</button>
     </div>
+
+    <dialog
+      ref="optionListDialog"
+      class="option-list-dialog"
+      closedby="none"
+      @keydown.esc.prevent.stop
+      @cancel.prevent
+    >
+      <form @submit.prevent="updateSubmit" novalidate>
+        <div v-if="activeAction === username" class="field">
+          <label for="username" class="form-label">Användarnamn</label>
+          <input
+            id="username"
+            v-model="form.username"
+            type="text"
+            name="username"
+            class="form-control"
+            required
+          />
+          <p v-if="formErrors.username" class="error-message">
+            {{ formErrors.username }}
+          </p>
+          <p v-if="successMessage" class="success-message" role="status">
+            {{ successMessage }}
+          </p>
+        </div>
+
+        <div v-if="activeAction === password" class="field">
+          <label for="password" class="form-label">Lösenord</label>
+          <input
+            id="password"
+            v-model="form.password"
+            type="password"
+            name="password"
+            class="form-control"
+            required
+          />
+          <p v-if="formErrors.password" class="error-message">
+            {{ formErrors.password }}
+          </p>
+          <p v-if="successMessage" class="success-message" role="status">
+            {{ successMessage }}
+          </p>
+        </div>
+
+        <div class="button dialog-button">
+          <button type="button" @click="closeModal">Avbryt</button>
+          <button type="submit">Spara</button>
+        </div>
+      </form>
+    </dialog>
   </div>
 </template>
 
