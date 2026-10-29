@@ -144,7 +144,7 @@ onMounted(() => {
       <h3>{{ user?.username || props.username }}</h3>
     </div>
 
-    <p v-if="errorMessage" class="error-message">
+    <p v-if="errorMessage" class="error-message" role="alert">
       {{ errorMessage }}
     </p>
 
