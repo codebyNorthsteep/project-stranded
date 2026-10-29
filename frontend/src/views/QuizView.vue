@@ -59,7 +59,7 @@ const isLast = computed(
 );
 
 const nextQuestion = () => {
-  if(progressError.value) {
+  if (progressError.value) {
     // If there was an error saving progress, we don't proceed to the next question
     return;
   }
@@ -235,11 +235,6 @@ const fetchAnswerValidation = async (answerId) => {
       String(route.params.levelId) === String(validationLevelId) &&
       selectedAnswerId.value === answerId
     ) {
-      if (!result.is_correct) {
-        gameOverExplanation.value = result.answer_explanation || "";
-        isGameOver.value = true;
-      }
-
       // Uppdatera current_question_id i databasen baserat på om svaret var korrekt eller inte
       //om svaret var korrekt öka currenQuestion värdet med 1, annars återställ till första frågan i nivån
       const nextQuestionId =
@@ -248,11 +243,22 @@ const fetchAnswerValidation = async (answerId) => {
         ? (nextQuestionId ?? currentQuestion.value.question_id)
         : questions.value[0].question_id;
 
-      savingProgress.value = true; // Sätt savingProgress till true innan anropet för att undvika att användaren klickar på nästa fråga innan uppdateringen är klar
-
       await saveProgress(questionIdToSave);
 
+      // kolla igen om vi är på samma nivå och att samma svar fortfarande är aktivt innan vi uppdaterar state med valideringsresultatet
+      if (
+        String(route.params.levelId) !== String(validationLevelId) ||
+        selectedAnswerId.value !== answerId
+      ) {
+        return;
+      }
+
       validatedAnswer.value = result;
+
+      if (!result.is_correct) {
+        gameOverExplanation.value = result.answer_explanation || "";
+        isGameOver.value = true;
+      }
     }
   } catch (err) {
     // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
@@ -385,7 +391,7 @@ onMounted(() => {
                   validatedAnswer && answer.answer_id !== selectedAnswerId,
               }"
               @click="fetchAnswerValidation(answer.answer_id)"
-              :disabled="validatedAnswer"
+              :disabled="validatedAnswer || savingProgress || progressError"
             >
               <span class="letter">
                 <span
@@ -431,15 +437,20 @@ onMounted(() => {
         >
           Nästa fråga
         </button>
-        <button v-else @click="nextQuestion" 
-        class="button"
-        :disabled="savingProgress || progressError"
+        <button
+          v-else
+          @click="nextQuestion"
+          class="button"
+          :disabled="savingProgress || progressError"
         >
           Slutför nivå
         </button>
       </div>
     </div>
-
+    <div v-if="progressError && !isGameOver" role="alert" class="status-msg error">
+      <p>{{ progressError }}</p>
+      <button class="button" @click="retrySaveProgress">Försök igen</button>
+    </div>
     <LevelCompleted
       v-if="isLevelCompleted"
       :level="currentQuestion?.level_name"
