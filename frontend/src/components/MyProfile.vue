@@ -18,6 +18,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 const token = localStorage.getItem("user_token");
 const userStorage = JSON.parse(localStorage.getItem("user") || "{}");
 const userId = userStorage.id;
+const successMessage = ref("");
 
 const promptUpdateUsername = () => {
   const newUsername = prompt("Enter new username:", user.value.username);
@@ -58,7 +59,7 @@ async function myProfile() {
         user_img: data.user_img || data.picture,
       };
     } else {
-      errorMessage.value = "Error getting user information";
+      errorMessage.value = "Fel vid hämtning av användarinformation";
     }
   } catch (error) {
     errorMessage.value = error.message;
@@ -66,6 +67,8 @@ async function myProfile() {
 }
 
 async function updateProfile(updateData) {
+  successMessage.value = "";
+
   try {
     const response = await fetch(`${apiBaseUrl}/api/users/${userId}`, {
       method: "PUT",
@@ -76,12 +79,29 @@ async function updateProfile(updateData) {
       body: JSON.stringify(updateData),
     });
 
+    const data = await response.json();
+
     if (response.ok) {
       console.log("Profile updated successfully");
+
+      if (updateData.password) {
+        successMessage.value = "Lösenordet har uppdaterats!";
+      } else if (updateData.username) {
+        successMessage.value = "Användarnamnet har uppdaterats!";
+      } else if (updateData.picture) {
+        successMessage.value = "Profilbilden har uppdaterats!";
+      } else {
+        successMessage.value =
+          typeof data === "string" ? data : "Profilen har uppdaterats!";
+      }
+
       myProfile();
+      setTimeout(() => {
+        successMessage.value = "";
+      }, 4000);
+
     } else {
-      const err = await response.json();
-      errorMessage.value = err.error || "It could not update";
+      errorMessage.value = data.error || "Det gick inte att uppdatera profilen";
     }
   } catch (error) {
     errorMessage.value = error.message;
@@ -104,7 +124,7 @@ async function deleteAccount() {
       router.push("/");
     } else {
       const err = await response.json();
-      errorMessage.value = "It could not delete account";
+      errorMessage.value = "Kontot kunde inte raderas";
     }
   } catch (error) {
     errorMessage.value = error.message;
@@ -143,6 +163,10 @@ onMounted(() => {
     <div class="my-profile-username">
       <h3>{{ user?.username || props.username }}</h3>
     </div>
+
+    <p v-if="successMessage" class="success-message" role="status">
+      {{ successMessage }}
+    </p>
 
     <p v-if="errorMessage" class="error-message" role="alert">
       {{ errorMessage }}
@@ -251,6 +275,13 @@ onMounted(() => {
 
 .error-message {
   color: red;
+  font-size: 0.8rem;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.success-message {
   font-size: 0.8rem;
   justify-content: center;
   text-align: center;

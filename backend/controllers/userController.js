@@ -333,6 +333,12 @@ exports.updateUser = async (req, res) => {
         });
       }
 
+      if (field === "password" && value.length < 6) {
+        return res.status(400).json({
+          error: "Ange ett lösenord med minst sex tecken",
+        });
+      }
+
       // Trim leading/trailing whitespace for username and picture, but preserve raw password characters
       updates[field] = field === "username" ? value.trim() : value;
     }
