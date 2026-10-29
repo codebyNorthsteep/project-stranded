@@ -47,6 +47,9 @@ exports.updateCurrentQuestion = async (req, res) => {
     if (!Number.isInteger(questionId)) {
       return res.status(400).json({ error: "questionId must be an integer" });
     }
+    if (!questionId) {
+      return res.status(400).json({ error: "questionId is required" });
+    }
 
     const result = await userService.updateCurrentQuestion(userId, questionId);
     res.json(result);

@@ -19,6 +19,8 @@ const levels = ref([]);
 //todo: kolla på att refaktorera detta till en bättre lösning
 let requestSequence = 0;
 
+const savingProgress = ref(false);
+
 const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
 const isLevelCompleted = ref(false);
@@ -227,8 +229,6 @@ const fetchAnswerValidation = async (answerId) => {
       String(route.params.levelId) === String(validationLevelId) &&
       selectedAnswerId.value === answerId
     ) {
-      validatedAnswer.value = result;
-
       if (!result.is_correct) {
         gameOverExplanation.value = result.answer_explanation || "";
         isGameOver.value = true;
@@ -236,13 +236,23 @@ const fetchAnswerValidation = async (answerId) => {
 
       // Uppdatera current_question_id i databasen baserat på om svaret var korrekt eller inte
       //om svaret var korrekt öka currenQuestion värdet med 1, annars återställ till första frågan i nivån
-      const quiestionIdToSave = result.is_correct
-        ? currentQuestion.value.question_id + 1
+      const nextQuestionId =
+        questions.value[currentIndex.value + 1]?.question_id;
+      const questionIdToSave = result.is_correct
+        ? (nextQuestionId ?? currentQuestion.value.question_id)
         : questions.value[0].question_id;
 
-        await updateCurrentQuestion(quiestionIdToSave); // Uppdatera current_question_id i databasen
-    }
+      savingProgress.value = true; // Sätt savingProgress till true innan anropet för att undvika att användaren klickar på nästa fråga innan uppdateringen är klar
+      try {
+        await updateCurrentQuestion(questionIdToSave); // Uppdatera current_question_id i databasen
+      } catch (err) {
+        console.error("Error updating current question:", err);
+      } finally {
+        savingProgress.value = false; // Sätt savingProgress till false efter anropet är klart
+      }
 
+      validatedAnswer.value = result;
+    }
   } catch (err) {
     // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
     if (
@@ -262,9 +272,9 @@ const updateCurrentQuestion = async (questionId) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("user_token")}`,
         },
         body: JSON.stringify({
-          userId: JSON.parse(localStorage.getItem("user")).id,
           questionId: questionId,
         }),
       },
@@ -395,7 +405,7 @@ onMounted(() => {
           <h3>Rätt svar!</h3>
           <p>{{ validatedAnswer.answer_explanation }}</p>
         </div>
-        <button v-if="!isLast" @click="nextQuestion" class="button">
+        <button v-if="!isLast" @click="nextQuestion" class="button" :disabled="savingProgress">
           Nästa fråga
         </button>
         <button v-else @click="nextQuestion" class="button">
