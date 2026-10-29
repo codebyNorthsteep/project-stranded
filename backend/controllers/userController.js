@@ -361,19 +361,27 @@ exports.updateUser = async (req, res) => {
         });
       }
 
-      // Ensure provided url's picture is valid
+      // Validate and normalize the picture URL.
       if (field === "picture") {
-        const trimmedPicture = value.trim();
         try {
-          const parsedUrl = new URL(trimmedPicture);
-          if ( parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:" ){
+          const parsedUrl = new URL(value.trim());
+
+          if (
+            parsedUrl.protocol !== "http:" &&
+            parsedUrl.protocol !== "https:"
+          ) {
             throw new Error();
           }
+
+          updates.picture = parsedUrl.href;
         } catch {
           return res.status(400).json({
             error: "Ange en giltig bild-URL",
           });
         }
+
+        // Prevent the assignment below from overwriting the normalized URL.
+        continue;
       }
 
       // Trim leading/trailing whitespace for username and picture, but preserve raw password characters
