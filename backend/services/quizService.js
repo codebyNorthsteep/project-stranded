@@ -29,7 +29,9 @@ function getQuestionsByLevel(levelId) {
       if (err) return reject(err);
       const questions = [];
       rows.forEach((row) => {
-        const question = questions.find((q) => q.question_id === row.question_id);
+        const question = questions.find(
+          (q) => q.question_id === row.question_id,
+        );
         if (!question) {
           questions.push({
             question_id: row.question_id,
@@ -50,24 +52,24 @@ function getQuestionsByLevel(levelId) {
           }
         });
       });
-      
-     resolve(questions);
+
+      resolve(questions);
     });
   });
 }
 
 function getAnswerValidation(anwerId) {
-    return new Promise((resolve, reject) => {
-        const sql = `
+  return new Promise((resolve, reject) => {
+    const sql = `
             SELECT is_correct, answer_explanation
             FROM answers
             WHERE answer_id = ?;
         `;
-        connectionMySQL.query(sql, [anwerId], (err, rows) => {
-            if (err) return reject(err);
-            resolve(rows[0]); 
-        });
+    connectionMySQL.query(sql, [anwerId], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows[0]);
     });
+  });
 }
 
 function updateCurrentQuestion(userId, questionId) {
@@ -79,7 +81,17 @@ function updateCurrentQuestion(userId, questionId) {
     `;
     connectionMySQL.query(sql, [questionId, userId], (err, result) => {
       if (err) return reject(err);
-      console.log("affectedRows:", result.affectedRows, "userId:", userId, "questionId:", questionId);
+      console.log(
+        "affectedRows:",
+        result.affectedRows,
+        "userId:",
+        userId,
+        "questionId:",
+        questionId,
+      );
+      if (result.affectedRows === 0) {
+        return reject(new Error("Progress kunde inte sparas"));
+      }
       resolve(result);
     });
   });
