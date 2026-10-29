@@ -316,12 +316,17 @@ onMounted(() => {
             Är du säker på att du vill ta bort ditt konto? Det går inte att
             ångra.
           </p>
+          
+          <div v-if="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
         </div>
+
         <div class="modal-button-container">
-          <button type="button" class="button" @click="closeModal">
+          <button type="button" class="button modal-button" @click="closeModal">
             Avbryt
           </button>
-          <button type="submit" class="button">Spara</button>
+          <button type="submit" class="button modal-button">Spara</button>
         </div>
       </form>
     </dialog>
@@ -480,5 +485,45 @@ form {
   justify-content: center;
   text-align: center;
   margin-top: 15px;
+}
+
+@media (min-width: 768px) {
+  .option-list-dialog {
+    max-width: 500px;
+    height: 300px;
+  }
+
+  form {
+    max-width: 250px;
+    gap: 30px;
+  }
+
+  .form-label {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+  }
+
+  .modal-button-container {
+    flex-direction: row;
+    gap: 25px;
+    justify-content: center;
+  }
+
+  .modal-button {
+    padding: 8px 20px;
+    font-size: 1rem;
+  }
+
+  .warning-text {
+    font-size: 1.2rem;
+  }
+
+  .error-message {
+    font-size: 1.1rem;
+  }
+
+  .success-message {
+    font-size: 1.1rem;
+  }
 }
 </style>
