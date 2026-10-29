@@ -360,9 +360,16 @@ exports.updateUser = async (req, res) => {
     return res.status(200).json("User updated successfully");
 
   } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({
+        code: "USERNAME_TAKEN",
+        error: "Användarnamnet används redan. Välj ett annat.",
+      });
+    }
+
     console.error("Update user info controller error:", err);
     return res.status(500).json({
-      error: "Ett fel uppstod när användarinformationen hämtades",
+      error: "Kunde inte uppdatera användarinformationen. Försök igen.",
     });
   }
 };
