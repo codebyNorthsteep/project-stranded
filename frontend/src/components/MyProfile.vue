@@ -98,9 +98,6 @@ async function updateProfile(updateData) {
       }
 
       myProfile();
-      setTimeout(() => {
-        successMessage.value = "";
-      }, 4000);
 
     } else {
       errorMessage.value = data.error || "Det gick inte att uppdatera profilen";
