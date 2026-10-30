@@ -21,6 +21,7 @@ let requestSequence = 0;
 
 const selectedAnswerId = ref(null);
 const validatedAnswer = ref(null);
+const isSubmittingAnswer = ref(false);
 const isLevelCompleted = ref(false);
 const isQuizCompleted = ref(false);
 const isGameOver = ref(false);
@@ -253,12 +254,31 @@ const fetchQuestions = async (
 };
 
 const fetchAnswerValidation = async (answerId) => {
+  if (isSubmittingAnswer.value) return;
+
   selectedAnswerId.value = answerId;
   const validationLevelId = route.params.levelId; // Spara nuvarande nivå när anropet startar för att säkerställa att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
 
+  isSubmittingAnswer.value = true;
+
   try {
+    const token = localStorage.getItem("user_token");
+    if (!token) {
+      throw new Error("Du måste logga in för att spara ditt svar.");
+    }
+
     const response = await fetch(
-      `http://localhost:3000/api/answers/${answerId}/validate`,
+      `http://localhost:3000/api/answers/${answerId}/submit`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          questionId: currentQuestion.value.question_id,
+        }),
+      },
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -292,6 +312,8 @@ const fetchAnswerValidation = async (answerId) => {
     ) {
       error.value = err.message;
     }
+  } finally {
+    isSubmittingAnswer.value = false;
   }
 };
 
@@ -396,7 +418,7 @@ onMounted(() => {
                   validatedAnswer && answer.answer_id !== selectedAnswerId,
               }"
               @click="fetchAnswerValidation(answer.answer_id)"
-              :disabled="validatedAnswer"
+              :disabled="validatedAnswer || isSubmittingAnswer"
             >
               <span class="letter">
                 <span

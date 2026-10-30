@@ -1,4 +1,7 @@
 const connectionMySQL = require("./../connectionMySQL");
+const {promisify}  = require ("util");
+
+const query = promisify(connectionMySQL.query).bind(connectionMySQL);
 
 function getCurrentQuestionForUser(userId) {
   return new Promise((resolve, reject) => {
@@ -14,6 +17,30 @@ function getCurrentQuestionForUser(userId) {
   });
 }
 
+async function saveAnswerAttempt(userId, questionId, answerId) {  const answerRows = await query(
+     `SELECT is_correct
+     FROM answers
+     WHERE answer_id = ? AND question_id = ?`,
+    [answerId, questionId],
+  );
+
+  if(answerRows.length ===0){
+    return null;
+  }
+
+  await query(
+    `INSERT INTO statistics (user_id, answer_id, answer_timestamp)
+     VALUES (?, ?, CURRENT_TIMESTAMP)`,
+     [userId,answerId],
+  );
+
+  return{
+    is_correct: Boolean(answerRows[0].is_correct),
+  };
+  
+}
+
 module.exports = {
   getCurrentQuestionForUser,
+  saveAnswerAttempt,
 };

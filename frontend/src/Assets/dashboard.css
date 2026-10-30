@@ -1,12 +1,21 @@
 .dashboard-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  grid-template-areas: "main stats";
+  align-items: start;
+  gap: 24px;
   min-height: 100vh;
   padding: 20px;
-  text-align: center;
   background-color: var(--bg-dark);
+}
+
+.dashboard-main {
+  grid-area: main;
+  min-width: 0;
+}
+
+.stats-panel {
+  grid-area: stats;
 }
 
 .dashboard-welcome {
@@ -64,7 +73,7 @@
   padding: 10px;
   width: 100%;
   max-width: 400px;
-  margin-top: 20px;
+  margin: 20px auto 0;
   gap: 10px;
 }
 
@@ -167,6 +176,8 @@ font-family: Syne Mono, monospace;
   .dashboard-quiz-card {
     flex-direction: row;
     max-width: 700px;
+    margin-right: auto;
+    margin-left: auto;
     gap: 20px;
     justify-content: center;
   }
@@ -180,5 +191,14 @@ font-family: Syne Mono, monospace;
 
   .dashboard-level p {
   font-size: 20px;
+}
+}
+
+@media (max-width: 900px) {
+.dashboard-container {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "main"
+    "stats";
 }
 }
