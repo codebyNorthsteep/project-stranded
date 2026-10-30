@@ -318,7 +318,7 @@ onMounted(() => {
             ångra.
           </p>
 
-          <div v-if="errorMessage" class="error-message">
+          <div v-if="errorMessage" class="error-message" role="alert">
             {{ errorMessage }}
           </div>
         </div>
