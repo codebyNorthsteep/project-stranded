@@ -354,10 +354,34 @@ exports.updateUser = async (req, res) => {
         });
       }
 
+      // Ensure provided password is no shorter than 6 digits
       if (field === "password" && value.length < 6) {
         return res.status(400).json({
           error: "Ange ett lösenord med minst sex tecken",
         });
+      }
+
+      // Validate and normalize the picture URL.
+      if (field === "picture") {
+        try {
+          const parsedUrl = new URL(value.trim());
+
+          if (
+            parsedUrl.protocol !== "http:" &&
+            parsedUrl.protocol !== "https:"
+          ) {
+            throw new Error();
+          }
+
+          updates.picture = parsedUrl.href;
+        } catch {
+          return res.status(400).json({
+            error: "Ange en giltig bild-URL",
+          });
+        }
+
+        // Prevent the assignment below from overwriting the normalized URL.
+        continue;
       }
 
       // Trim leading/trailing whitespace for username and picture, but preserve raw password characters
