@@ -113,7 +113,7 @@ const firstLevel = async () => {
 
   const firstLevelId = levels.value[0].level_id;
 
-    // Hämta första frågan i första nivån och spara den när man väljer att spela om hela quizzet
+  // Hämta första frågan i första nivån och spara den när man väljer att spela om hela quizzet
   try {
     const response = await fetch(
       `http://localhost:3000/api/levels/${firstLevelId}/questions`,
@@ -121,7 +121,10 @@ const firstLevel = async () => {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const firstLevelQuestions = await response.json();
     const firstQuestionId = firstLevelQuestions[0]?.question_id;
-    if (firstQuestionId) await fetchUpdateCurrentQuestion(firstQuestionId);
+    if (firstQuestionId) {
+      const saved = await fetchUpdateCurrentQuestion(firstQuestionId);
+      if (!saved) return;
+    }
   } catch (err) {
     error.value = err.message;
     return;
@@ -308,6 +311,7 @@ const fetchUpdateCurrentQuestion = async (questionId) => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+    return true;
   } catch (err) {
     error.value = err.message;
   }
