@@ -21,6 +21,8 @@ const userStorage = JSON.parse(localStorage.getItem("user") || "{}");
 const userId = userStorage.id;
 const successMessage = ref("");
 const isSubmitting = ref(false);
+let profileIsCurrent = false;
+let profileRequestVersion = 0;
 
 const optionListDialog = ref(null);
 const activeAction = ref(null);
@@ -67,6 +69,17 @@ function closeModal() {
   activeAction.value = null;
 }
 
+function normalizePictureUrl(value) {
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "http:" || url.protocol === "https:"
+      ? url.href
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 async function updateSubmit() {
   if (isSubmitting.value || successMessage.value) return;
 
@@ -76,8 +89,13 @@ async function updateSubmit() {
     if (activeAction.value === "username") {
 
       // Ensure that the new username is not the same as the current username
-      const currentUsername = user.value?.username || props.username;
-      if (form.value.username === currentUsername) {
+      const currentUsername = user.value?.username;
+      if (
+        profileIsCurrent &&
+        typeof currentUsername === "string" &&
+        currentUsername.trim() &&
+        form.value.username.trim() === currentUsername.trim()
+      ) {
         errorMessage.value = "Ange ett ny användarnamn";
         return;
       }
@@ -93,8 +111,9 @@ async function updateSubmit() {
 
     } else if (activeAction.value === "picture") {
 
-      const currentPicture = user.value?.user_img || props.user_img;
-      if (form.value.picture === currentPicture) {
+      const currentPicture = normalizePictureUrl(user.value?.user_img || "");
+      const submittedPicture = normalizePictureUrl(form.value.picture);
+      if (profileIsCurrent && currentPicture && currentPicture === submittedPicture) {
         errorMessage.value = "Ladda upp en ny bild";
         return;
       }
@@ -110,6 +129,9 @@ async function updateSubmit() {
 }
 
 async function myProfile() {
+  const requestVersion = ++profileRequestVersion;
+  profileIsCurrent = false;
+
   try {
     const response = await fetch(`${apiBaseUrl}/api/users/${userId}`, {
       method: "GET",
@@ -120,21 +142,28 @@ async function myProfile() {
 
     if (response.ok) {
       const data = await response.json();
-      user.value = {
-        ...data,
-        user_img: data.user_img || data.picture,
-      };
-    } else {
+      if (requestVersion === profileRequestVersion) {
+        user.value = {
+          ...data,
+          user_img: data.user_img || data.picture,
+        };
+        profileIsCurrent = true;
+      }
+    } else if (requestVersion === profileRequestVersion) {
       errorMessage.value = "Fel vid hämtning av användarinformation";
     }
   } catch (error) {
-    errorMessage.value = error.message;
+    if (requestVersion === profileRequestVersion) {
+      errorMessage.value = error.message;
+    }
   }
 }
 
 async function updateProfile(updateData) {
   errorMessage.value = "";
   successMessage.value = "";
+  profileIsCurrent = false;
+  profileRequestVersion++;
 
   try {
     const response = await fetch(`${apiBaseUrl}/api/users/${userId}`, {
@@ -278,8 +307,7 @@ onMounted(() => {
             type="text"
             name="username"
             class="form-control"
-            :disabled="isSubmitting"
-            :readonly="successMessage !== ''"
+            :readonly="isSubmitting || successMessage !== ''"
             required
           />
           <div v-if="errorMessage" class="error-message">
@@ -300,8 +328,7 @@ onMounted(() => {
             type="password"
             name="password"
             class="form-control"
-            :disabled="isSubmitting"
-            :readonly="successMessage !== ''"
+            :readonly="isSubmitting || successMessage !== ''"
             required
           /><br />
 
@@ -314,8 +341,7 @@ onMounted(() => {
             type="password"
             name="confirmPassword"
             class="form-control"
-            :disabled="isSubmitting"
-            :readonly="successMessage !== ''"
+            :readonly="isSubmitting || successMessage !== ''"
             required
           />
 
@@ -335,8 +361,7 @@ onMounted(() => {
             type="url"
             name="picture"
             class="form-control"
-            :disabled="isSubmitting"
-            :readonly="successMessage !== ''"
+            :readonly="isSubmitting || successMessage !== ''"
             required
           />
 
