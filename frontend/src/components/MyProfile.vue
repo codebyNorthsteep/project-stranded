@@ -20,6 +20,7 @@ const token = localStorage.getItem("user_token");
 const userStorage = JSON.parse(localStorage.getItem("user") || "{}");
 const userId = userStorage.id;
 const successMessage = ref("");
+const isSubmitting = ref(false);
 
 const optionListDialog = ref(null);
 const activeAction = ref(null);
@@ -40,6 +41,8 @@ const handleDeleteAccount = () => {
 };
 
 async function openModal(action) {
+  if (isSubmitting.value) return;
+
   activeAction.value = action;
   errorMessage.value = "";
   successMessage.value = "";
@@ -58,24 +61,34 @@ async function openModal(action) {
 }
 
 function closeModal() {
+  if (isSubmitting.value) return;
+
   optionListDialog.value?.close();
   activeAction.value = null;
 }
 
-function updateSubmit() {
-  if (activeAction.value === "username") {
-    updateProfile({ username: form.value.username });
-  } else if (activeAction.value === "password") {
-    // Ensure that new password and confirm password are the same
-    if (form.value.password !== form.value.confirmPassword) {
-      errorMessage.value = "Lösenorden matchar inte";
-      return;
+async function updateSubmit() {
+  if (isSubmitting.value || successMessage.value) return;
+
+  isSubmitting.value = true;
+
+  try {
+    if (activeAction.value === "username") {
+      await updateProfile({ username: form.value.username });
+    } else if (activeAction.value === "password") {
+      if (form.value.password !== form.value.confirmPassword) {
+        errorMessage.value = "Lösenorden matchar inte";
+        return;
+      }
+
+      await updateProfile({ password: form.value.password });
+    } else if (activeAction.value === "picture") {
+      await updateProfile({ picture: form.value.picture });
+    } else if (activeAction.value === "delete") {
+      await deleteAccount();
     }
-    updateProfile({ password: form.value.password });
-  } else if (activeAction.value === "picture") {
-    updateProfile({ picture: form.value.picture });
-  } else if (activeAction.value === "delete") {
-    deleteAccount();
+  } finally {
+    isSubmitting.value = false;
   }
 }
 
@@ -132,7 +145,7 @@ async function updateProfile(updateData) {
           typeof data === "string" ? data : "Profilen har uppdaterats!";
       }
 
-      myProfile();
+      await myProfile();
     } else {
       errorMessage.value = data.error || "Det gick inte att uppdatera profilen";
     }
@@ -329,14 +342,15 @@ onMounted(() => {
             class="button modal-button"
             @click="closeModal"
             v-if="!successMessage"
+            :disabled="isSubmitting"
           >
             Avbryt
           </button>
           <button
             type="submit"
-            class="button modal-butto"
-            :disabled="successMessage !== ''"
+            class="button modal-button"
             v-if="!successMessage"
+            :disabled="isSubmitting || successMessage !== ''"
           >
             {{ activeAction === "delete" ? "Radera konto" : "Spara" }}
           </button>
@@ -533,6 +547,7 @@ form {
   .modal-button {
     padding: 8px 20px;
     font-size: 1rem;
+    text-align: center;
   }
 
   .warning-text {
