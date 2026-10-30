@@ -54,8 +54,8 @@ const logout = () => {
 .button {
   height: 30px;
   padding: 0 10px;
-  margin-top: 20px;
   margin-right: -10px;
+  margin-top: 10px;
   font-family: "Syne Mono", monospace;
 }
 
@@ -68,7 +68,6 @@ const logout = () => {
   .button {
     height: 35px;
     padding: 0 15px;
-    margin-top: 30px;
     margin-right: 10px;
   }
 }

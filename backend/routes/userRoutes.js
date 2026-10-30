@@ -15,4 +15,10 @@ router.post('/api/register', userController.registerUser);
 // GET api/users/:userId route for fetching user info, initially added for dashboard welcome message, can be used for other purposes as well
 router.get('/api/users/:userId', userMiddleware.isLoggedIn, userController.getUserInfo);
 
+// PUT api/users/:userId route for update user info (username, password, picture)
+router.put('/api/users/:userId', userMiddleware.isLoggedIn, userController.updateUser);
+
+// DELETE /api/users/:userId route for delete an user account
+router.delete('/api/users/:userId', userMiddleware.isLoggedIn, userController.deleteUser);
+
 module.exports = router;

@@ -109,12 +109,23 @@ exports.registerUser = async (req, res) => {
       hashedPassword,
     );
 
+    if (!newUser) {
+      return res.status(500).json({
+        error: "Kunde inte skapa konto. Försök igen.",
+      });
+    }
+
+    // Create an entry in users_questions for the new user
+    const newQuestionEntry =
+      await userService.createCurrentQuestionEntryForUser(newUser.user_id);
+
     //5. Return user info
     return res.status(201).json({
       message: "Register successful",
       user_id: newUser.user_id,
       username: newUser.username,
       email: newUser.email,
+      current_question_id: newQuestionEntry.current_question_id, // Include the current_question_id in the response
     });
   } catch (err) {
     console.error("Register controller error:", err);
@@ -126,7 +137,6 @@ exports.registerUser = async (req, res) => {
 
 exports.loginViaSocialLogin = async (req, res) => {
   try {
-
     const { credential } = req.body ?? {};
 
     //1. Validation
@@ -177,7 +187,8 @@ exports.loginViaSocialLogin = async (req, res) => {
     }
 
     const email = payload.email;
-    const username = payload.given_name?.trim() || payload.name?.trim() || email.split("@")[0];
+    const username =
+      payload.given_name?.trim() || payload.name?.trim() || email.split("@")[0];
 
     const secretKey = process.env.JWT_SECRET;
 
@@ -237,6 +248,16 @@ exports.loginViaSocialLogin = async (req, res) => {
         password,
       );
 
+      if (!newUser) {
+        return res.status(500).json({
+          error: "Kunde inte skapa konto. Försök igen.",
+        });
+      }
+
+      // Create an entry in users_questions for the new user
+      const newQuestionEntry =
+        await userService.createCurrentQuestionEntryForUser(newUser.user_id);
+
       //B.5 Generate JWT token
       const token = jwt.sign(
         { id: newUser.user_id, username: newUser.username },
@@ -252,6 +273,7 @@ exports.loginViaSocialLogin = async (req, res) => {
           id: newUser.user_id,
           username: newUser.username,
           email: newUser.email,
+          current_question_id: newQuestionEntry.current_question_id, // Include the current_question_id in the response
         },
       });
     }
@@ -285,6 +307,148 @@ exports.getUserInfo = async (req, res) => {
     console.error("Get user info controller error:", err);
     return res.status(500).json({
       error: "Ett fel uppstod när användarinformationen hämtades",
+    });
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    const authenticatedUserId = req.userData?.id;
+
+    //1. Authentication check
+    if (authenticatedUserId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    //2. Authorization check (prevent other users from modifying other accounts)
+    if (String(req.params.userId) !== String(authenticatedUserId)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const userId = authenticatedUserId;
+    const input = req.body ?? {};
+
+    //3. Ensure the request body is a valid JSON object
+    if (typeof input !== "object" || Array.isArray(input)) {
+      return res.status(400).json({ error: "Invalid request body" });
+    }
+
+    const updates = {};
+
+    //4. Validate only the fields present in the request body
+    for (const field of ["username", "password", "picture"]) {
+      //Skip fields that were not provided in the request
+      if (!Object.prototype.hasOwnProperty.call(input, field)) {
+        continue;
+      }
+
+      const value = input[field];
+
+      // Ensure provided values are non-empty strings
+      if (
+        typeof value !== "string" ||
+        (field === "password" ? value.length === 0 : !value.trim())
+      ) {
+        return res.status(400).json({
+          error: `${field} must be a non-empty string`,
+        });
+      }
+
+      // Ensure provided password is no shorter than 6 digits
+      if (field === "password" && value.length < 6) {
+        return res.status(400).json({
+          error: "Ange ett lösenord med minst sex tecken",
+        });
+      }
+
+      // Validate and normalize the picture URL.
+      if (field === "picture") {
+        try {
+          const parsedUrl = new URL(value.trim());
+
+          if (
+            parsedUrl.protocol !== "http:" &&
+            parsedUrl.protocol !== "https:"
+          ) {
+            throw new Error();
+          }
+
+          updates.picture = parsedUrl.href;
+        } catch {
+          return res.status(400).json({
+            error: "Ange en giltig bild-URL",
+          });
+        }
+
+        // Prevent the assignment below from overwriting the normalized URL.
+        continue;
+      }
+
+      // Trim leading/trailing whitespace for username and picture, but preserve raw password characters
+      updates[field] = field === "username" ? value.trim() : value;
+    }
+
+    //5. Ensure at least one valid field was sent for update
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({
+        error: "Provide username, password, or picture",
+      });
+    }
+
+    //6. Hash password BEFORE touching the database to avoid partial updates on error
+    if (updates.password !== undefined) {
+      if (Buffer.byteLength(updates.password, "utf8") > 72) {
+        return res.status(400).json({
+          error: "Lösenordet får inte överstiga 72 UTF-8-byte",
+        });
+      }
+      updates.password = await bcrypt.hash(updates.password, 10);
+    }
+
+    //7. Perform a single atomic UPDATE query in the database
+    await userService.updateUser(userId, updates);
+
+    return res.status(200).json("Användaren har uppdaterats");
+  } catch (err) {
+    if (err.code === "ER_DUP_ENTRY") {
+      return res.status(409).json({
+        code: "USERNAME_TAKEN",
+        error: "Användarnamnet används redan. Välj ett annat.",
+      });
+    }
+
+    console.error("Update user info controller error:", err);
+    return res.status(500).json({
+      error: "Kunde inte uppdatera användarinformationen. Försök igen.",
+    });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const authenticatedUserId = req.userData?.id;
+
+    if (authenticatedUserId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    if (String(req.params.userId) !== String(authenticatedUserId)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const userId = authenticatedUserId;
+
+    const deleted = await userService.deleteUser(userId);
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Användare hittades inte" });
+    }
+
+    return res.status(200).json("Användaren har tagits bort");
+  } catch (err) {
+    console.error("Delete user controller error:", err);
+    return res.status(500).json({
+      error: "Ett fel uppstod när användaren skulle tas bort",
     });
   }
 };

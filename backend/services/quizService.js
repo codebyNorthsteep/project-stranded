@@ -70,8 +70,58 @@ function getAnswerValidation(anwerId) {
     });
 }
 
+function updateCurrentQuestion(userId, questionId) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+      UPDATE users_questions
+      SET current_question_id = ?
+      WHERE user_id = ?;
+    `;
+    connectionMySQL.query(sql, [questionId, userId], (err, result) => {
+      if (err) return reject(err);
+      console.log(
+        "affectedRows:",
+        result.affectedRows,
+        "userId:",
+        userId,
+        "questionId:",
+        questionId,
+      );
+      if (result.affectedRows === 0) {
+        return reject(new Error("Progress kunde inte sparas"));
+      }
+      resolve(result);
+    });
+  });
+}
+
+//funktion för att uppdatera användarens nuvarande fråga till den första frågan i nästa nivå när de har klarat en nivå
+//Scenario: Användaren har klarat en nivå och vi vill uppdatera deras nuvarande fråga till den första frågan i nästa nivå. Vi antar att nivåerna är numrerade och att nästa nivå är den med det lägsta level_id som är större än den nuvarande level_id.
+function completeLevel(userId, levelId) {
+  return new Promise((resolve, reject) => {
+    const sql = `
+    update users_questions
+    set current_question_id = (
+      select min(q.question_id)
+      from questions q
+      join level l on l.level_id = q.level_id
+      where l.level_id > ?
+      and q.level_id = (select min(level_id) from level where level_id > ?)
+    )
+    where user_id = ?;
+    `;
+
+    connectionMySQL.query(sql, [levelId, levelId, userId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 module.exports = {
   getAllLevels,
   getQuestionsByLevel,
   getAnswerValidation,
+  updateCurrentQuestion,
+  completeLevel,
 };
