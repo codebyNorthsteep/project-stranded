@@ -68,7 +68,30 @@ const nextQuestion = () => {
       //Otherwise, it's the last question of another level so we show the component level completed instead
     } else {
       isLevelCompleted.value = true;
+      // Call the completeLevel function to update the user's progress
+      completeLevel();
     }
+  }
+};
+
+const completeLevel = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/api/users/statistics/complete-level",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+        },
+        body: JSON.stringify({ levelId: Number(route.params.levelId) }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (err) {
+    error.value = err.message;
   }
 };
 
@@ -86,10 +109,27 @@ const nextLevel = () => {
 };
 
 //We need to handle first level in case the user press on the button "start quiz from first level" on quiz completed
-const firstLevel = () => {
+const firstLevel = async () => {
   if (levels.value.length === 0) return;
 
   const firstLevelId = levels.value[0].level_id;
+
+  // Hämta första frågan i första nivån och spara den när man väljer att spela om hela quizzet
+  try {
+    const response = await fetch(
+      `http://localhost:3000/api/levels/${firstLevelId}/questions`,
+    );
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const firstLevelQuestions = await response.json();
+    const firstQuestionId = firstLevelQuestions[0]?.question_id;
+    if (firstQuestionId) {
+      const saved = await fetchUpdateCurrentQuestion(firstQuestionId);
+      if (!saved) return;
+    }
+  } catch (err) {
+    error.value = err.message;
+    return;
+  }
 
   //If the first level is, ath the same time, the last level, we need to restart all the variables
   if (Number(route.params.levelId) === Number(firstLevelId)) {
@@ -110,11 +150,14 @@ const firstLevel = () => {
 
 //If the user loses, we have to restart the level there the user was answering
 const handleRestartCurrentLevel = () => {
+  const firstQuestionId = questions.value[0]?.question_id;
   isGameOver.value = false;
   gameOverExplanation.value = "";
   validatedAnswer.value = null;
   selectedAnswerId.value = null;
   currentIndex.value = 0;
+
+  if (firstQuestionId) fetchUpdateCurrentQuestion(firstQuestionId);
   questions.value = [];
   fetchQuestions(route.params.levelId, { resume: false });
 };
@@ -242,17 +285,24 @@ const fetchAnswerValidation = async (answerId) => {
     }
     const result = await response.json();
 
-    // Kontrollera att vi är kvar på samma nivå och att samma svar fortfarande är aktivt
     if (
       String(route.params.levelId) === String(validationLevelId) &&
       selectedAnswerId.value === answerId
     ) {
       validatedAnswer.value = result;
+      // Spara nästa fråga som ska visas beroende på om svaret var korrekt eller inte, och uppdatera användarens nuvarande fråga i databasen
+      const nextQuestionId =
+        questions.value[currentIndex.value + 1]?.question_id;
+      const questionIdToSave = result.is_correct
+        ? (nextQuestionId ?? currentQuestion.value.question_id)
+        : questions.value[0].question_id;
 
       if (!result.is_correct) {
         gameOverExplanation.value = result.answer_explanation || "";
         isGameOver.value = true;
       }
+
+      fetchUpdateCurrentQuestion(questionIdToSave);
     }
   } catch (err) {
     // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
@@ -264,6 +314,28 @@ const fetchAnswerValidation = async (answerId) => {
     }
   } finally {
     isSubmittingAnswer.value = false;
+  }
+};
+
+const fetchUpdateCurrentQuestion = async (questionId) => {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/api/users/statistics/current-question",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+        },
+        body: JSON.stringify({ questionId }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return true;
+  } catch (err) {
+    error.value = err.message;
   }
 };
 
