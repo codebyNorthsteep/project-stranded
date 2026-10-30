@@ -261,6 +261,7 @@ onMounted(() => {
             type="text"
             name="username"
             class="form-control"
+            :disabled="isSubmitting || successMessage !== ''"
             required
           />
           <div v-if="errorMessage" class="error-message">
@@ -281,6 +282,7 @@ onMounted(() => {
             type="password"
             name="password"
             class="form-control"
+            :disabled="isSubmitting || successMessage !== ''"
             required
           /><br />
 
@@ -293,6 +295,7 @@ onMounted(() => {
             type="password"
             name="confirmPassword"
             class="form-control"
+            :disabled="isSubmitting || successMessage !== ''"
             required
           />
 
@@ -312,6 +315,7 @@ onMounted(() => {
             type="url"
             name="picture"
             class="form-control"
+            :disabled="isSubmitting || successMessage !== ''"
             required
           />
 
