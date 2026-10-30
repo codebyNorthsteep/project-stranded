@@ -116,6 +116,7 @@ const toggleMenu = async () => {
   flex-direction: column;
   justify-content: space-between;
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .burger-menu.is-open {
@@ -150,8 +151,8 @@ h1 {
 
 @media (min-width: 450px) {
   .burger-menu {
-    width: 300px;
-    right: -300px;
+    width: 450px;
+    right: -450px;
   }
 
   .overlay {

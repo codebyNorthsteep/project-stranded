@@ -74,16 +74,33 @@ async function updateSubmit() {
 
   try {
     if (activeAction.value === "username") {
+
+      // Ensure that the new username is not the same as the current username
+      const currentUsername = user.value?.username || props.username;
+      if (form.value.username === currentUsername) {
+        errorMessage.value = "Ange ett ny användarnamn";
+        return;
+      }
       await updateProfile({ username: form.value.username });
+
+      // Ensure that the new password and confirm password match
     } else if (activeAction.value === "password") {
       if (form.value.password !== form.value.confirmPassword) {
         errorMessage.value = "Lösenorden matchar inte";
         return;
       }
-
       await updateProfile({ password: form.value.password });
+
     } else if (activeAction.value === "picture") {
+
+      const currentPicture = user.value?.user_img || props.user_img;
+      if (form.value.picture === currentPicture) {
+        errorMessage.value = "Ladda upp en ny bild";
+        return;
+      }
+
       await updateProfile({ picture: form.value.picture });
+
     } else if (activeAction.value === "delete") {
       await deleteAccount();
     }
@@ -261,7 +278,8 @@ onMounted(() => {
             type="text"
             name="username"
             class="form-control"
-            :disabled="isSubmitting || successMessage !== ''"
+            :disabled="isSubmitting"
+            :readonly="successMessage !== ''"
             required
           />
           <div v-if="errorMessage" class="error-message">
@@ -282,7 +300,8 @@ onMounted(() => {
             type="password"
             name="password"
             class="form-control"
-            :disabled="isSubmitting || successMessage !== ''"
+            :disabled="isSubmitting"
+            :readonly="successMessage !== ''"
             required
           /><br />
 
@@ -295,7 +314,8 @@ onMounted(() => {
             type="password"
             name="confirmPassword"
             class="form-control"
-            :disabled="isSubmitting || successMessage !== ''"
+            :disabled="isSubmitting"
+            :readonly="successMessage !== ''"
             required
           />
 
@@ -315,7 +335,8 @@ onMounted(() => {
             type="url"
             name="picture"
             class="form-control"
-            :disabled="isSubmitting || successMessage !== ''"
+            :disabled="isSubmitting"
+            :readonly="successMessage !== ''"
             required
           />
 
@@ -398,17 +419,14 @@ onMounted(() => {
   backdrop-filter: blur(2px);
 }
 
-.profile-container {
+.my-profile-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background-color: var(--bg-dark);
-  color: var(--accent-gold);
-  min-height: 100vh;
-  padding: 24px;
-  max-width: 500px;
-  margin: 0 auto;
+  justify-content: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .my-profile-picture {
@@ -450,9 +468,10 @@ onMounted(() => {
 .options-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
   margin-bottom: 30px;
   align-items: center;
+  width: 100%;
 }
 
 .option-card {
@@ -464,8 +483,8 @@ onMounted(() => {
   cursor: pointer;
   transition: border-color 0.2s;
   font-size: 0.8rem;
-  width: 85%;
-  max-width: 250px;
+  width: 90%;
+  max-width: 350px;
 }
 
 .option-card:hover {
@@ -528,6 +547,30 @@ form {
 }
 
 @media (min-width: 768px) {
+  .my-profile-username {
+    font-size: 1.3rem;
+    margin-top: 10px;
+    margin-bottom: 30px;
+  }
+
+  .option-card {
+    max-width: 350px;
+    padding: 16px 20px;
+    font-size: 1.2em;
+  }
+
+  .picture-wrapper {
+    margin-top: 20px;
+    width: 130px;
+    height: 130px;
+  }
+
+  .button-update-picture {
+    bottom: -5px;
+    right: -9px;
+    padding: 8px 10px;
+  }
+
   .option-list-dialog {
     max-width: 500px;
     height: 350px;
