@@ -480,6 +480,7 @@ form {
   display: flex;
   flex-direction: column;
   width: 100%;
+  align-items: center;
 }
 
 .form-label {
@@ -525,17 +526,23 @@ form {
 @media (min-width: 768px) {
   .option-list-dialog {
     max-width: 500px;
-    height: 300px;
+    height: 350px;
   }
 
   form {
-    max-width: 250px;
+    max-width: 350px;
     gap: 30px;
   }
 
   .form-label {
     font-size: 1.3rem;
     margin-bottom: 20px;
+  }
+
+  .form-control {
+    padding: 5px;
+    font-size: 1rem;
+    max-width: 300px;
   }
 
   .modal-button-container {
@@ -560,6 +567,7 @@ form {
 
   .success-message {
     font-size: 1.1rem;
+    margin-top: 30px;
   }
 }
 </style>
