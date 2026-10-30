@@ -14,6 +14,6 @@ router.get('/api/answers/:answerId/validate', quizController.getAnswerValidation
 
 router.put('/api/users/statistics/current-question', userMiddleware.isLoggedIn, quizController.updateCurrentQuestion);
 
-
+router.put('/api/users/statistics/complete-level', userMiddleware.isLoggedIn, quizController.completeLevel);
 
 module.exports = router;

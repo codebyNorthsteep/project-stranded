@@ -67,7 +67,30 @@ const nextQuestion = () => {
       //Otherwise, it's the last question of another level so we show the component level completed instead
     } else {
       isLevelCompleted.value = true;
+      // Call the completeLevel function to update the user's progress
+      completeLevel();
     }
+  }
+};
+
+const completeLevel = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/api/users/statistics/complete-level",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+        },
+        body: JSON.stringify({ levelId: Number(route.params.levelId) }),
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (err) {
+    error.value = err.message;
   }
 };
 

@@ -64,3 +64,33 @@ exports.updateCurrentQuestion = async (req, res) => {
     });
   }
 };
+
+exports.completeLevel = async (req, res) => {
+  try {
+    const userId = req.userData?.id;
+    if (userId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const { levelId } = req.body;
+    console.log("userId:", userId, "levelId:", req.body.levelId);
+    if (!Number.isInteger(levelId)) {
+      return res.status(400).json({ error: "levelId must be an integer" });
+    }
+    if (levelId <= 0) {
+      return res.status(400).json({ error: "levelId must be a positive integer" });
+    }
+
+    if (!levelId) {
+      return res.status(400).json({ error: "levelId is required" });
+    }
+
+    const result = await userService.completeLevel(userId, levelId);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "An error occurred while completing the level",
+    });
+  }
+};
