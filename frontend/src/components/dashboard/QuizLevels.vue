@@ -9,6 +9,8 @@ const currentQuestion = ref(null);
 const currentQuestionReady = ref(false);
 const loggedInUserId = ref(null);
 
+const apiBaseUrl = "http://localhost:3000/api"; // Bas-URL för API-anrop
+
 // Hjälpfunktion för att få rätt CSS-klass baserat på miljöns namn
 const getBackgroundId = (envName) => {
   const name = envName?.toLowerCase();
@@ -29,6 +31,19 @@ const currentQuestionId = computed(() => {
   return currentQuestion.value?.current_question_id;
 });
 
+const isQuizCompleted = computed(() => {
+  return currentQuestion.value?.quiz_completed === 1;
+});
+
+//hjälpfunktion för att displaya påbörja quiz eller fortsätt quiz beroende på om användaren är på början eller mitt i en nivå
+const getStartButtonText = (level, index) => {
+  if (getLevelStatus(level, index) === "in-progress") {
+    const positionInLevel = levelQuestions.value.findIndex(
+      (q) => q.question_id === currentQuestionId.value,
+    );
+    return positionInLevel > 0 ? "Fortsätt nivå" : "Starta nivå";
+  }
+};
 const getProgress = (level, index) => {
   const status = getLevelStatus(level, index);
   if (status === "completed") return 100;
@@ -43,6 +58,10 @@ const getProgress = (level, index) => {
 };
 
 const getLevelStatus = (level, index) => {
+
+    if(currentQuestion.value?.quiz_completed === 1) {
+    return "completed"; // Om quizzet är slutfört, markera alla nivåer som avklarade
+  }
   // hämta värdet på den aktuella nivån för användaren
   const userLevelId = currentLevelId.value;
 
@@ -63,7 +82,7 @@ const getLevelStatus = (level, index) => {
 const fetchLevels = async () => {
   loading.value = true;
   try {
-    const response = await fetch("http://localhost:3000/api/levels");
+    const response = await fetch(`${apiBaseUrl}/levels`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -78,7 +97,7 @@ const fetchLevels = async () => {
 const fetchCurrentQuestionForUser = async (userId) => {
   try {
     const response = await fetch(
-      `http://localhost:3000/api/users/${userId}/statistics/current-question`,
+      `${apiBaseUrl}/users/${userId}/statistics/current-question`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("user_token")}`,
@@ -97,13 +116,40 @@ const fetchCurrentQuestionForUser = async (userId) => {
     // hämta frågorna för den aktuella nivån
     if (data?.current_level_id == null) return;
     const resQ = await fetch(
-      `http://localhost:3000/api/levels/${data.current_level_id}/questions`,
+      `${apiBaseUrl}/levels/${data.current_level_id}/questions`,
     );
     if (resQ.ok) levelQuestions.value = await resQ.json();
   } catch (err) {
     error.value = err.message;
   }
 };
+
+const resetQuiz = async () => {
+
+  error.value = null;
+  
+try {
+    const response = await fetch(
+      `${apiBaseUrl}/users/statistics/reset-quiz`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    // Efter att ha återställt quizzet, hämta den aktuella frågan igen
+    await fetchCurrentQuestionForUser(loggedInUserId.value);
+  } catch (err) {
+    error.value = err.message;
+  }
+}
+
 
 onMounted(() => {
   //Hämta nivåer
@@ -150,11 +196,7 @@ onMounted(() => {
           class="button"
         >
           <!-- Byt text beroende på om man är på början eller mitt i -->
-          {{
-            currentLevelId > 1 || (currentQuestionId && currentQuestionId > 1)
-              ? "Fortsätt quiz"
-              : "Starta quiz"
-          }}
+          {{ getStartButtonText(level, index) }}
         </router-link>
 
         <!-- Om den är låst -->
@@ -168,6 +210,13 @@ onMounted(() => {
           max="100"
         ></progress>
       </div>
+    </div>
+  </div>
+  <div v-if="isQuizCompleted" class="quiz-completed-message">
+    <h2>Grattis, du har slutfört alla nivåer!</h2>
+    <p>Du kan nu kalla dig för en expert inom överlevnad!</p>
+    <div>
+      <button @click="resetQuiz" class="button">Börja om quizzet</button>
     </div>
   </div>
 </template>
@@ -192,5 +241,23 @@ progress::-webkit-progress-value {
 progress::-moz-progress-bar {
   background: var(--accent-gold);
   border-radius: 4px;
+}
+
+.quiz-completed-message {
+  width: 100%;
+  max-width: 700px;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 8px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+h2 {
+  color: var(--accent-gold);
 }
 </style>
