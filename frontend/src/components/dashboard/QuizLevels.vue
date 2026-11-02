@@ -9,6 +9,8 @@ const currentQuestion = ref(null);
 const currentQuestionReady = ref(false);
 const loggedInUserId = ref(null);
 
+const apiBaseUrl = "http://localhost:3000/api"; // Bas-URL för API-anrop
+
 // Hjälpfunktion för att få rätt CSS-klass baserat på miljöns namn
 const getBackgroundId = (envName) => {
   const name = envName?.toLowerCase();
@@ -80,7 +82,7 @@ const getLevelStatus = (level, index) => {
 const fetchLevels = async () => {
   loading.value = true;
   try {
-    const response = await fetch("http://localhost:3000/api/levels");
+    const response = await fetch(`${apiBaseUrl}/levels`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -95,7 +97,7 @@ const fetchLevels = async () => {
 const fetchCurrentQuestionForUser = async (userId) => {
   try {
     const response = await fetch(
-      `http://localhost:3000/api/users/${userId}/statistics/current-question`,
+      `${apiBaseUrl}/users/${userId}/statistics/current-question`,
       {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("user_token")}`,
@@ -114,7 +116,7 @@ const fetchCurrentQuestionForUser = async (userId) => {
     // hämta frågorna för den aktuella nivån
     if (data?.current_level_id == null) return;
     const resQ = await fetch(
-      `http://localhost:3000/api/levels/${data.current_level_id}/questions`,
+      `${apiBaseUrl}/levels/${data.current_level_id}/questions`,
     );
     if (resQ.ok) levelQuestions.value = await resQ.json();
   } catch (err) {
@@ -128,7 +130,7 @@ const resetQuiz = async () => {
   
 try {
     const response = await fetch(
-      `http://localhost:3000/api/users/statistics/reset-quiz`,
+      `${apiBaseUrl}/users/statistics/reset-quiz`,
       {
         method: "PUT",
         headers: {
