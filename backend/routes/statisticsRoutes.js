@@ -19,4 +19,9 @@ router.post(
     statisticsController.submitAnswer
 );
 
+router.get(
+    '/api/users/:userId/statistics/log/',
+    userMiddleware.isLoggedIn,
+    statisticsController.getUserStatisticsLog
+);
 module.exports = router;

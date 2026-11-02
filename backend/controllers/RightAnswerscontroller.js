@@ -28,6 +28,25 @@ exports.getUserLevelStats = async (req, res) => {
 
   return res.json({ levels: stats });
 };
+
+async function getUserStatisticsLog(req, res) {
+  const userId = Number(req.userData?.id);
+
+    if (!Number.isInteger(userId) || userId < 1) {
+        return res.status(401).json({ error: "You must be logged in." });
+    }
+    if (String(req.params.userId) !== String(userId)) {
+        return res.status(403).json({ error: "Access denied." });
+    }
+
+    const stats = 
+    await statisticsServices.getUserStatisticsLog(userId);
+
+    return res.json({ statistics_log: stats });
+}
+  
+
 module.exports = {
     getCorrectAnswers,
+    getUserStatisticsLog
 };

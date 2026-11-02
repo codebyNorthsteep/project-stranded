@@ -69,6 +69,32 @@ exports.submitAnswer = async (req, res) => {
     });
   }
 };
+
+exports.getUserStatisticsLog = async (req, res) => {
+  const userId = Number(req.userData?.id);
+
+  if  (!Number.isInteger(userId) || userId < 1) {
+    return res.status(401).json({ error: "You must be logged in." });
+  }
+  if(String(req.params.userId) !== String(userId)) {
+    return res.status(403).json({ error: "Access denied." });
+  }
+  try {
+    const statisticsLog = 
+    await rightAnswerService.getUserStatisticsLog(userId);
+    
+    return res.json({ statistics_log: statisticsLog });
+  } catch (error) {
+    console.error("Could not fetch user statistics log:", error);
+    return res.status(500).json({
+      error: "Could not fetch user statistics log.",
+    });
+  }
+};
+
+
+
+
 exports.getLevelsStatistics = async (req, res) => {
   const userId = Number(req.userData?.id);
 

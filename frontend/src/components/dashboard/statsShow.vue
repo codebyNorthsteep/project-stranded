@@ -1,4 +1,3 @@
-
 <script setup>
 import { ref, onMounted } from "vue";
 
@@ -7,6 +6,8 @@ const stats = ref([
   { level_id: 2, correct_answers: 0, wrong_answers: 0, unlocked: false },
   { level_id: 3, correct_answers: 0, wrong_answers: 0, unlocked: false },
 ]);
+
+const statslog = ref([]);
 
 const levelNames = {
   1: "Svenska skog",
@@ -27,21 +28,25 @@ async function fetchStats() {
 
     const levelsUrl = `http://localhost:3000/api/users/${user.id}/statistics/levels`;
     const questionUrl = `http://localhost:3000/api/users/${user.id}/statistics/current-question`;
+    const userStatsLogUrl = `http://localhost:3000/api/users/${user.id}/statistics/log/`;
 
     const headers = {
       Authorization: `Bearer ${token}`,
     };
 
-    const [statsResponse, questionResponse] = await Promise.all([
+    const [statsResponse, questionResponse, userStatsLogResponse] = await Promise.all([
       fetch(levelsUrl, { headers }),
       fetch(questionUrl, { headers }),
+      fetch(userStatsLogUrl, { headers }),
 ]);
-    if (!statsResponse.ok || !questionResponse.ok) {
+    if (!statsResponse.ok || !questionResponse.ok || !userStatsLogResponse.ok) {
       throw new Error("Kunde inte hämta statistiken.");
     }
 
     const { levels } = await statsResponse.json();
     const question = await questionResponse.json();
+    const { statistics_log } = await userStatsLogResponse.json();
+    statslog.value = statistics_log;
 
     const currentLevelId =
       Number(question?.current_level_id) || 1;
@@ -80,11 +85,24 @@ onMounted(fetchStats);
           {{ getLevel(id)?.wrong_answers ?? 0 }}
         </p>
       </template>
-
       <p v-else>
         🔒 Låst nivå
       </p>
     </div>
+      <section>
+        <h3>Statistiklogg</h3>
+
+        <p v-if="statslog.length === 0">Inga loggposter ännu.</p>
+
+        <ul v-else>
+          <li v-for="event in statslog" :key="event.stat_id">
+            {{ new Date(event.answer_timestamp).toLocaleString("sv-SE") }}
+            – {{ event.is_correct ? "Rätt" : "Fel" }} svar på
+            {{ event.question_title }}
+            ({{ levelNames[event.level_id] ?? event.level_id }})
+          </li>
+        </ul>
+      </section>
   </div>
 </template>
 

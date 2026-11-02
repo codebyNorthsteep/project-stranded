@@ -30,6 +30,22 @@ async function getCorrectAnswersByLevel(userId) {
   return query(sql, [userId]);
 }
 
+async function getUserStatisticsLog(userId) {
+  const sql = `
+    SELECT s.stat_id, s.answer_timestamp, a.is_correct, q.question_title, l.level_id
+    FROM statistics s
+    JOIN answers a ON s.answer_id = a.answer_id
+    JOIN questions q ON a.question_id = q.question_id
+    JOIN level l ON q.level_id = l.level_id
+    WHERE s.user_id = ?
+     ORDER BY s.answer_timestamp DESC, s.stat_id DESC
+    LIMIT 5;
+    `;
+
+  return query(sql, [userId]);
+}
+
 module.exports = {
   getCorrectAnswersByLevel,
+  getUserStatisticsLog
 };
