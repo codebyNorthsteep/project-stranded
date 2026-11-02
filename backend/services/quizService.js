@@ -75,8 +75,7 @@ function updateCurrentQuestion(userId, questionId) {
   return new Promise((resolve, reject) => {
     const sql = `
       UPDATE users_questions
-      SET current_question_id = ?,
-      quiz_completed = FALSE
+      SET current_question_id = ?
       WHERE user_id = ?;
     `;
     connectionMySQL.query(sql, [questionId, userId], (err, result) => {
@@ -130,6 +129,16 @@ function completeQuiz(userId) {
   });
 }
 
+function resetQuiz(userId) {
+  return new Promise((resolve, reject) => {
+    const sql = `UPDATE users_questions SET current_question_id = (SELECT MIN(question_id) FROM questions), quiz_completed = FALSE WHERE user_id = ?;`;
+    connectionMySQL.query(sql, [userId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 module.exports = {
   getAllLevels,
   getQuestionsByLevel,
@@ -137,4 +146,5 @@ module.exports = {
   updateCurrentQuestion,
   completeLevel,
   completeQuiz,
+  resetQuiz,
 };

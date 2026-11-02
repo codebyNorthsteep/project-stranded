@@ -110,3 +110,19 @@ exports.completeQuiz = async (req, res) => {
     });
   }
 };
+
+exports.resetQuiz = async (req, res) => {
+  try {
+    const userId = req.userData?.id;
+    if (userId == null) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+    const result = await userService.resetQuiz(userId);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      error: "An error occurred while resetting the quiz",
+    });
+  }
+};

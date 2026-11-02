@@ -18,4 +18,6 @@ router.put('/api/users/statistics/complete-level', userMiddleware.isLoggedIn, qu
 
 router.put('/api/users/statistics/complete-quiz', userMiddleware.isLoggedIn, quizController.completeQuiz);
 
+router.put('/api/users/statistics/reset-quiz', userMiddleware.isLoggedIn, quizController.resetQuiz);
+
 module.exports = router;

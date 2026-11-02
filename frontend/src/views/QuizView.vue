@@ -125,28 +125,33 @@ const nextLevel = () => {
   }
 };
 
-//We need to handle first level in case the user press on the button "start quiz from first level" on quiz completed
-const firstLevel = async () => {
+//Resetta quizzet, sätt alla variabler till default och hämta första frågan på första nivån
+//Backend resetar current_question_id till första frågan på första nivån och quiz_completed till false
+const resetQuiz = async () => {
   if (levels.value.length === 0) return;
 
   const firstLevelId = levels.value[0].level_id;
+  
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/users/statistics/reset-quiz`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+          },
+        },
+      );
 
-  // Hämta första frågan i första nivån och spara den när man väljer att spela om hela quizzet
-  try {
-    const response = await fetch(
-      `http://localhost:3000/api/levels/${firstLevelId}/questions`,
-    );
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    const firstLevelQuestions = await response.json();
-    const firstQuestionId = firstLevelQuestions[0]?.question_id;
-    if (firstQuestionId) {
-      const saved = await fetchUpdateCurrentQuestion(firstQuestionId);
-      if (!saved) return;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+    } catch (err) {
+      error.value = err.message;
+      return; // Stoppa exekveringen om det uppstår ett fel vid återställning av quizzet
     }
-  } catch (err) {
-    error.value = err.message;
-    return;
-  }
+  
 
   //If the first level is, ath the same time, the last level, we need to restart all the variables
   if (Number(route.params.levelId) === Number(firstLevelId)) {
@@ -471,7 +476,7 @@ onMounted(() => {
       v-if="isQuizCompleted"
       :level="currentQuestion?.level_name"
       :summary="levelSummaries[currentQuestion?.level_name]"
-      @first-level="firstLevel"
+      @first-level="resetQuiz"
     />
     <GameOver
       v-if="isGameOver"

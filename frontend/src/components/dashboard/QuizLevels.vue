@@ -122,24 +122,26 @@ const fetchCurrentQuestionForUser = async (userId) => {
   }
 };
 
-const restartQuiz = async () => {
+const resetQuiz = async () => {
+
+  error.value = null;
   
-  try {
+try {
     const response = await fetch(
-      "http://localhost:3000/api/users/statistics/current-question",
+      `http://localhost:3000/api/users/statistics/reset-quiz`,
       {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("user_token")}`,
         },
-        body: JSON.stringify({ questionId:1 }), // Skicka en parameter som indikerar att quizzet ska återställas
       },
     );
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    levelQuestions.value = [];
+
+    // Efter att ha återställt quizzet, hämta den aktuella frågan igen
     await fetchCurrentQuestionForUser(loggedInUserId.value);
   } catch (err) {
     error.value = err.message;
@@ -212,7 +214,7 @@ onMounted(() => {
     <h2>Grattis, du har slutfört alla nivåer!</h2>
     <p>Du kan nu kalla dig för en expert inom överlevnad!</p>
     <div>
-      <button @click="restartQuiz" class="button">Börja om quizzet</button>
+      <button @click="resetQuiz" class="button">Börja om quizzet</button>
     </div>
   </div>
 </template>
