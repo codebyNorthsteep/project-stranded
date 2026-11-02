@@ -38,7 +38,7 @@ const routes = [
     beforeEnter: (to, from) => {
       const levelId = Number(to.params.levelId);
 
-      if (!levelId || isNaN(levelId)) {
+      if (!Number.isSafeInteger(levelId) || levelId <= 0) {
         return from.fullPath && from.fullPath !== to.fullPath
           ? from.fullPath
           : { name: "MyDashboard" };
