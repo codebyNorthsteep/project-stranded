@@ -16,4 +16,6 @@ router.put('/api/users/statistics/current-question', userMiddleware.isLoggedIn, 
 
 router.put('/api/users/statistics/complete-level', userMiddleware.isLoggedIn, quizController.completeLevel);
 
+router.put('/api/users/statistics/complete-quiz', userMiddleware.isLoggedIn, quizController.completeQuiz);
+
 module.exports = router;

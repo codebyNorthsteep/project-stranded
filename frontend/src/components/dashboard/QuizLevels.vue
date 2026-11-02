@@ -52,6 +52,10 @@ const getProgress = (level, index) => {
 };
 
 const getLevelStatus = (level, index) => {
+
+    if(currentQuestion.value?.quiz_completed === 1) {
+    return "completed"; // Om quizzet är slutfört, markera alla nivåer som avklarade
+  }
   // hämta värdet på den aktuella nivån för användaren
   const userLevelId = currentLevelId.value;
 

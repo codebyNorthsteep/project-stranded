@@ -70,11 +70,13 @@ function getAnswerValidation(anwerId) {
     });
 }
 
+// Uppdaterar användarens nuvarande fråga i databasen när de svarar på en fråga samt sätter quiz_completed till FALSE om man väljer att börja om quizzet.
 function updateCurrentQuestion(userId, questionId) {
   return new Promise((resolve, reject) => {
     const sql = `
       UPDATE users_questions
-      SET current_question_id = ?
+      SET current_question_id = ?,
+      quiz_completed = FALSE
       WHERE user_id = ?;
     `;
     connectionMySQL.query(sql, [questionId, userId], (err, result) => {
@@ -118,10 +120,21 @@ function completeLevel(userId, levelId) {
   });
 }
 
+function completeQuiz(userId) {
+  return new Promise((resolve, reject) => {
+    const sql = `UPDATE users_questions SET quiz_completed = TRUE WHERE user_id = ?;`;
+    connectionMySQL.query(sql, [userId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+}
+
 module.exports = {
   getAllLevels,
   getQuestionsByLevel,
   getAnswerValidation,
   updateCurrentQuestion,
   completeLevel,
+  completeQuiz,
 };

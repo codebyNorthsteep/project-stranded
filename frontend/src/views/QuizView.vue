@@ -62,12 +62,13 @@ const nextQuestion = () => {
   } else {
     //If it's last question,
     //We have to check if it's the last question of the last level, in that case, we show the component quiz completed
+
+    //om det är sista frågan på sista nivån, markera quizzet som slutfört, annars markera nivån som slutförd
     if (isLastLevelOfQuiz.value) {
       isQuizCompleted.value = true;
-      //Otherwise, it's the last question of another level so we show the component level completed instead
+      completeQuiz();
     } else {
       isLevelCompleted.value = true;
-      // Call the completeLevel function to update the user's progress
       completeLevel();
     }
   }
@@ -89,6 +90,23 @@ const completeLevel = async () => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+  } catch (err) {
+    error.value = err.message;
+  }
+};
+
+const completeQuiz = async () => {
+  try {
+    const response = await fetch(
+      "http://localhost:3000/api/users/statistics/complete-quiz",
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+        },
+      },
+    );
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   } catch (err) {
     error.value = err.message;
   }
