@@ -3,7 +3,7 @@ const connectionMySQL = require("./../connectionMySQL");
 function getCurrentQuestionForUser(userId) {
   return new Promise((resolve, reject) => {
     //Hämta den aktuella frågan för användaren och dess nivå från databasen med en left join mellan users_questions och questions tabellerna
-    const sql = `select uq.current_question_id, q.level_id as current_level_id
+    const sql = `select uq.current_question_id, uq.quiz_completed, q.level_id as current_level_id
      from users_questions uq
      left join questions q on uq.current_question_id = q.question_id 
      where uq.user_id = ?`;
