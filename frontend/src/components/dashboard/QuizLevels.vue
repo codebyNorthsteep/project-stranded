@@ -29,6 +29,10 @@ const currentQuestionId = computed(() => {
   return currentQuestion.value?.current_question_id;
 });
 
+const isQuizCompleted = computed(() => {
+  return currentQuestion.value?.quiz_completed === 1;
+});
+
 //hjälpfunktion för att displaya påbörja quiz eller fortsätt quiz beroende på om användaren är på början eller mitt i en nivå
 const getStartButtonText = (level, index) => {
   if (getLevelStatus(level, index) === "in-progress") {
@@ -118,6 +122,31 @@ const fetchCurrentQuestionForUser = async (userId) => {
   }
 };
 
+const restartQuiz = async () => {
+  
+  try {
+    const response = await fetch(
+      "http://localhost:3000/api/users/statistics/current-question",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+        },
+        body: JSON.stringify({ questionId:1 }), // Skicka en parameter som indikerar att quizzet ska återställas
+      },
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    levelQuestions.value = [];
+    await fetchCurrentQuestionForUser(loggedInUserId.value);
+  } catch (err) {
+    error.value = err.message;
+  }
+}
+
+
 onMounted(() => {
   //Hämta nivåer
   fetchLevels();
@@ -179,6 +208,10 @@ onMounted(() => {
       </div>
     </div>
   </div>
+  <div v-if="isQuizCompleted" class="quiz-completed-message">
+    <p>Grattis, du har slutfört quizzet!</p>
+    <button class="button" @click="restartQuiz">Starta om quiz</button>
+  </div>
 </template>
 
 <style scoped>
@@ -201,5 +234,19 @@ progress::-webkit-progress-value {
 progress::-moz-progress-bar {
   background: var(--accent-gold);
   border-radius: 4px;
+}
+
+.quiz-completed-message {
+  width: 700px;
+  margin-top: 20px;
+  padding: 15px;
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 8px;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 </style>
