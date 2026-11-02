@@ -35,15 +35,7 @@ const routes = [
     path: "/quiz/:levelId/questions",
     name: "Quiz",
     component: Quiz,
-    beforeEnter: (to, from) => {
-      const levelId = Number(to.params.levelId);
-
-      if (!Number.isSafeInteger(levelId) || levelId <= 0) {
-        return from.fullPath && from.fullPath !== to.fullPath
-          ? from.fullPath
-          : { name: "MyDashboard" };
-      }
-    },
+    meta: { requiresAuth: true},
   },
   {
     path: "/:pathMatch(.*)*",
@@ -58,6 +50,17 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from) => {
+
+  if (to.name === "Quiz") {
+    const levelId = Number(to.params.levelId);
+
+    if (!Number.isSafeInteger(levelId) || levelId <= 0) {
+      return from.fullPath && from.fullPath !== to.fullPath
+        ? from.fullPath
+        : { name: "MyDashboard" };
+    }
+  }
+
   const isAuthenticated = Boolean(localStorage.getItem("user_token"));
 
   if (to.meta.requiresAuth && !isAuthenticated) {
