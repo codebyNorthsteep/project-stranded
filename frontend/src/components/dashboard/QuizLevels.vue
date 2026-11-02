@@ -209,8 +209,10 @@ onMounted(() => {
     </div>
   </div>
   <div v-if="isQuizCompleted" class="quiz-completed-message">
-    <p>Grattis, du har slutfört quizzet!</p>
-    <button class="button" @click="restartQuiz">Starta om quiz</button>
+    <p>Grattis, du har slutfört alla nivåer!</p>
+    <div>
+      <button @click="restartQuiz" class="button">Börja om quizzet</button>
+    </div>
   </div>
 </template>
 
