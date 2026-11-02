@@ -209,7 +209,8 @@ onMounted(() => {
     </div>
   </div>
   <div v-if="isQuizCompleted" class="quiz-completed-message">
-    <p>Grattis, du har slutfört alla nivåer!</p>
+    <h2>Grattis, du har slutfört alla nivåer!</h2>
+    <p>Du kan nu kalla dig för en expert inom överlevnad!</p>
     <div>
       <button @click="restartQuiz" class="button">Börja om quizzet</button>
     </div>
@@ -239,7 +240,8 @@ progress::-moz-progress-bar {
 }
 
 .quiz-completed-message {
-  width: 700px;
+  width: 100%;
+  max-width: 700px;
   margin-top: 20px;
   padding: 15px;
   background-color: var(--card-bg);
@@ -250,5 +252,8 @@ progress::-moz-progress-bar {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+h2 {
+  color: var(--accent-gold);
 }
 </style>
