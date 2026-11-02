@@ -29,6 +29,15 @@ const currentQuestionId = computed(() => {
   return currentQuestion.value?.current_question_id;
 });
 
+//hjälpfunktion för att displaya påbörja quiz eller fortsätt quiz beroende på om användaren är på början eller mitt i en nivå
+const getStartButtonText = (level, index) => {
+  if (getLevelStatus(level, index) === "in-progress") {
+    const positionInLevel = levelQuestions.value.findIndex(
+      (q) => q.question_id === currentQuestionId.value,
+    );
+    return positionInLevel > 0 ? "Fortsätt nivå" : "Starta nivå";
+  }
+};
 const getProgress = (level, index) => {
   const status = getLevelStatus(level, index);
   if (status === "completed") return 100;
@@ -150,11 +159,7 @@ onMounted(() => {
           class="button"
         >
           <!-- Byt text beroende på om man är på början eller mitt i -->
-          {{
-            currentLevelId > 1 || (currentQuestionId && currentQuestionId > 1)
-              ? "Fortsätt quiz"
-              : "Starta quiz"
-          }}
+          {{ getStartButtonText(level, index) }}
         </router-link>
 
         <!-- Om den är låst -->
