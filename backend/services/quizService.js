@@ -29,7 +29,9 @@ function getQuestionsByLevel(levelId) {
       if (err) return reject(err);
       const questions = [];
       rows.forEach((row) => {
-        const question = questions.find((q) => q.question_id === row.question_id);
+        const question = questions.find(
+          (q) => q.question_id === row.question_id,
+        );
         if (!question) {
           questions.push({
             question_id: row.question_id,
@@ -50,24 +52,24 @@ function getQuestionsByLevel(levelId) {
           }
         });
       });
-      
-     resolve(questions);
+
+      resolve(questions);
     });
   });
 }
 
 function getAnswerValidation(anwerId) {
-    return new Promise((resolve, reject) => {
-        const sql = `
+  return new Promise((resolve, reject) => {
+    const sql = `
             SELECT is_correct, answer_explanation
             FROM answers
             WHERE answer_id = ?;
         `;
-        connectionMySQL.query(sql, [anwerId], (err, rows) => {
-            if (err) return reject(err);
-            resolve(rows[0]); 
-        });
+    connectionMySQL.query(sql, [anwerId], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows[0]);
     });
+  });
 }
 
 // Uppdaterar användarens nuvarande fråga i databasen när de svarar på en fråga samt sätter quiz_completed till FALSE om man väljer att börja om quizzet.
@@ -114,6 +116,9 @@ function completeLevel(userId, levelId) {
 
     connectionMySQL.query(sql, [levelId, levelId, userId], (err, result) => {
       if (err) return reject(err);
+      if (result.affectedRows === 0) {
+        return reject(new Error("Progress saknas för användaren"));
+      }
       resolve(result);
     });
   });
@@ -124,6 +129,9 @@ function completeQuiz(userId) {
     const sql = `UPDATE users_questions SET quiz_completed = TRUE WHERE user_id = ?;`;
     connectionMySQL.query(sql, [userId], (err, result) => {
       if (err) return reject(err);
+      if (result.affectedRows === 0) {
+        return reject(new Error("Progress saknas för användaren"));
+      }
       resolve(result);
     });
   });
@@ -133,10 +141,13 @@ function resetQuiz(userId) {
   return new Promise((resolve, reject) => {
     const sql = `UPDATE users_questions SET current_question_id = (
     SELECT MIN(question_id) FROM questions
-    WHERE level_id = (SELECT MIN(level_id) FROM level), 
+    WHERE level_id = (SELECT MIN(level_id) FROM level)), 
     quiz_completed = FALSE WHERE user_id = ?;`;
     connectionMySQL.query(sql, [userId], (err, result) => {
       if (err) return reject(err);
+      if (result.affectedRows === 0) {
+        return reject(new Error("Progress saknas för användaren"));
+      }
       resolve(result);
     });
   });
