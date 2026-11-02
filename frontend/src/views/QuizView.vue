@@ -254,6 +254,8 @@ const fetchQuestions = async (
 
 const fetchAnswerValidation = async (answerId) => {
   selectedAnswerId.value = answerId;
+  await saveAnswerToStatistics(answerId, currentQuestion.value.question_id);
+  validatedAnswer.value = result;
   const validationLevelId = route.params.levelId; // Spara nuvarande nivå när anropet startar för att säkerställa att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
 
   try {
@@ -295,23 +297,30 @@ const fetchAnswerValidation = async (answerId) => {
   }
 };
 
-const saveAnswerToStatistics = async (answerId, isCorrect) => {
+const saveAnswerToStatistics = async (answerId, questionId) => {
   const token = localStorage.getItem("user_token");
   if (!token) {
     throw new Error("Du måste logga in för att spara ditt svar.");
   }
 
-  fetch(`http://localhost:3000/api/users/${userId}/statistics/log/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("user_token")}`,
+  const response = await fetch(
+    `http://localhost:3000/api/answers/${answerId}/submit`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ questionId }),
     },
-    body: JSON.stringify({ answerId, isCorrect }),
-  });
+  );
+
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    throw new Error(`Kunde inte spara svaret: ${response.status}`);
   }
+
+  return response.json();
+};
 
 const fetchUpdateCurrentQuestion = async (questionId) => {
   try {

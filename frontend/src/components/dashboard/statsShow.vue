@@ -89,7 +89,7 @@ onMounted(fetchStats);
         🔒 Låst nivå
       </p>
     </div>
-      <section>
+      <section class="level-card">
         <h3>Statistiklogg</h3>
 
         <p v-if="statslog.length === 0">Inga loggposter ännu.</p>
@@ -97,7 +97,10 @@ onMounted(fetchStats);
         <ul v-else>
           <li v-for="event in statslog" :key="event.stat_id">
             {{ new Date(event.answer_timestamp).toLocaleString("sv-SE") }}
-            – {{ event.is_correct ? "Rätt" : "Fel" }} svar på
+            <span :class="event.is_correct ? 'answer-correct' : 'answer-wrong'">
+            {{ event.is_correct ? "Rätt" : "Fel" }}
+            </span>
+            svar på
             {{ event.question_title }}
             ({{ levelNames[event.level_id] ?? event.level_id }})
           </li>
@@ -122,6 +125,12 @@ h2 {
   color: var(--accent-gold);
 }
 
+h3 {
+  margin-bottom: 20px;
+  color: var(--accent-gold);
+}
+
+
 .level-card {
   padding: 16px;
   margin-bottom: 12px;
@@ -137,14 +146,17 @@ h2 {
   background: rgba(18, 29, 17, 0.5);
 }
 
-.level-card h3 {
-  margin-top: 0;
-  margin-bottom: 12px;
-  color: var(--accent-gold);
-}
-
 .level-card p {
   margin: 6px 0;
   color: var(--accent-gold);
+}
+.answer-correct {
+  color: #7ed957;
+  font-weight: 600;
+}
+
+.answer-wrong {
+  color: #ff6b6b;
+  font-weight: 600;
 }
 </style>

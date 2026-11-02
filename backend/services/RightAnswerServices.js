@@ -39,7 +39,7 @@ async function getUserStatisticsLog(userId) {
     JOIN level l ON q.level_id = l.level_id
     WHERE s.user_id = ?
      ORDER BY s.answer_timestamp DESC, s.stat_id DESC
-    LIMIT 5;
+    LIMIT 3;
     `;
 
   return query(sql, [userId]);
