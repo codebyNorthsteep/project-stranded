@@ -131,7 +131,10 @@ function completeQuiz(userId) {
 
 function resetQuiz(userId) {
   return new Promise((resolve, reject) => {
-    const sql = `UPDATE users_questions SET current_question_id = (SELECT MIN(question_id) FROM questions), quiz_completed = FALSE WHERE user_id = ?;`;
+    const sql = `UPDATE users_questions SET current_question_id = (
+    SELECT MIN(question_id) FROM questions
+    WHERE level_id = (SELECT MIN(level_id) FROM level), 
+    quiz_completed = FALSE WHERE user_id = ?;`;
     connectionMySQL.query(sql, [userId], (err, result) => {
       if (err) return reject(err);
       resolve(result);

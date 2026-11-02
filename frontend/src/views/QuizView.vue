@@ -107,8 +107,10 @@ const completeQuiz = async () => {
       },
     );
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return true;
   } catch (err) {
     error.value = err.message;
+    return false;
   }
 };
 
