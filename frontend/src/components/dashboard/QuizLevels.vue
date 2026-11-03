@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { useRouter } from "vue-router";
 
 const loading = ref(false);
 const error = ref(null);
@@ -8,6 +9,7 @@ const levelQuestions = ref([]);
 const currentQuestion = ref(null);
 const currentQuestionReady = ref(false);
 const loggedInUserId = ref(null);
+const router = useRouter();
 
 const apiBaseUrl = "http://localhost:3000/api"; // Bas-URL för API-anrop
 
@@ -106,6 +108,12 @@ const fetchCurrentQuestionForUser = async (userId) => {
     );
 
     if (!response.ok) {
+      if (response.status === 401) {
+       localStorage.removeItem("user_token");
+       localStorage.removeItem("user");
+       router.push("/login");
+       return;
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
@@ -140,6 +148,12 @@ try {
     );
 
     if (!response.ok) {
+      if (response.status === 401) {
+       localStorage.removeItem("user_token");
+       localStorage.removeItem("user");
+       router.push("/login");
+       return;
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
