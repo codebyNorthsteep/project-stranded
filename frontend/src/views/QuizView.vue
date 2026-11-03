@@ -104,6 +104,13 @@ const completeLevel = async () => {
         body: JSON.stringify({ levelId: Number(route.params.levelId) }),
       },
     );
+
+    if (response.status === 401) {
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user");
+      return router.push("/login");
+    }
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -123,6 +130,13 @@ const completeQuiz = async () => {
         },
       },
     );
+
+    if (response.status === 401) {
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user");
+      return router.push("/login");
+    }
+
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return true;
   } catch (err) {
@@ -161,6 +175,12 @@ const resetQuiz = async () => {
           },
         },
       );
+
+      if (response.status === 401) {
+        localStorage.removeItem("user_token");
+        localStorage.removeItem("user");
+        return router.push("/login");
+      }
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -265,6 +285,13 @@ const fetchQuestions = async (
     const response = await fetch(
       `http://localhost:3000/api/levels/${requestedLevelId}/questions`,
     );
+
+    if (response.status === 401) {
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user");
+      return router.push("/login");
+    }
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -302,6 +329,13 @@ const fetchAnswerValidation = async (answerId) => {
     const response = await fetch(
       `http://localhost:3000/api/answers/${answerId}/validate`,
     );
+
+    if (response.status === 401) {
+        localStorage.removeItem("user_token");
+        localStorage.removeItem("user");
+        return router.push("/login");
+    }
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -351,6 +385,13 @@ const fetchUpdateCurrentQuestion = async (questionId) => {
         body: JSON.stringify({ questionId }),
       },
     );
+
+    if (response.status === 401) {
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user");
+      return router.push("/login");
+    }
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
