@@ -1,4 +1,5 @@
 <script setup>
+import { useSoundEffect } from "@/composables/useSoundEffect.js";
 import { ref, watch, onMounted, onBeforeUnmount } from "vue";
 
 const props = defineProps({ src: String });
@@ -7,7 +8,7 @@ const audio = new Audio();
 audio.loop = true;
 
 const isPlaying = ref(false);
-const muted = ref(false);
+const { muted } = useSoundEffect();
 
 async function play() {
   try {
@@ -27,7 +28,7 @@ function toggle() {
   }
 }
 
-watch(muted, (m) => (audio.muted = m));
+watch(muted, (m) => (audio.muted = m), { immediate: true });
 
 // byter låt när src ändras
 watch(
