@@ -45,12 +45,12 @@ onBeforeUnmount(() => audio.pause());
 </script>
 
 <template>
-  <div class="music-player" role="group" aria-label="Ambience controls">
+  <div class="music-player" role="group" aria-label="Sound controls">
     <button
       type="button"
       @click="toggle"
-      :aria-label="isPlaying ? 'Pause ambience' : 'Play ambience'"
-      :title="isPlaying ? 'Pause ambience' : 'Play ambience'"
+      :aria-label="isPlaying ? 'Pause background ambience' : 'Play background ambience'"
+      :title="isPlaying ? 'Pause background ambience' : 'Play background ambience'"
     >
       <span aria-hidden="true">{{ isPlaying ? "⏸" : "▶" }}</span>
     </button>
@@ -58,8 +58,8 @@ onBeforeUnmount(() => audio.pause());
     <button
       type="button"
       @click="muted = !muted"
-      :aria-label="muted ? 'Unmute ambience' : 'Mute ambience'"
-      :title="muted ? 'Unmute ambience' : 'Mute ambience'"
+      :aria-label="muted ? 'Unmute all sound' : 'Mute all sound'"
+      :title="muted ? 'Unmute all sound' : 'Mute all sound'"
     >
       <span aria-hidden="true">{{ muted ? "🔇" : "🔊" }}</span>
     </button>
