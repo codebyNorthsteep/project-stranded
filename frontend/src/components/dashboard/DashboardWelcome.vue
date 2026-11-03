@@ -50,6 +50,7 @@ const getLoggedInUsername = async (userId) => {
 
     if (response.status === 401) {
       localStorage.removeItem("user_token");
+      localStorage.removeItem("user");
       return router.push("/login");
     }
 
