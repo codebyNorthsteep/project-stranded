@@ -280,7 +280,6 @@ const fetchQuestions = async (
 const fetchAnswerValidation = async (answerId) => {
   selectedAnswerId.value = answerId;
   await saveAnswerToStatistics(answerId, currentQuestion.value.question_id);
-  validatedAnswer.value = result;
   const validationLevelId = route.params.levelId; // Spara nuvarande nivå när anropet startar för att säkerställa att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
 
   try {
