@@ -46,7 +46,10 @@ async function fetchStats() {
     const { levels } = await statsResponse.json();
     const question = await questionResponse.json();
     const { statistics_log } = await userStatsLogResponse.json();
-    statslog.value = statistics_log;
+    statslog.value = statistics_log.filter(
+  (event) => Number(event.is_correct) === 0 ||
+    [10, 20, 30].includes(Number(event.question_id))
+);
 
     const currentLevelId =
       Number(question?.current_level_id) || 1;
@@ -97,8 +100,8 @@ onMounted(fetchStats);
         <ul v-else>
           <li v-for="event in statslog" :key="event.stat_id">
             {{ new Date(event.answer_timestamp).toLocaleString("sv-SE") }}
-            <span :class="event.is_correct ? 'answer-correct' : 'answer-wrong'">
-            {{ event.is_correct ? "Rätt" : "Fel" }}
+            <span :class="Number(event.is_correct) === 1 ? 'answer-correct' : 'answer-wrong'">
+            {{ Number(event.is_correct) === 1 ? "Rätt" : "Fel" }}
             </span>
             svar på
             {{ event.question_title }}

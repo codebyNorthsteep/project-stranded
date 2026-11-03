@@ -40,7 +40,22 @@ async function saveAnswerAttempt(userId, questionId, answerId) {  const answerRo
   
 }
 
-module.exports = {
+async function getIncorrectAnswerCount(userId, questionId) {
+  return query(
+      `SELECT q.question_title, a.answer_text, a.answer_explanation,
+            s.answer_timestamp
+     FROM statistics s
+     JOIN answers a ON a.answer_id = s.answer_id
+     JOIN questions q ON q.question_id = a.question_id
+     WHERE s.user_id = ? 
+     AND a.is_correct = 0
+     ORDER BY s.answer_timestamp DESC`,
+    [userId]
+  );
+}
+
+    module.exports = {
   getCurrentQuestionForUser,
   saveAnswerAttempt,
+  getIncorrectAnswerCount
 };
