@@ -1,6 +1,7 @@
 <script setup>
 import "@/Assets/quiz.css";
 import {useSoundEffect} from "@/composables/useSoundEffect.js";
+import UseAmbienceMusic from "@/components/UseAmbienceMusic.vue";
 import { useRoute, useRouter } from "vue-router";
 import { ref, onMounted, computed, watch } from "vue";
 import LevelCompleted from "@/components/LevelCompleted.vue";
@@ -49,6 +50,18 @@ const getBackgroundId = computed(() => {
   if (name?.includes("amazonas")) return "level-background-amazonas";
   if (name?.includes("sahara")) return "level-background-sahara";
   return "";
+});
+
+const levelMusic = {
+  skog: "/ambience/northern-forrest-birds.mp3",
+  amazonas: "/ambience/rainforest-birds.mp3",
+  sahara: "/ambience/desert-wind-soft.mp3",
+};
+
+const currentMusic = computed(() => {
+  const name = currentQuestion.value?.level_name?.toLowerCase();
+  const key = Object.keys(levelMusic).find((k) => name?.includes(k));
+  return key ? levelMusic[key] : null;
 });
 
 const currentQuestion = computed(() => questions.value[currentIndex.value]);
@@ -375,6 +388,7 @@ onMounted(() => {
 
 <template>
   <div class="quiz-container" :id="getBackgroundId">
+    <UseAmbienceMusic :src="currentMusic" />
     <p v-if="loading || levelsLoading" class="status-msg">Laddar...</p>
 
     <p v-if="error" class="status-msg error">Fel: {{ error }}</p>

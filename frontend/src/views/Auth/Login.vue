@@ -1,9 +1,11 @@
 <script setup>
 import LoginForm from "../../components/LoginForm.vue";
 import SocialLogin from "../../components/SocialLogin.vue";
+import UseAmbienceMusic from "../../components/UseAmbienceMusic.vue";
 </script>
 
 <template>
+  <UseAmbienceMusic  src="/ambience/bonfire.mp3"/>
   <p class="slogan">your knowledge is your survival tool</p>
 
   <LoginForm />
