@@ -1,6 +1,8 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const loggedInUserId = ref(null);
 const username = ref(); // ersätt med det faktiska användarnamnet från backend
 const firstTimeGreetings = [
@@ -45,6 +47,12 @@ const getLoggedInUsername = async (userId) => {
         },
       },
     );
+
+    if (response.status === 401) {
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user");
+      return router.push("/login");
+    }
 
     if (!response.ok) {
       throw new Error(`User request failed: ${response.status}`);
