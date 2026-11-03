@@ -30,6 +30,10 @@ app.use(userRoute);
 const statisticsRoute = require('./routes/statisticsRoutes');
 app.use(statisticsRoute);
 
+// Use the right-answer routes
+const rightAnswersRoute = require('./routes/RightAnswersRoutes');
+app.use(rightAnswersRoute);
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);   
 });
