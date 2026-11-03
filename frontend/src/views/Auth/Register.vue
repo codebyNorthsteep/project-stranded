@@ -1,10 +1,8 @@
 <script setup>
 import RegisterForm from "../../components/RegisterForm.vue";
-import UseAmbienceMusic from "../../components/UseAmbienceMusic.vue";
 </script>
 
 <template>
-  <UseAmbienceMusic  src="/ambience/bonfire.mp3"/>
   <p class="subtitle">join the survival arena and test your wits</p>
 
   <RegisterForm />

@@ -11,25 +11,25 @@ const routes = [
     path: "/",
     name: "Welcome",
     component: Welcome,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, music: "/ambience/bonfire.mp3" },
   },
   {
     path: "/login",
     name: "Login",
     component: Login,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, music: "/ambience/bonfire.mp3" },
   },
   {
     path: "/register",
     name: "Register",
     component: Register,
-    meta: { requiresAuth: false },
+    meta: { requiresAuth: false, music: "/ambience/bonfire.mp3" },
   },
   {
     path: "/dashboard",
     name: "MyDashboard",
     component: MyDashboard,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, music: "/ambience/bonfire.mp3" },
   },
   {
     path: "/quiz/:levelId/questions",
@@ -41,6 +41,7 @@ const routes = [
     path: "/:pathMatch(.*)*",
     name: "notfound",
     component: NotFound,
+    meta: { music: "/ambience/bonfire.mp3" },
   },
 ];
 
