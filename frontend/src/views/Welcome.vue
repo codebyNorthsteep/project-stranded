@@ -4,7 +4,6 @@ import WelcomeButtons from '../components/WelcomeButtons.vue'
 </script>
 
 <template>
-
     <TheWelcome />
     <WelcomeButtons />
 
