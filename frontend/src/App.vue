@@ -12,7 +12,7 @@ const music = computed(() => route.meta.music ?? null);
   <ClickableHeader />
   
   <main class="main-content">
-    <UseAmbienceMusic v-if="music" :src="music" />
+    <UseAmbienceMusic v-if="music" key="route.name" :src="music" />
     <RouterView />
   </main>
 
