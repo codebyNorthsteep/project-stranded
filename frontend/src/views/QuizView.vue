@@ -1,5 +1,6 @@
 <script setup>
 import "@/Assets/quiz.css";
+import {useSoundEffect} from "@/composables/useSoundEffect.js";
 import { useRoute, useRouter } from "vue-router";
 import { ref, onMounted, computed, watch } from "vue";
 import LevelCompleted from "@/components/LevelCompleted.vue";
@@ -8,6 +9,7 @@ import GameOver from "@/components/GameOver.vue";
 
 const route = useRoute();
 const router = useRouter(); //Hämta router-instansen för att kunna navigera till nästa level efter att man har klarat alla frågor i en nivå
+const {playSound} = useSoundEffect();
 
 const loading = ref(false);
 const error = ref(null);
@@ -66,9 +68,11 @@ const nextQuestion = () => {
     //om det är sista frågan på sista nivån, markera quizzet som slutfört, annars markera nivån som slutförd
     if (isLastLevelOfQuiz.value) {
       isQuizCompleted.value = true;
+      playSound("quizComplete");
       completeQuiz();
     } else {
       isLevelCompleted.value = true;
+      playSound("levelComplete");
       completeLevel();
     }
   }
@@ -295,6 +299,7 @@ const fetchAnswerValidation = async (answerId) => {
       selectedAnswerId.value === answerId
     ) {
       validatedAnswer.value = result;
+      playSound(result.is_correct ? "correct" : "levelFailed");
       // Spara nästa fråga som ska visas beroende på om svaret var korrekt eller inte, och uppdatera användarens nuvarande fråga i databasen
       const nextQuestionId =
         questions.value[currentIndex.value + 1]?.question_id;
@@ -356,6 +361,7 @@ watch(
       isQuizCompleted.value = false;
       isGameOver.value = false;
       gameOverExplanation.value = "";
+      
       fetchQuestions(newLevelId); // Hämta nya frågor för den nya nivån
     }
   },

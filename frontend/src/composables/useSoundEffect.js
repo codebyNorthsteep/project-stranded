@@ -1,9 +1,8 @@
 const sounds = {
     correct: new Audio("/answer-sounds/correct-answer.mp3"),
-    incorrect: new Audio("/answer-sounds/incorrect-answer.mp3"),
-    levelFailed: new Audio("quiz-modals/defeat-music.mp3"),
-    levelComplete: new Audio("quiz-modals/level-complete.mp3"),
-    quizComplete: new Audio("quiz-modals/quiz-complete.mp3"),
+    levelFailed: new Audio("/quiz-modals/level-failed.mp3"),
+    levelComplete: new Audio("/quiz-modals/level-up-2.mp3"),
+    quizComplete: new Audio("/quiz-modals/quiz-completed.mp3"),
 };
 
 export function useSoundEffect() {
