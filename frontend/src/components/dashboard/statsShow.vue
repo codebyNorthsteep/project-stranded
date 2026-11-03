@@ -47,9 +47,8 @@ async function fetchStats() {
     const question = await questionResponse.json();
     const { statistics_log } = await userStatsLogResponse.json();
     statslog.value = statistics_log.filter(
-  (event) => Number(event.is_correct) === 0 ||
-    [10, 20, 30].includes(Number(event.question_id))
-);
+  (event) => Number(event.is_correct) === 0 || Number(event.is_correct) === 1)
+;
 
     const currentLevelId =
       Number(question?.current_level_id) || 1;
