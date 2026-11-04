@@ -324,7 +324,7 @@ const fetchQuestions = async (
 };
 
 const fetchAnswerValidation = async (answerId) => {
-  if (isSubmittingAnswer.value) return; // Förhindra flera samtidiga anrop
+  if (isSubmittingAnswer.value) return;
 
   isSubmittingAnswer.value = true;
   selectedAnswerId.value = answerId;
@@ -332,34 +332,33 @@ const fetchAnswerValidation = async (answerId) => {
 
   const questionId = currentQuestion.value?.question_id;
   const selectionKey = `${questionId}-${answerId}`;
-
- try {
-  if (statisticsSavedForSelection.value !== selectionKey) {
-    try {
-      await saveAnswerToStatistics(answerId, questionId);
-      statisticsSavedForSelection.value = selectionKey;
-    } catch (err) {
-      error.value = `Fel vid sparande av svaret: ${err.message}`;
-      return;
-    }
-  }
-
-  const validationLevelId = route.params.levelId; // Spara nuvarande nivå när anropet startar för att säkerställa att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
+  const validationLevelId = route.params.levelId;
 
   try {
+    if (statisticsSavedForSelection.value !== selectionKey) {
+      try {
+        await saveAnswerToStatistics(answerId, questionId);
+        statisticsSavedForSelection.value = selectionKey;
+      } catch (err) {
+        error.value = `Fel vid sparande av svaret: ${err.message}`;
+        return;
+      }
+    }
+
     const response = await fetch(
       `http://localhost:3000/api/answers/${answerId}/validate`,
     );
 
     if (response.status === 401) {
-        localStorage.removeItem("user_token");
-        localStorage.removeItem("user");
-        return router.push("/login");
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user");
+      return router.push("/login");
     }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     const result = await response.json();
 
     if (
@@ -368,7 +367,7 @@ const fetchAnswerValidation = async (answerId) => {
     ) {
       validatedAnswer.value = result;
       playSound(result.is_correct ? "correct" : "levelFailed");
-      // Spara nästa fråga som ska visas beroende på om svaret var korrekt eller inte, och uppdatera användarens nuvarande fråga i databasen
+
       const nextQuestionId =
         questions.value[currentIndex.value + 1]?.question_id;
       const questionIdToSave = result.is_correct
@@ -383,7 +382,6 @@ const fetchAnswerValidation = async (answerId) => {
       fetchUpdateCurrentQuestion(questionIdToSave);
     }
   } catch (err) {
-    // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
     if (
       String(route.params.levelId) === String(validationLevelId) &&
       selectedAnswerId.value === answerId
@@ -392,9 +390,8 @@ const fetchAnswerValidation = async (answerId) => {
     }
   } finally {
     isSubmittingAnswer.value = false;
-  };
-
-
+  }
+};
 
 const saveAnswerToStatistics = async (answerId, questionId) => {
   const token = localStorage.getItem("user_token");
