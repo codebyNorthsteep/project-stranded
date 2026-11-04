@@ -34,6 +34,22 @@ function getEventMessage(event) {
   }
 }
 
+function formatTimeStamp(timestamp){
+  if (!timestamp) return "";
+
+  const date = new Date(
+    typeof timestamp === "string" ? timestamp.replace(" ", "T") : timestamp
+  );
+
+  if (Number.isNaN(date.getTime())) return "";
+
+  return new Intl.DateTimeFormat("sv-SE", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(date);
+}
+
+
 async function fetchStats() {
   try {
     const token = localStorage.getItem("user_token");
@@ -119,6 +135,7 @@ onMounted(fetchStats);
           >
             {{ getEventMessage(event) }}
           </span>
+          <small>{{ formatTimeStamp(event.answer_timestamp) }}</small>
         </div>
       </div>
     </section>
