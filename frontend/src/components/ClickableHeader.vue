@@ -63,6 +63,8 @@ function goHome() {
 
 .main-header {
   display: flex;
+  flex-wrap: wrap;
+  row-gap: 8px;
   justify-content: space-between;
   align-items: center;
   width: 100%;

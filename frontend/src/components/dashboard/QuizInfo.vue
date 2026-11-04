@@ -23,11 +23,15 @@ const onDialogClick = (event) => {
   <dialog
     class="quiz-info-dialog"
     id="quiz-info-dialog"
+    aria-labelledby="quiz-info-title"
+    aria-describedby="quiz-info-description"
     ref="quizInfoDialog"
     @click="onDialogClick"
   >
-    <h2 class="quiz-info-title">Quiz Information</h2>
-    <p class="quiz-info-description">
+    <h2 class="quiz-info-title" id="quiz-info-title" aria-label="Quiz Information">
+      Quiz Information
+    </h2>
+    <p class="quiz-info-description" id="quiz-info-description">
       Här kan du testa dina kunskaper inom överlevnad i extrema miljöer och ha
       kul samtidigt. Varje fråga har flera svarsalternativ, och du tar dig
       vidare för varje korrekt svar. Lycka till!
@@ -54,7 +58,7 @@ const onDialogClick = (event) => {
         </li>
         <li>
           <strong>Lås upp & Avklara:</strong> När du klarar sista frågan i en
-          nivå låses nästa nivå upp. Klarar du alla frågor i hela spelet
+          nivå låses nästa nivå upp efter du har klickat på "Slutför nivå". Klarar du alla frågor i hela spelet
           markeras alla nivåer som <em>Avklarade</em>.
         </li>
       </ul>
@@ -141,7 +145,7 @@ h3 {
 }
 
 .info-btn:hover {
-  transform: scale(1.7);
+  transform: scale(1.20);
 }
 
 .button {
@@ -154,7 +158,7 @@ h3 {
 }
 
 .button:hover {
-  transform: scale(1.4);
+  transform: scale(1.2);
 }
 
 @media (min-width: 768px) {
