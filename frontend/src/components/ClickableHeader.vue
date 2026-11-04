@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { useRouter,useRoute } from "vue-router";
 import BurgerMenu from '../components/dashboard/BurgerMenu.vue';
+import QuizInfo from '../components/dashboard/QuizInfo.vue';
 
 
 const router = useRouter();
@@ -37,14 +38,12 @@ function goHome() {
 
     <h1 v-else class="clickable-header">Stranded</h1>
 
-    <BurgerMenu v-if="isDashboardPage" />
-
+    <div class="header-actions">
+      <QuizInfo v-if="isDashboardPage || isQuizpage" />
+      <BurgerMenu v-if="isDashboardPage" />
     <div v-if="route.path.startsWith('/quiz')" class="dashboard-button-container">
-    <router-link  
-    to="/dashboard" 
-    class="button">
-    Gå till Dashboard
-    </router-link>
+      <router-link to="/dashboard" class="button">Gå till Dashboard</router-link>
+    </div>
     </div>
 
     </header>
@@ -68,6 +67,12 @@ function goHome() {
   align-items: center;
   width: 100%;
   box-sizing: border-box;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 h1 {
