@@ -18,10 +18,12 @@ function getCurrentQuestionForUser(userId) {
 }
 
 async function saveAnswerAttempt(userId, questionId, answerId) {  const answerRows = await query(
-     `SELECT is_correct
-     FROM answers
-     WHERE answer_id = ? AND question_id = ?`,
-    [answerId, questionId],
+     `SELECT a.is_correct
+   FROM answers a
+   JOIN users_questions uq
+   ON uq.user_id = ? AND uq.current_question_id = a.question_id
+  WHERE a.answer_id = ? AND a.question_id = ?`,
+  [userId, answerId, questionId],
   );
 
   if(answerRows.length ===0){
