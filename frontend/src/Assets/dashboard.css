@@ -161,7 +161,7 @@ font-family: Syne Mono, monospace;
 }
 .dashboard-container {
   display: grid;
-  grid-template-columns: minmax(0, 700px) minmax(240px, 300px);
+  grid-template-columns: minmax(0, 700px) minmax(280px, 450px);
   grid-template-areas: "main stats";
   justify-content: center;
   align-items: start;
