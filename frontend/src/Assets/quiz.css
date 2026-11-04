@@ -200,6 +200,10 @@ ul {
   color: #1ad920;
 }
 
+.button:hover {
+  transform: scale(1.02);
+}
+
 .correct-msg {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
