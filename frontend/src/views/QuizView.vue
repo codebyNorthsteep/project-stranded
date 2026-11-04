@@ -71,25 +71,26 @@ const isLast = computed(
   () => currentIndex.value === questions.value.length - 1,
 );
 
-const nextQuestion = () => {
+const nextQuestion = async () => {
   if (!isLast.value) {
     currentIndex.value++;
     validatedAnswer.value = null;
     selectedAnswerId.value = null;
-  } else {
-    //If it's last question,
-    //We have to check if it's the last question of the last level, in that case, we show the component quiz completed
+    return;
+  }
 
-    //om det är sista frågan på sista nivån, markera quizzet som slutfört, annars markera nivån som slutförd
-    if (isLastLevelOfQuiz.value) {
-      isQuizCompleted.value = true;
-      playSound("quizComplete");
-      completeQuiz();
-    } else {
-      isLevelCompleted.value = true;
-      playSound("levelComplete");
-      completeLevel();
-    }
+  if (isLastLevelOfQuiz.value) {
+    isQuizCompleted.value = true;
+    playSound("quizComplete");
+    completeQuiz();
+    return;
+  }
+
+  const completed = await completeLevel();
+
+  if (completed) {
+    isLevelCompleted.value = true;
+    playSound("levelComplete");
   }
 };
 
@@ -110,14 +111,18 @@ const completeLevel = async () => {
     if (response.status === 401) {
       localStorage.removeItem("user_token");
       localStorage.removeItem("user");
-      return router.push("/login");
+      router.push("/login");
+      return false;
     }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    return true;
   } catch (err) {
     error.value = err.message;
+    return false;
   }
 };
 
@@ -280,7 +285,9 @@ const fetchQuestions = async (
   const targetQuestionId =
     resume && route.query.questionId ? Number(route.query.questionId) : null;
 
-  // Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
+  /*Kontrollera att vi fortfarande är på samma nivå som när vi började hämta 
+   frågorna så att vi inte uppdaterar state med fel data om användaren 
+   navigerar bort innan fetchen är klar*/
   const isCurrentRequestedLevel = () =>
     String(route.params.levelId) === String(requestedLevelId);
   try {
