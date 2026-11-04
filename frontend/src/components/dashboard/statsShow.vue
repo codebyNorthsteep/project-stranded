@@ -204,4 +204,9 @@ h3 {
   border-radius: 8px;
   background: var(--card-bg);
 }
+
+.stats-log-item small {
+  display: block;
+  margin-top: 4px;
+}
 </style>
