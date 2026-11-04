@@ -260,7 +260,7 @@ progress::-moz-progress-bar {
 .quiz-completed-message {
   width: 100%;
   max-width: 700px;
-  margin-top: 20px;
+  margin: 20px auto 0;
   padding: 15px;
   background-color: var(--card-bg);
   color: var(--text-color);

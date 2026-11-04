@@ -17,6 +17,8 @@ const error = ref(null);
 const questions = ref([]);
 const currentIndex = ref(0);
 const levels = ref([]);
+const isSubmittingAnswer = ref(false);
+const statisticsSavedForSelection = ref(null);
 
 //håll koll på sekvensnumret för att hantera race conditions vid flera fetch-anrop
 //todo: kolla på att refaktorera detta till en bättre lösning
@@ -69,25 +71,26 @@ const isLast = computed(
   () => currentIndex.value === questions.value.length - 1,
 );
 
-const nextQuestion = () => {
+const nextQuestion = async () => {
   if (!isLast.value) {
     currentIndex.value++;
     validatedAnswer.value = null;
     selectedAnswerId.value = null;
-  } else {
-    //If it's last question,
-    //We have to check if it's the last question of the last level, in that case, we show the component quiz completed
+    return;
+  }
 
-    //om det är sista frågan på sista nivån, markera quizzet som slutfört, annars markera nivån som slutförd
-    if (isLastLevelOfQuiz.value) {
-      isQuizCompleted.value = true;
-      playSound("quizComplete");
-      completeQuiz();
-    } else {
-      isLevelCompleted.value = true;
-      playSound("levelComplete");
-      completeLevel();
-    }
+  if (isLastLevelOfQuiz.value) {
+    isQuizCompleted.value = true;
+    playSound("quizComplete");
+    completeQuiz();
+    return;
+  }
+
+  const completed = await completeLevel();
+
+  if (completed) {
+    isLevelCompleted.value = true;
+    playSound("levelComplete");
   }
 };
 
@@ -108,14 +111,18 @@ const completeLevel = async () => {
     if (response.status === 401) {
       localStorage.removeItem("user_token");
       localStorage.removeItem("user");
-      return router.push("/login");
+      router.push("/login");
+      return false;
     }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    return true;
   } catch (err) {
     error.value = err.message;
+    return false;
   }
 };
 
@@ -278,7 +285,9 @@ const fetchQuestions = async (
   const targetQuestionId =
     resume && route.query.questionId ? Number(route.query.questionId) : null;
 
-  // Kontrollera att vi fortfarande är på samma nivå som när vi började hämta frågorna så att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
+  /*Kontrollera att vi fortfarande är på samma nivå som när vi började hämta 
+   frågorna så att vi inte uppdaterar state med fel data om användaren 
+   navigerar bort innan fetchen är klar*/
   const isCurrentRequestedLevel = () =>
     String(route.params.levelId) === String(requestedLevelId);
   try {
@@ -322,23 +331,41 @@ const fetchQuestions = async (
 };
 
 const fetchAnswerValidation = async (answerId) => {
+  if (isSubmittingAnswer.value) return;
+
+  isSubmittingAnswer.value = true;
   selectedAnswerId.value = answerId;
-  const validationLevelId = route.params.levelId; // Spara nuvarande nivå när anropet startar för att säkerställa att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
+  error.value = null;
+
+  const questionId = currentQuestion.value?.question_id;
+  const selectionKey = `${questionId}-${answerId}`;
+  const validationLevelId = route.params.levelId;
 
   try {
+    if (statisticsSavedForSelection.value !== selectionKey) {
+      try {
+        await saveAnswerToStatistics(answerId, questionId);
+        statisticsSavedForSelection.value = selectionKey;
+      } catch (err) {
+        error.value = `Fel vid sparande av svaret: ${err.message}`;
+        return;
+      }
+    }
+
     const response = await fetch(
       `http://localhost:3000/api/answers/${answerId}/validate`,
     );
 
     if (response.status === 401) {
-        localStorage.removeItem("user_token");
-        localStorage.removeItem("user");
-        return router.push("/login");
+      localStorage.removeItem("user_token");
+      localStorage.removeItem("user");
+      return router.push("/login");
     }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+
     const result = await response.json();
 
     if (
@@ -347,7 +374,7 @@ const fetchAnswerValidation = async (answerId) => {
     ) {
       validatedAnswer.value = result;
       playSound(result.is_correct ? "correct" : "levelFailed");
-      // Spara nästa fråga som ska visas beroende på om svaret var korrekt eller inte, och uppdatera användarens nuvarande fråga i databasen
+
       const nextQuestionId =
         questions.value[currentIndex.value + 1]?.question_id;
       const questionIdToSave = result.is_correct
@@ -362,14 +389,40 @@ const fetchAnswerValidation = async (answerId) => {
       fetchUpdateCurrentQuestion(questionIdToSave);
     }
   } catch (err) {
-    // Samma säkerhetskoll i catch-blocket så vi inte sätter felmeddelande på fel nivå
     if (
       String(route.params.levelId) === String(validationLevelId) &&
       selectedAnswerId.value === answerId
     ) {
       error.value = err.message;
     }
+  } finally {
+    isSubmittingAnswer.value = false;
   }
+};
+
+const saveAnswerToStatistics = async (answerId, questionId) => {
+  const token = localStorage.getItem("user_token");
+  if (!token) {
+    throw new Error("Du måste logga in för att spara ditt svar.");
+  }
+
+  const response = await fetch(
+    `http://localhost:3000/api/answers/${answerId}/submit`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ questionId }),
+    },
+  );
+const data = await response.json();
+  if (!response.ok) {
+    throw new Error(`Kunde inte spara svaret: ${response.status}`);
+  }
+
+  return data;
 };
 
 const fetchUpdateCurrentQuestion = async (questionId) => {
@@ -482,7 +535,7 @@ onMounted(() => {
                   validatedAnswer && answer.answer_id !== selectedAnswerId,
               }"
               @click="fetchAnswerValidation(answer.answer_id)"
-              :disabled="validatedAnswer"
+              :disabled="validatedAnswer || isSubmittingAnswer"
             >
               <span class="letter">
                 <span
