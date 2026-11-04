@@ -324,10 +324,10 @@ const fetchQuestions = async (
 
 const fetchAnswerValidation = async (answerId) => {
   selectedAnswerId.value = answerId;
-  await saveAnswerToStatistics(answerId, currentQuestion.value.question_id);
-  try{
-    await validateAnswer(answerId, currentQuestion.value.question_id);
-  }catch(err){
+  
+  try{ 
+    await saveAnswerToStatistics(answerId, currentQuestion.value.question_id);
+    }catch(err){
     error.value = ("Fel vid sparande av svaret: " + err);
   }
   const validationLevelId = route.params.levelId; // Spara nuvarande nivå när anropet startar för att säkerställa att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
