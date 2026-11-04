@@ -32,7 +32,7 @@ async function getCorrectAnswersByLevel(userId) {
 
 async function getUserStatisticsLog(userId) {
   const sql = `
-    SELECT s.stat_id, s.answer_timestamp, a.is_correct, q.question_title, l.level_id
+    SELECT s.stat_id, s.answer_timestamp, a.is_correct, q.question_title, l.level_id, q.question_id
     FROM statistics s
     JOIN answers a ON s.answer_id = a.answer_id
     JOIN questions q ON a.question_id = q.question_id

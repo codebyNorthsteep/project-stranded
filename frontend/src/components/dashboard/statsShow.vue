@@ -10,13 +10,28 @@ const stats = ref([
 const statslog = ref([]);
 
 const levelNames = {
-  1: "Svenska skog",
+  1: "Svensk skog",
   2: "Amazonas",
   3: "Sahara",
+};
+const completionMessages = {
+  10: "Du har klarat nivå 1:Svensk skog!",
+  20: "Du har klarat nivå 2:Amazonas!",
+  30: "Du har klarat nivå 3:Sahara!",
 };
 
 function getLevel(id) {
   return stats.value.find((level) => Number(level.level_id) === id);
+}
+
+function getEventMessage(event) {
+  const isCorrect = Number(event.is_correct) === 1;
+  const completionMessage = completionMessages[event.question_id];
+  if (isCorrect && completionMessage) {
+    return completionMessage;
+  } else {
+    return `${isCorrect ? "Rätt" : "Fel"} svar på ${event.question_title} (${levelNames[event.level_id] ?? event.level_id})`;
+  }
 }
 
 async function fetchStats() {
@@ -47,8 +62,8 @@ async function fetchStats() {
     const question = await questionResponse.json();
     const { statistics_log } = await userStatsLogResponse.json();
     statslog.value = statistics_log.filter(
-  (event) => Number(event.is_correct) === 0 || Number(event.is_correct) === 1)
-;
+  (event) => [10, 20, 30].includes(Number(event.question_id)) ||
+    Number(event.is_correct) === 0);
 
     const currentLevelId =
       Number(question?.current_level_id) || 1;
@@ -98,13 +113,9 @@ onMounted(fetchStats);
 
         <ul v-else>
           <li v-for="event in statslog" :key="event.stat_id">
-            {{ new Date(event.answer_timestamp).toLocaleString("sv-SE") }}
-            <span :class="Number(event.is_correct) === 1 ? 'answer-correct' : 'answer-wrong'">
-            {{ Number(event.is_correct) === 1 ? "Rätt" : "Fel" }}
+            <span :class="event.is_correct == 1 ? 'answer-correct' : 'answer-wrong'">
+              {{ getEventMessage(event) }}  
             </span>
-            svar på
-            {{ event.question_title }}
-            ({{ levelNames[event.level_id] ?? event.level_id }})
           </li>
         </ul>
       </section>
