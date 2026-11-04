@@ -398,12 +398,12 @@ const saveAnswerToStatistics = async (answerId, questionId) => {
       body: JSON.stringify({ questionId }),
     },
   );
-
+const data = await response.json();
   if (!response.ok) {
     throw new Error(`Kunde inte spara svaret: ${response.status}`);
   }
 
-  return response.json();
+  return data;
 };
 
 const fetchUpdateCurrentQuestion = async (questionId) => {

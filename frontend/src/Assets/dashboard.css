@@ -207,7 +207,7 @@ font-family: Syne Mono, monospace;
 }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
 .dashboard-container {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
