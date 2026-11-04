@@ -17,6 +17,7 @@ const error = ref(null);
 const questions = ref([]);
 const currentIndex = ref(0);
 const levels = ref([]);
+const isSubmittingAnswer = ref(false);
 
 //håll koll på sekvensnumret för att hantera race conditions vid flera fetch-anrop
 //todo: kolla på att refaktorera detta till en bättre lösning
@@ -370,6 +371,8 @@ const fetchAnswerValidation = async (answerId) => {
     ) {
       error.value = err.message;
     }
+  } finally {
+    isSubmittingAnswer.value = false;
   }
 };
 
@@ -508,7 +511,7 @@ onMounted(() => {
                   validatedAnswer && answer.answer_id !== selectedAnswerId,
               }"
               @click="fetchAnswerValidation(answer.answer_id)"
-              :disabled="validatedAnswer"
+              :disabled="validatedAnswer || isSubmittingAnswer"
             >
               <span class="letter">
                 <span
