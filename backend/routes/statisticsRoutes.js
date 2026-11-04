@@ -24,4 +24,11 @@ router.get(
     userMiddleware.isLoggedIn,
     statisticsController.getUserStatisticsLog
 );
+
+router.get(
+  "/api/statistics/:user_id/correct-answers",
+  userMiddleware.isLoggedIn,
+  statisticsController.getCorrectAnswers
+);
+
 module.exports = router;

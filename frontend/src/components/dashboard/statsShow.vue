@@ -92,33 +92,36 @@ onMounted(fetchStats);
       <h3>{{ levelNames[id] }}</h3>
 
       <template v-if="getLevel(id)?.unlocked">
-        <p>
-          Rätt svar:
-          {{ getLevel(id)?.correct_answers ?? 0 }}
-        </p>
-
-        <p>
-          Fel svar:
-          {{ getLevel(id)?.wrong_answers ?? 0 }}
-        </p>
+        <p>Rätt svar: {{ getLevel(id)?.correct_answers ?? 0 }}</p>
+        <p>Fel svar: {{ getLevel(id)?.wrong_answers ?? 0 }}</p>
       </template>
-      <p v-else>
-        🔒 Låst nivå
-      </p>
-    </div>
-      <section class="level-card">
-        <h3>Statistiklogg</h3>
 
-        <p v-if="statslog.length === 0">Inga loggposter ännu.</p>
+      <p v-else>🔒 Låst nivå</p>
+       </div>
 
-        <ul v-else>
-          <li v-for="event in statslog" :key="event.stat_id">
-            <span :class="event.is_correct == 1 ? 'answer-correct' : 'answer-wrong'">
-              {{ getEventMessage(event) }}  
-            </span>
-          </li>
-        </ul>
-      </section>
+    <section class="level-card">
+      <h3>Statistiklogg</h3>
+
+      <p v-if="statslog.length === 0">Inga loggposter ännu.</p>
+
+      <div v-else class="stats-log-list">
+        <div
+          v-for="event in statslog"
+          :key="event.stat_id"
+          class="stats-log-item"
+        >
+          <span
+            :class="
+              Number(event.is_correct) === 1
+                ? 'answer-correct'
+                : 'answer-wrong'
+            "
+          >
+            {{ getEventMessage(event) }}
+          </span>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -143,14 +146,13 @@ h3 {
   color: var(--accent-gold);
 }
 
-
 .level-card {
   padding: 16px;
   margin-bottom: 12px;
   border: 1px solid var(--border-color);
   border-radius: 12px;
   background: rgba(18, 29, 17, 0.35);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
@@ -163,6 +165,7 @@ h3 {
   margin: 6px 0;
   color: var(--accent-gold);
 }
+
 .answer-correct {
   color: #7ed957;
   font-weight: 600;
@@ -171,5 +174,17 @@ h3 {
 .answer-wrong {
   color: #ff6b6b;
   font-weight: 600;
+}
+.stats-log-list {
+  display: grid;
+  gap: 10px;
+}
+
+.stats-log-item {
+  display: block;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card-bg);
 }
 </style>

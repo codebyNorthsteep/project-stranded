@@ -1,5 +1,4 @@
 const statisticsService = require("../services/statisticsService");
-const rightAnswerService = require("../services/RightAnswerServices");
 
 exports.getCurrentQuestionForUser = async (req, res) => {
   try {
@@ -81,8 +80,7 @@ exports.getUserStatisticsLog = async (req, res) => {
   }
   try {
     const statisticsLog = 
-    await rightAnswerService.getUserStatisticsLog(userId);
-    
+      await statisticsService.getUserStatisticsLog(userId);    
     return res.json({ statistics_log: statisticsLog });
   } catch (error) {
     console.error("Could not fetch user statistics log:", error);
@@ -99,27 +97,41 @@ exports.getLevelsStatistics = async (req, res) => {
   const userId = Number(req.userData?.id);
 
   if (!Number.isInteger(userId) || userId < 1) {
-    return res.status(401).json({
-      error: "You must be logged in.",
-    });
+    return res.status(401).json({ error: "You must be logged in." });
   }
 
   if (String(req.params.userId) !== String(userId)) {
-    return res.status(403).json({
-      error: "Access denied.",
-    });
+    return res.status(403).json({ error: "Access denied." });
   }
 
   try {
-    const levels =
-      await rightAnswerService.getCorrectAnswersByLevel(userId);
-
+    const levels = await statisticsService.getCorrectAnswersByLevel(userId);
     return res.json({ levels });
   } catch (error) {
     console.error("Could not fetch level statistics:", error);
+    return res.status(500).json({ error: "Could not fetch statistics." });
+  }
+};
 
+exports.getCorrectAnswers = async (req, res) => {
+  const userId = Number(req.params.user_id);
+  const authenticatedUserId = Number(req.userData?.id);
+
+  if (!Number.isInteger(userId) || userId < 1) {
+    return res.status(400).json({ error: "Ogiltigt user_id." });
+  }
+
+  if (authenticatedUserId !== userId) {
+    return res.status(403).json({ error: "Access denied." });
+  }
+
+  try {
+    const levels = await statisticsService.getCorrectAnswersByLevel(userId);
+    return res.json({ correct_questions: levels });
+  } catch (error) {
+    console.error("Fel vid hämtningen av statistik:", error);
     return res.status(500).json({
-      error: "Could not fetch statistics.",
+      error: "Ett problem uppstod vid hämtningen av statistik.",
     });
   }
 };
