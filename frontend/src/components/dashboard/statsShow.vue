@@ -135,7 +135,7 @@ onMounted(fetchStats);
           >
             {{ getEventMessage(event) }}
           </span>
-          <small>{{ formatTimeStamp(event.answer_timestamp) }}</small>
+          <small>{{ formatTimeStamp(event.answer_timestamp) }}</small>        
         </div>
       </div>
     </section>
