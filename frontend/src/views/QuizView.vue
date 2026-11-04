@@ -333,16 +333,16 @@ const fetchAnswerValidation = async (answerId) => {
   const questionId = currentQuestion.value?.question_id;
   const selectionKey = `${questionId}-${answerId}`;
 
-  try {
-    if (statisticsSavedForSelection.value !== selectionKey) {
-      try {
-        await saveAnswerToStatistics(answerId, questionId);
-        statisticsSavedForSelection.value = selectionKey;
-      } catch (err) {
-        error.value = `Fel vid sparande av svaret: ${err.message}`;
-        return;
-      }
+ try {
+  if (statisticsSavedForSelection.value !== selectionKey) {
+    try {
+      await saveAnswerToStatistics(answerId, questionId);
+      statisticsSavedForSelection.value = selectionKey;
+    } catch (err) {
+      error.value = `Fel vid sparande av svaret: ${err.message}`;
+      return;
     }
+  }
 
   const validationLevelId = route.params.levelId; // Spara nuvarande nivå när anropet startar för att säkerställa att vi inte uppdaterar state med fel data om användaren navigerar bort innan fetchen är klar
 
