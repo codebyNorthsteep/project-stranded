@@ -34,18 +34,17 @@ function getEventMessage(event) {
   }
 }
 
-function formatTimeStamp(timestamp){
+function formatTimeStamp(timestamp) {
   if (!timestamp) return "";
 
-  const date = new Date(
-    typeof timestamp === "string" ? timestamp.replace(" ", "T") : timestamp
-  );
+  const date = new Date(timestamp);
 
   if (Number.isNaN(date.getTime())) return "";
 
   return new Intl.DateTimeFormat("sv-SE", {
     dateStyle: "short",
     timeStyle: "short",
+    timeZone: "Europe/Stockholm",
   }).format(date);
 }
 

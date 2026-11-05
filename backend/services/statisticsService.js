@@ -35,7 +35,7 @@ async function saveAnswerAttempt(userId, questionId, answerId) {
 
   await query(
     `INSERT INTO statistics (user_id, answer_id, answer_timestamp)
-     VALUES (?, ?, CURRENT_TIMESTAMP)`,
+     VALUES (?, ?, UTC_TIMESTAMP())`,
      [userId,answerId],
   );
 
