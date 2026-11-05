@@ -94,6 +94,7 @@ async function getUserStatisticsLog(userId) {
     JOIN questions q ON a.question_id = q.question_id
     JOIN level l ON q.level_id = l.level_id
     WHERE s.user_id = ?
+    AND(a.is_correct = 0 OR q.question_id IN (10,20,30))
      ORDER BY s.answer_timestamp DESC, s.stat_id DESC
     LIMIT 10;
     `;
