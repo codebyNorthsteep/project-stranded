@@ -34,18 +34,17 @@ function getEventMessage(event) {
   }
 }
 
-function formatTimeStamp(timestamp){
+function formatTimeStamp(timestamp) {
   if (!timestamp) return "";
 
-  const date = new Date(
-    typeof timestamp === "string" ? timestamp.replace(" ", "T") : timestamp
-  );
+  const date = new Date(timestamp);
 
   if (Number.isNaN(date.getTime())) return "";
 
   return new Intl.DateTimeFormat("sv-SE", {
     dateStyle: "short",
     timeStyle: "short",
+    timeZone: "Europe/Stockholm",
   }).format(date);
 }
 
@@ -175,11 +174,6 @@ h3 {
   background: rgba(18, 29, 17, 0.35);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
   transition: border-color 0.2s ease, background 0.2s ease;
-}
-
-.level-card:hover {
-  border-color: var(--accent-gold);
-  background: rgba(18, 29, 17, 0.5);
 }
 
 .level-card p {
