@@ -20,10 +20,8 @@ function getCurrentQuestionForUser(userId) {
 async function saveAnswerAttempt(userId, questionId, answerId) {  const answerRows = await query(
      `SELECT a.is_correct
    FROM answers a
-   JOIN users_questions uq
-   ON uq.user_id = ? AND uq.current_question_id = a.question_id
   WHERE a.answer_id = ? AND a.question_id = ?`,
-  [userId, answerId, questionId],
+  [answerId, questionId],
   );
 
   if(answerRows.length ===0){
@@ -91,8 +89,9 @@ async function getUserStatisticsLog(userId) {
     JOIN questions q ON a.question_id = q.question_id
     JOIN level l ON q.level_id = l.level_id
     WHERE s.user_id = ?
+      AND(a.is_correct = 0 OR (a.is_correct =1 AND q.question_id IN (10,20,30)))
      ORDER BY s.answer_timestamp DESC, s.stat_id DESC
-    LIMIT 3;
+    LIMIT 10;
     `;
 
   return query(sql, [userId]);
