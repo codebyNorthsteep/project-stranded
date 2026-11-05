@@ -57,8 +57,6 @@ main {
   background-attachment: scroll;
   background-color: var(--card-bg);
   border-top: 2px solid var(--accent-gold);
-  padding-top: 10px;
-  padding-bottom: 10px;
   font-family: "Syne Mono", monospace;
 }
 
