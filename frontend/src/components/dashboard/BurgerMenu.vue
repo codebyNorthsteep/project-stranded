@@ -139,10 +139,6 @@ h1 {
   margin: 0;
 }
 
-.menu-main {
-  border-top: 2px solid var(--accent-gold);
-}
-
 .menu-footer {
   display: flex;
   justify-content: center;
