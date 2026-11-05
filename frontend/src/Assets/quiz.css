@@ -1,27 +1,42 @@
-.quiz-container {
-  max-width: 420px;
+body {
+  margin: 0;
   min-height: 100vh;
-  margin: 0 auto;
-  padding: 24px 20px;
-  background-color: var(--bg-dark);
-  color: var(--text-light);
-  box-sizing: border-box;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Gör så att bilden täcker hela fönstret även vid scroll */
+}
+
+.quiz-container {
+  width: 100%;
+  max-width: none;
+  min-height: calc(100vh - 160px); /* ungefär header + footer */
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #level-background-svensk-skog {
-  background-image: url(https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Stig_i_svensk_skog.jpg/960px-Stig_i_svensk_skog.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20220531181304);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url(https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Stig_i_svensk_skog.jpg/960px-Stig_i_svensk_skog.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail&_=20220531181304);
   background-size: cover;
   background-position: center;
 }
 
 #level-background-amazonas {
-  background-image: url(https://betterwood.se/wp-content/uploads/2020/12/Amazonas-Peru.jpg);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url(https://betterwood.se/wp-content/uploads/2020/12/Amazonas-Peru.jpg);
   background-size: cover;
   background-position: center;
 }
 
 #level-background-sahara {
-  background-image: url(https://images.pexels.com/photos/1731660/pexels-photo-1731660.jpeg?cs=srgb&dl=pexels-the-trvlr-1731660.jpg&fm=jpg&_gl=1*1hnacrd*_ga*MTg0OTE1NzY4My4xNzg5NTYwMDIx*_ga_8JE65Q40S6*czE3OTE0NTk1NDQkbzMkZzEkdDE3OTE0NTk3ODMkajYwJGwwJGgw);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url(https://images.pexels.com/photos/1731660/pexels-photo-1731660.jpeg?cs=srgb&dl=pexels-the-trvlr-1731660.jpg&fm=jpg&_gl=1*1hnacrd*_ga*MTg0OTE1NzY4My4xNzg5NTYwMDIx*_ga_8JE65Q40S6*czE3OTE0NTk1NDQkbzMkZzEkdDE3OTE0NTk3ODMkajYwJGwwJGgw);
   background-size: cover;
   background-position: center;
 }
@@ -37,6 +52,8 @@
 }
 
 .quiz-content {
+  width: 100%;
+  max-width: 1100px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -104,6 +121,7 @@ progress::-moz-progress-bar {
 .question-card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
+  background-color: rgba(18, 29, 17, 0.88);
   border-radius: 16px;
   padding: 20px;
 }
@@ -116,9 +134,9 @@ progress::-moz-progress-bar {
 }
 
 .question-text {
-  font-size: 14px;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
   line-height: 1.4;
-  letter-spacing: 0.08em;
   margin: 0;
   color: var(--text-light);
   font-weight: 300;
@@ -156,6 +174,10 @@ ul {
   font-size: 0.95rem;
 }
 
+.answers {
+  margin-top: 8px;
+}
+
 .answer-content {
   display: flex;
   flex-direction: column;
@@ -166,7 +188,7 @@ ul {
 .answer-text {
   font-size: 0.95rem;
   line-height: 1.35;
-  color: #d1ddd0;
+  color: var(--text-light);
 }
 
 .answer-img {
@@ -176,10 +198,16 @@ ul {
   border-radius: 6px;
 }
 
+.answers .button {
+  width: 100%;
+  text-align: left;
+  background-color: rgba(18, 29, 17, 0.88);
+}
+
 .correct-answer {
   border-color: #1ad920;
   color: #1ad920;
-  transform: scale(1.1);
+  transform: scale(1.02);
 }
 
 .button.dimmed-answer {
@@ -228,14 +256,10 @@ ul {
   width: 40%;
 }
 
-/* ==========================================================================
-   MEDIA QUERIES FOR TABLET & DESKTOP :)
-   ========================================================================== */
+/*   MEDIA QUERIES */ 
 
 @media (min-width: 768px) {
   .quiz-container {
-    max-width: 90%;
-    padding: 60px 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -243,8 +267,6 @@ ul {
 
   .quiz-content {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 32px;
     width: 100%;
     align-items: start;
   }
@@ -262,24 +284,59 @@ ul {
   .quiz-header {
     grid-column: 2;
     grid-row: 1;
-
-    background-color: rgb(18, 29, 17, 0.88);
+    background-color: rgba(18, 29, 17, 0.88);
     border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 24px 20px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 16px;
   }
 
+  .answers .button {
+    width: 100%;
+    text-align: left;
+  }
+}
 
+/* Tablet (768px till 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .quiz-content {
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 32px;
+  }
 
   .level-info {
     flex-direction: column;
     align-items: center;
     gap: 20px;
     width: 100%;
+  }
+}
+
+/* Desktop (1024px och uppåt) */
+@media (min-width: 1024px) {
+  .quiz-content {
+    grid-template-columns: 1.5fr 1fr;
+    gap: 48px;
+    row-gap: 32px;
+  }
+
+  .answers .button {
+    padding: 16px 20px;
+    gap: 16px;
+  }
+
+  ul {
+    gap: 16px;
+  }
+
+  .level-info {
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
   }
 }

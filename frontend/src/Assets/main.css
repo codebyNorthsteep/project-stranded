@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik+Distressed&family=Syne+Mono&family=Winky+Rough:ital,wght@0,300..900;1,300..900&display=swap%27');
+@import url("https://fonts.googleapis.com/css2?family=Rubik+Distressed&family=Syne+Mono&family=Winky+Rough:ital,wght@0,300..900;1,300..900&display=swap%27");
 
 :root {
   --bg-dark: #121d11;
@@ -9,7 +9,8 @@
   --border-color: #273b24;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -31,7 +32,7 @@ header {
 }
 
 h1 {
-  font-family: 'Rubik Distressed', cursive;
+  font-family: "Rubik Distressed", cursive;
   font-size: 1.8rem;
   color: var(--accent-gold);
   letter-spacing: 6px;
@@ -48,11 +49,14 @@ label {
 
 main {
   flex: 1;
+  background-image:
+    linear-gradient(rgba(18, 29, 17, 0.75), rgba(18, 29, 17, 0.75)),
+    url("../Assets/images/stranded.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: scroll;
   background-color: var(--card-bg);
-  border-top: 2px solid var(--accent-gold);
-  padding-top: 10px;
-  padding-bottom: 10px;
-  font-family: 'Syne Mono', monospace;
+  font-family: "Syne Mono", monospace;
 }
 
 .button {
@@ -69,10 +73,12 @@ main {
   color: var(--text-light);
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
   font-family: inherit;
 }
- 
+
 .button:hover {
   border-color: var(--accent-gold);
   background-color: #21331f;
@@ -80,7 +86,6 @@ main {
 
 footer {
   background-color: var(--bg-dark);
-  border-top: 2px solid var(--accent-gold);
   padding-top: 10px;
   font-size: 0.5rem;
   text-align: center;
@@ -88,14 +93,12 @@ footer {
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
-
   h1 {
     font-size: 3rem;
   }
 }
 
 @media (min-width: 1024px) {
-
   h1 {
     font-size: 4rem;
   }
