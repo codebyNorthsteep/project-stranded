@@ -177,11 +177,6 @@ h3 {
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.level-card:hover {
-  border-color: var(--accent-gold);
-  background: rgba(18, 29, 17, 0.5);
-}
-
 .level-card p {
   margin: 6px 0;
   color: var(--accent-gold);
