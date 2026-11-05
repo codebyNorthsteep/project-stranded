@@ -56,7 +56,6 @@ main {
   background-position: center;
   background-attachment: scroll;
   background-color: var(--card-bg);
-  border-top: 2px solid var(--accent-gold);
   font-family: "Syne Mono", monospace;
 }
 
@@ -87,7 +86,6 @@ main {
 
 footer {
   background-color: var(--bg-dark);
-  border-top: 2px solid var(--accent-gold);
   padding-top: 10px;
   font-size: 0.5rem;
   text-align: center;
