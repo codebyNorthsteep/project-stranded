@@ -22,7 +22,7 @@ import SocialLogin from "../../components/SocialLogin.vue";
   text-align: center;
   font-size: 1.1rem;
   margin-bottom: 20px;
-  margin-top: 20px;
+  margin-top: 70px;
 }
 
 .register-link {

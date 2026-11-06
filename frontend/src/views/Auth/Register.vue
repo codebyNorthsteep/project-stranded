@@ -20,7 +20,7 @@ import RegisterForm from "../../components/RegisterForm.vue";
   text-align: center;
   font-size: 1.1rem;
   margin-bottom: 20px;
-  margin-top: 20px;
+  margin-top: 70px;
   padding-left: 25px;
   padding-right: 25px;
 }
